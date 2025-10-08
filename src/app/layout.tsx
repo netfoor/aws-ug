@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import AmplifyClientProvider from "@/components/AmplifyClientProvider";
-//import { AuthProvider } from "../context/auth-context";
+import { AuthProvider } from "../context/auth-context";
 //import ThemeProviderWrapper from "../components/theme/ThemeProviderWrapper";
 
 
@@ -37,8 +37,7 @@ export default async function RootLayout({
       >
         {/* <ThemeProviderWrapper> */}
           <AmplifyClientProvider>
-            {children}
-            {/* <AuthProvider>{children}</AuthProvider> */}
+            <AuthProvider>{children}</AuthProvider>
           </AmplifyClientProvider>
         {/* </ThemeProviderWrapper> */}
       </body>
