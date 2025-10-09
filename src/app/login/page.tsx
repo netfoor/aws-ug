@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { login, isAuthenticated, isLoading, error } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function LoginPage() {
       setIsLoginLoading(true);
       await login(returnUrl);
     } catch (err) {
-      console.error('Error en login:', err);
+      console.error('Error al iniciar sesión:', err);
       // El error ya se maneja en el contexto
     } finally {
       setIsLoginLoading(false);
@@ -47,7 +48,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8" data-testid="login-container">
         <div>
           <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
             <svg
@@ -65,7 +66,7 @@ export default function LoginPage() {
             </svg>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Iniciar Sesión
+            Login
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Accede a AWS User Group Puebla
@@ -159,5 +160,20 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando página de login...</p>
+        </div>
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }

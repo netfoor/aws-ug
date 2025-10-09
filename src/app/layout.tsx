@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Foor.dev - AWS Cloud Engineer & DevOps Specialist",
-  description: "AWS Cloud Engineer specializing in serverless architecture, DevOps automation, and cloud infrastructure solutions.",
+  title: "AWS UG Puebla - User Group",
+  description: "AWS User Group Puebla - Community for cloud enthusiasts, developers, and DevOps professionals.",
 };
 
 export default async function RootLayout({

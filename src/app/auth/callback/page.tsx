@@ -1,11 +1,11 @@
 'use client';
 
-
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading, refreshUser, error } = useAuth();
@@ -21,24 +21,24 @@ export default function AuthCallbackPage() {
         
         if (error) {
           console.error('OAuth Error:', error, errorDescription);
-          setCallbackError(errorDescription || 'Error en la autenticación');
+          setCallbackError(errorDescription || 'Error al autenticar');
           setIsProcessing(false);
           return;
         }
 
-        // Obtener el returnUrl del customState si está disponible
-        const customState = searchParams.get('state');
-        let returnUrl = '/';
+        // Obtener la returnUrl desde sessionStorage (guardada durante el login)
+        let returnUrl = '/dashboard'; // Default seguro
         
-        // Si tenemos customState, podría contener la URL de retorno
-        if (customState) {
-          try {
-            // Intenta decodificar el customState
-            returnUrl = decodeURIComponent(customState);
-          } catch (e) {
-            // Si no se puede decodificar, usar la URL por defecto
-            returnUrl = '/';
+        try {
+          const storedReturnUrl = sessionStorage.getItem('auth_return_url');
+          if (storedReturnUrl && storedReturnUrl.startsWith('/')) {
+            returnUrl = storedReturnUrl;
+            // Limpiar el storage después de usar
+            sessionStorage.removeItem('auth_return_url');
           }
+        } catch (e) {
+          // Si hay error accediendo sessionStorage, usar default
+          console.warn('Error accessing sessionStorage:', e);
         }
 
         // Refrescar la información del usuario para asegurar que el contexto esté actualizado
@@ -59,7 +59,7 @@ export default function AuthCallbackPage() {
 
       } catch (err) {
         console.error('Error processing callback:', err);
-        setCallbackError('Error procesando la autenticación');
+        setCallbackError('Error al procesar la autenticación');
         setIsProcessing(false);
       }
     };
@@ -89,7 +89,7 @@ export default function AuthCallbackPage() {
               </svg>
             </div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Error de Autenticación
+              Error al Autenticar
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
               {callbackError}
@@ -144,5 +144,20 @@ export default function AuthCallbackPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    }>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

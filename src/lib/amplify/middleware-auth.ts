@@ -9,7 +9,7 @@
 // Verification function optimized for middleware's secure environment
 export async function verifyTokensInMiddleware(request: Request): Promise<{
   isValid: boolean;
-  userInfo?: any;
+  userInfo?: unknown;
   groups?: string[];
 }> {
   try {
@@ -24,6 +24,11 @@ export async function verifyTokensInMiddleware(request: Request): Promise<{
       // Validate token expiration
       const tokenExpiration = parseInt(cookies.token_exp);
       const currentTime = Math.floor(Date.now() / 1000);
+      
+      // Check if token_exp is a valid number
+      if (isNaN(tokenExpiration)) {
+        return { isValid: false };
+      }
       
       if (tokenExpiration <= currentTime) {
         // Token has expired

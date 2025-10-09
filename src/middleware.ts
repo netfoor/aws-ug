@@ -3,10 +3,10 @@ import { verifyTokens } from '@/lib/amplify/auth';
 import { verifyTokensInMiddleware, isUserAdmin } from '@/lib/amplify/middleware-auth';
 
 // Rutas que están protegidas y requieren autenticación en el middleware
-const PROTECTED_ROUTES = ['/profile', '/dashboard'];
+const PROTECTED_ROUTES = ['/profile', '/dashboard', '/admin'];
 
 // Rutas que requieren permisos de administrador EN EL MIDDLEWARE
-const ADMIN_ROUTES: string[] = [];
+const ADMIN_ROUTES: string[] = ['/admin'];
 
 // Rutas públicas (no requieren autenticación en middleware)
 const PUBLIC_ROUTES = ['/', '/login', '/auth/callback', '/access-denied'];
@@ -26,9 +26,7 @@ export async function middleware(request: NextRequest) {
 
   // 1. PERMITIR RUTAS PÚBLICAS Y AUTH CALLBACK
   if (PUBLIC_ROUTES.includes(pathname) || 
-      pathname.startsWith('/auth/') ||
-      pathname === '/admin' ||
-      pathname.startsWith('/admin/')) {
+      pathname.startsWith('/auth/')) {
     return NextResponse.next();
   }
 
@@ -69,7 +67,7 @@ export async function middleware(request: NextRequest) {
     // Si pasa todas las verificaciones, permitir acceso
     return NextResponse.next();
   } catch (error) {
-    console.error('Error en middleware de autenticación:', error);
+    console.error('Error al procesar middleware de autenticación:', error);
     
     // En caso de error, redirigir al login
     const loginUrl = new URL('/login?error=session_error', request.url);

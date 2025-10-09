@@ -44,7 +44,7 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="mt-2 text-gray-600">
-            Bienvenido de vuelta, {userAttributes?.given_name || user.signInDetails?.loginId?.split('@')[0] || 'Usuario'}
+            Bienvenido de vuelta, {String(userAttributes?.given_name) || user?.signInDetails?.loginId?.split('@')[0] || 'Usuario'}
           </p>
         </div>
 
@@ -271,7 +271,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       {userAttributes?.given_name && userAttributes?.family_name
-                        ? `${userAttributes.given_name} ${userAttributes.family_name}`
+                        ? `${String(userAttributes.given_name)} ${String(userAttributes.family_name)}`
                         : user.signInDetails?.loginId?.split('@')[0] || 'Usuario'
                       }
                     </p>
@@ -286,7 +286,7 @@ export default function DashboardPage() {
                     <span className="text-gray-500">Miembro desde</span>
                     <span className="text-gray-900">
                       {userAttributes?.created_at 
-                        ? new Date(userAttributes.created_at * 1000).toLocaleDateString()
+                        ? new Date(Number(userAttributes.created_at) * 1000).toLocaleDateString()
                         : 'Hoy'
                       }
                     </span>

@@ -14,7 +14,7 @@ import type { AuthUser } from 'aws-amplify/auth';
  */
 export async function verifyTokens(): Promise<{
   isValid: boolean;
-  tokens?: any;
+  tokens?: unknown;
   error?: Error;
 }> {
   try {
@@ -83,7 +83,7 @@ export async function verifyTokens(): Promise<{
  * @param error Error a procesar
  * @returns true si el usuario fue desconectado
  */
-export async function handleAuthError(error: any): Promise<boolean> {
+export async function handleAuthError(error: Error): Promise<boolean> {
   if (!error) return false;
   
   // Convert to string to check for common auth errors
@@ -138,12 +138,15 @@ export async function getCurrentUser() {
  * @returns Promise that resolves when sign in completes
  */
 export async function signInWithHostedUI(options?: { redirectUri?: string }) {
-  // Convert old-style redirectUri to customState which is used in the new API
-  const signInOptions = options?.redirectUri 
-    ? { customState: options.redirectUri }
-    : {};
+  // Store returnUrl in sessionStorage for retrieval after callback
+  if (options?.redirectUri) {
+    sessionStorage.setItem('auth_return_url', options.redirectUri);
+  }
   
-  return signInWithRedirect(signInOptions);
+  // Don't use customState for redirectUri - that's not what it's for
+  return signInWithRedirect({
+    provider: 'Google'  // Explicitly specify the provider
+  });
 }
 
 /**
@@ -151,7 +154,7 @@ export async function signInWithHostedUI(options?: { redirectUri?: string }) {
  * @param callback Function to call when auth events occur
  * @returns Unsubscribe function
  */
-export function createAuthListener(callback: (event: string, data: any) => void) {
+export function createAuthListener(callback: (event: string, data: unknown) => void) {
   return Hub.listen('auth', (data) => {
     const { payload } = data;
     callback(payload.event, payload);
@@ -169,7 +172,7 @@ async function checkIsUserAdmin(user: AuthUser): Promise<boolean> {
   }
 }
 
-async function getUserAttributes(user: AuthUser): Promise<Record<string, any> | null> {
+async function getUserAttributes(user: AuthUser): Promise<Record<string, unknown> | null> {
   try {
     const session = await fetchAuthSession();
     return session.tokens?.idToken?.payload || null;

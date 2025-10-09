@@ -11,6 +11,7 @@ import {
   checkIsUserAdmin,
   getUserAttributes
 } from '@/lib/amplify/auth';
+import { clearAuthCookies } from '@/lib/amplify/token-sync';
 
 /**
  * Interfaces para el contexto de autenticación
@@ -20,7 +21,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
-  userAttributes: Record<string, any> | null;
+    userAttributes: Record<string, unknown> | null;
   error: Error | null;
   login: (redirectUri?: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -34,18 +35,8 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-// Crear contexto con valores predeterminados
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  isAdmin: false,
-  userAttributes: null,
-  error: null,
-  login: async () => {},
-  logout: async () => {},
-  refreshUser: async () => {}
-});
+// Crear contexto sin valores predeterminados para detectar uso fuera del Provider
+const AuthContext = createContext<AuthContextType | null>(null);
 
 /**
  * Proveedor para el contexto de autenticación
@@ -55,7 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [userAttributes, setUserAttributes] = useState<Record<string, any> | null>(null);
+  const [userAttributes, setUserAttributes] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<Error | null>(null);
   /**
    * Función para obtener el usuario y actualizar el estado
@@ -88,7 +79,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsAuthenticated(false);
         setIsAdmin(false);
         setUserAttributes(null);
-        setError(err as Error);
+        
+        // Only set error for actual errors, not authentication failures
+        const errorMessage = (err as Error).message;
+        if (!errorMessage.includes('not authenticated') && 
+            !errorMessage.includes('No credentials') &&
+            !errorMessage.includes('User is not authenticated')) {
+          setError(err as Error);
+        } else {
+          setError(null); // Clear error for normal unauthenticated state
+        }
       }
     } finally {
       setIsLoading(false);
@@ -142,14 +142,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, []);  /**
    * Función para iniciar sesión
-   */  const login = async (redirectUri?: string) => {
+   */  
+  const login = async (redirectUri?: string) => {
     try {
-      // Si ya está autenticado, no es necesario iniciar sesión de nuevo
-      const authResult = await getCurrentUser();
-      if (authResult) {
-        return; // La función LoginButton manejará la redirección
+      // Verificar si ya está autenticado
+      try {
+        const authResult = await getCurrentUser();
+        if (authResult) {
+          return; // Ya está autenticado, no necesita login
+        }
+      } catch (authCheckError) {
+        // Si getCurrentUser falla, significa que NO está autenticado
+        // Continuar con el proceso de login
       }
       
+      // Proceder con el login
       await signInWithHostedUI({ 
         redirectUri: redirectUri || window.location.origin
       });
@@ -159,7 +166,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           err.name !== 'UserAlreadyAuthenticatedException' && 
           !err.message?.includes('already authenticated')) {
         setError(err as Error);
-        console.error('Error al iniciar sesión');
+        console.error('Error al iniciar sesión:', err);
       }
       throw err; // Re-lanzar para que LoginButton pueda manejarlo
     }
@@ -171,10 +178,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       await signOut();
+      
+      // Clear authentication state
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);
       setUserAttributes(null);
+      setError(null);
+      
+      // Clear cookies for middleware
+      if (typeof window !== 'undefined') {
+        clearAuthCookies();
+      }
     } catch (err) {
       setError(err as Error);
       console.error('Error al cerrar sesión:', err);

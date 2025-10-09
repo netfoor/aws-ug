@@ -91,7 +91,7 @@ export default function ProfilePage() {
                       Email
                     </label>
                     <div className="mt-1 text-sm text-gray-900">
-                      {userAttributes?.email || user.signInDetails?.loginId || 'No disponible'}
+                      {(userAttributes?.email as string) || user?.signInDetails?.loginId || 'No disponible'}
                     </div>
                   </div>
 
@@ -100,7 +100,7 @@ export default function ProfilePage() {
                       Nombre
                     </label>
                     <div className="mt-1 text-sm text-gray-900">
-                      {userAttributes?.given_name || 'No especificado'}
+                      {userAttributes?.given_name ? String(userAttributes.given_name) : 'No especificado'}
                     </div>
                   </div>
 
@@ -109,7 +109,7 @@ export default function ProfilePage() {
                       Apellido
                     </label>
                     <div className="mt-1 text-sm text-gray-900">
-                      {userAttributes?.family_name || 'No especificado'}
+                      {userAttributes?.family_name ? String(userAttributes.family_name) : 'No especificado'}
                     </div>
                   </div>
 
@@ -118,7 +118,7 @@ export default function ProfilePage() {
                       Teléfono
                     </label>
                     <div className="mt-1 text-sm text-gray-900">
-                      {userAttributes?.phone_number || 'No especificado'}
+                      {(typeof userAttributes?.phone_number === 'string' ? userAttributes.phone_number : null) || 'No especificado'}
                     </div>
                   </div>
 
@@ -176,7 +176,7 @@ export default function ProfilePage() {
                     </label>
                     <div className="mt-1 text-sm text-gray-900">
                       {userAttributes?.updated_at 
-                        ? new Date(userAttributes.updated_at * 1000).toLocaleString()
+                        ? new Date(Number(userAttributes.updated_at) * 1000).toLocaleString()
                         : 'No disponible'
                       }
                     </div>
