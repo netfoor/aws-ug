@@ -19,7 +19,12 @@ const config = {
   testPathIgnorePatterns: [
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
-    '<rootDir>/amplify/'
+    '<rootDir>/amplify/',
+    '<rootDir>/__tests__/paused-e2e/',
+  ],
+  testMatch: [
+    '**/__tests__/**/*.test.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[jt]s?(x)',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
