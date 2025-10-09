@@ -27,6 +27,12 @@ export const auth = defineAuth({
       ],
     }
   },
+  // Habilitar MFA (Multi-Factor Authentication)
+  multifactor: {
+    mode: 'OPTIONAL', // Los usuarios pueden elegir habilitar MFA
+    sms: true,        // MFA por SMS
+    totp: true,       // MFA por aplicación authenticator (Google Authenticator, etc)
+  },
   userAttributes: {
     givenName: {
       required: true,
@@ -46,4 +52,6 @@ export const auth = defineAuth({
     },
   },
   groups: ['ADMINS', 'SPEAKERS', 'MEMBERS'],
+  // Políticas de contraseña robustas
+  accountRecovery: 'EMAIL_ONLY', // Solo email para recuperación (más seguro que SMS)
 });

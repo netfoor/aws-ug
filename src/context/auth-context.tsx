@@ -11,7 +11,6 @@ import {
   checkIsUserAdmin,
   getUserAttributes
 } from '@/lib/amplify/auth';
-import { clearAuthCookies } from '@/lib/amplify/token-sync';
 
 /**
  * Interfaces para el contexto de autenticación
@@ -72,7 +71,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUserAttributes(null);
       }
     } catch (err) {
-      console.error('Error al refrescar el usuario');
+      // Log completo del error para debugging
+      console.error('Error al refrescar el usuario:', {
+        message: err instanceof Error ? err.message : 'Unknown error',
+        stack: err instanceof Error ? err.stack : undefined,
+        error: err,
+      });
       // No cambiar el estado si ya estaba autenticado (podría ser un error temporal)
       if (!isAuthenticated) {
         setUser(null);
@@ -166,7 +170,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
           err.name !== 'UserAlreadyAuthenticatedException' && 
           !err.message?.includes('already authenticated')) {
         setError(err as Error);
-        console.error('Error al iniciar sesión:', err);
+        // Log completo del error
+        console.error('Error al iniciar sesión:', {
+          message: err.message,
+          name: err.name,
+          stack: err.stack,
+          error: err,
+        });
       }
       throw err; // Re-lanzar para que LoginButton pueda manejarlo
     }
@@ -185,14 +195,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAdmin(false);
       setUserAttributes(null);
       setError(null);
-      
-      // Clear cookies for middleware
-      if (typeof window !== 'undefined') {
-        clearAuthCookies();
-      }
     } catch (err) {
       setError(err as Error);
-      console.error('Error al cerrar sesión:', err);
+      // Log completo del error
+      console.error('Error al cerrar sesión:', {
+        message: err instanceof Error ? err.message : 'Unknown error',
+        stack: err instanceof Error ? err.stack : undefined,
+        error: err,
+      });
     }
   };
 

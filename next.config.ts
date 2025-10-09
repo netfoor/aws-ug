@@ -7,17 +7,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['aws-amplify'],
   },
-  
-  // Reduce aggressive reloading in development
-  ...(process.env.NODE_ENV === 'development' && {
-    webpack: (config: any) => {
-      config.watchOptions = {
-        poll: 1000,
-        aggregateTimeout: 300,
-      };
-      return config;
-    }
-  })
 };
 
 export default nextConfig;
