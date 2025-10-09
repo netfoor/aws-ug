@@ -8,11 +8,14 @@ import { useAuth } from '@/context/auth-context';
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading, refreshUser, error } = useAuth();
+  const { refreshUser } = useAuth();
   const [isProcessing, setIsProcessing] = useState(true);
   const [callbackError, setCallbackError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Usar una flag para prevenir ejecuciones múltiples
+    let isMounted = true;
+    
     const handleCallback = async () => {
       try {
         // Verificar si hay errores en los parámetros de la URL
@@ -21,8 +24,10 @@ function AuthCallbackContent() {
         
         if (error) {
           console.error('OAuth Error:', error, errorDescription);
-          setCallbackError(errorDescription || 'Error al autenticar');
-          setIsProcessing(false);
+          if (isMounted) {
+            setCallbackError(errorDescription || 'Error al autenticar');
+            setIsProcessing(false);
+          }
           return;
         }
 
@@ -46,26 +51,30 @@ function AuthCallbackContent() {
 
         // Esperar un poco para que el estado se actualice
         setTimeout(() => {
-          setIsProcessing(false);
-          
-          // Si el usuario está autenticado, redirigir
-          if (isAuthenticated) {
+          if (isMounted) {
+            setIsProcessing(false);
+            // Siempre redirigir después del callback exitoso
             router.push(returnUrl);
-          } else {
-            // Si no está autenticado después del callback, ir al login
-            router.push('/login?error=callback_failed');
           }
         }, 1000);
 
       } catch (err) {
         console.error('Error processing callback:', err);
-        setCallbackError('Error al procesar la autenticación');
-        setIsProcessing(false);
+        if (isMounted) {
+          setCallbackError('Error al procesar la autenticación');
+          setIsProcessing(false);
+        }
       }
     };
 
     handleCallback();
-  }, [searchParams, refreshUser, isAuthenticated, router]);
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Solo ejecutar una vez al montar
 
   // Mostrar error si hay uno
   if (callbackError) {
@@ -132,15 +141,6 @@ function AuthCallbackContent() {
               ></div>
             </div>
           </div>
-
-          {/* Mostrar errores del contexto si los hay */}
-          {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">
-                {error.message}
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>
