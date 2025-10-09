@@ -317,7 +317,13 @@ describe('Navigation Component', () => {
 
       // Should handle error gracefully and log it
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith('Error al cerrar sesión:', expect.any(Error));
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'Error al cerrar sesión:',
+          expect.objectContaining({
+            message: 'Logout failed',
+            error: expect.any(Error)
+          })
+        );
       });
 
       consoleSpy.mockRestore();

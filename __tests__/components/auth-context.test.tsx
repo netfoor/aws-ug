@@ -64,6 +64,14 @@ describe('AuthProvider', () => {
         mockFn.mockClear();
       }
     });
+    
+    // Set default mock behavior (unauthenticated)
+    // Tests can override this by calling mockResolvedValue/mockRejectedValue
+    mockAuthFunctions.getCurrentUser.mockRejectedValue(new Error('User not authenticated'));
+    mockAuthFunctions.checkIsUserAdmin.mockResolvedValue(false);
+    mockAuthFunctions.getUserAttributes.mockResolvedValue({});
+    mockAuthFunctions.signOut.mockResolvedValue(undefined);
+    mockAuthFunctions.signInWithHostedUI.mockResolvedValue(undefined);
   });
 
   describe('Initial State', () => {
@@ -218,11 +226,12 @@ describe('AuthProvider', () => {
     it('should not redirect if user is already authenticated', async () => {
       // Mock user already authenticated for both calls
       const memberScenario = authScenarios.memberUser;
-      mockAuthFunctions.getCurrentUser
-        .mockResolvedValue(memberScenario.user); // Always return authenticated user
-      mockAuthFunctions.checkIsUserAdmin.mockResolvedValue(false);
-      mockAuthFunctions.getUserAttributes.mockResolvedValue(memberScenario.user.attributes);
-      mockAuthFunctions.signInWithHostedUI.mockResolvedValue(undefined);
+      
+      // Reset and configure mocks for this test
+      mockAuthFunctions.getCurrentUser.mockReset().mockResolvedValue(memberScenario.user);
+      mockAuthFunctions.checkIsUserAdmin.mockReset().mockResolvedValue(false);
+      mockAuthFunctions.getUserAttributes.mockReset().mockResolvedValue(memberScenario.user.attributes);
+      mockAuthFunctions.signInWithHostedUI.mockReset().mockResolvedValue(undefined);
 
       render(
         <AuthProvider>
@@ -373,10 +382,11 @@ describe('AuthProvider', () => {
     it('should handle logout errors', async () => {
       const memberScenario = authScenarios.memberUser;
       
-      mockAuthFunctions.getCurrentUser.mockResolvedValue(memberScenario.user);
-      mockAuthFunctions.checkIsUserAdmin.mockResolvedValue(false);
-      mockAuthFunctions.getUserAttributes.mockResolvedValue({});
-      mockAuthFunctions.signOut.mockRejectedValue(new Error('Logout failed'));
+      // Reset and configure mocks for this test
+      mockAuthFunctions.getCurrentUser.mockReset().mockResolvedValue(memberScenario.user);
+      mockAuthFunctions.checkIsUserAdmin.mockReset().mockResolvedValue(false);
+      mockAuthFunctions.getUserAttributes.mockReset().mockResolvedValue({});
+      mockAuthFunctions.signOut.mockReset().mockRejectedValue(new Error('Logout failed'));
 
       render(
         <AuthProvider>
