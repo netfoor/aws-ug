@@ -1,7 +1,7 @@
 // src\context\auth-context.tsx
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { AuthUser } from 'aws-amplify/auth';
 import { 
   getCurrentUser, 
@@ -20,7 +20,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
-    userAttributes: Record<string, unknown> | null;
+  userAttributes: Record<string, unknown> | null;
   error: Error | null;
   login: (redirectUri?: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -39,6 +39,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 /**
  * Proveedor para el contexto de autenticación
+ * Optimizado con debouncing y caching
  */
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -47,81 +48,125 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userAttributes, setUserAttributes] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<Error | null>(null);
+
+  // Cache y deduplicación
+  const lastRefreshTimeRef = useRef<number>(0);
+  const refreshPromiseRef = useRef<Promise<void> | null>(null);
+  
+  // Constantes de optimización
+  const CACHE_DURATION = 5000; // 5 segundos de cache
+  const DEBOUNCE_DELAY = 300; // 300ms de debounce
+  
   /**
    * Función para obtener el usuario y actualizar el estado
-   */  const refreshUser = async () => {
-    try {
-      setIsLoading(true);
-      const user = await getCurrentUser();
-      
-      if (user) {
-        // Extract user info
-        const isAdmin = await checkIsUserAdmin(user);
-        const attributes = await getUserAttributes(user);
-        
-        setUser(user);
-        setIsAuthenticated(true);
-        setIsAdmin(isAdmin);
-        setUserAttributes(attributes);
-        setError(null);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-        setIsAdmin(false);
-        setUserAttributes(null);
-      }
-    } catch (err) {
-      // Log completo del error para debugging
-      console.error('Error al refrescar el usuario:', {
-        message: err instanceof Error ? err.message : 'Unknown error',
-        stack: err instanceof Error ? err.stack : undefined,
-        error: err,
-      });
-      // No cambiar el estado si ya estaba autenticado (podría ser un error temporal)
-      if (!isAuthenticated) {
-        setUser(null);
-        setIsAuthenticated(false);
-        setIsAdmin(false);
-        setUserAttributes(null);
-        
-        // Only set error for actual errors, not authentication failures
-        const errorMessage = (err as Error).message;
-        if (!errorMessage.includes('not authenticated') && 
-            !errorMessage.includes('No credentials') &&
-            !errorMessage.includes('User is not authenticated')) {
-          setError(err as Error);
-        } else {
-          setError(null); // Clear error for normal unauthenticated state
-        }
-      }
-    } finally {
-      setIsLoading(false);
+   * Optimizada con caching y deduplicación de requests
+   */
+  const refreshUser = useCallback(async () => {
+    // Si ya hay un refresh en progreso, retornar esa promesa
+    if (refreshPromiseRef.current) {
+      return refreshPromiseRef.current;
     }
-  };
+
+    // Si el cache es reciente (< 5 segundos), no refrescar
+    const now = Date.now();
+    if (now - lastRefreshTimeRef.current < CACHE_DURATION && isAuthenticated) {
+      return;
+    }
+
+    const promise = (async () => {
+      try {
+        setIsLoading(true);
+        const user = await getCurrentUser();
+        
+        if (user) {
+          // Extract user info
+          const isAdmin = await checkIsUserAdmin(user);
+          const attributes = await getUserAttributes(user);
+          
+          setUser(user);
+          setIsAuthenticated(true);
+          setIsAdmin(isAdmin);
+          setUserAttributes(attributes);
+          setError(null);
+          lastRefreshTimeRef.current = Date.now();
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+          setUserAttributes(null);
+          lastRefreshTimeRef.current = Date.now();
+        }
+      } catch (err) {
+        // Log completo del error para debugging
+        console.error('Error al refrescar el usuario:', {
+          message: err instanceof Error ? err.message : 'Unknown error',
+          stack: err instanceof Error ? err.stack : undefined,
+          error: err,
+        });
+        // No cambiar el estado si ya estaba autenticado (podría ser un error temporal)
+        if (!isAuthenticated) {
+          setUser(null);
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+          setUserAttributes(null);
+          
+          // Only set error for actual errors, not authentication failures
+          const errorMessage = (err as Error).message;
+          if (!errorMessage.includes('not authenticated') && 
+              !errorMessage.includes('No credentials') &&
+              !errorMessage.includes('User is not authenticated')) {
+            setError(err as Error);
+          } else {
+            setError(null); // Clear error for normal unauthenticated state
+          }
+        }
+      } finally {
+        setIsLoading(false);
+        refreshPromiseRef.current = null;
+      }
+    })();
+
+    refreshPromiseRef.current = promise;
+    return promise;
+  }, [isAuthenticated]);
+
   /**
    * Efecto para cargar el usuario al inicio
-   */  useEffect(() => {
-    // Intentar cargar usuario inmediatamente al montar
+   */  
+  useEffect(() => {
     refreshUser();
+  }, [refreshUser]);
 
-    // También verificar al obtener el foco de la ventana (al volver a la pestaña)
+  /**
+   * Efecto para manejar el foco de la ventana con debouncing
+   */
+  useEffect(() => {
+    let debounceTimer: NodeJS.Timeout;
+
+    const debouncedRefreshUser = () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        refreshUser();
+      }, DEBOUNCE_DELAY);
+    };
+
     const handleFocus = () => {
-      refreshUser();
+      debouncedRefreshUser();
     };
 
     window.addEventListener('focus', handleFocus);
 
-    // Limpiar al desmontar
     return () => {
       window.removeEventListener('focus', handleFocus);
+      clearTimeout(debounceTimer);
     };
-  }, []);
+  }, [refreshUser]);
 
   /**
    * Configurar listeners para eventos de autenticación
    */
   useEffect(() => {
-    const unsubscribe = createAuthListener((event, payload) => {
+    const unsubscribe = createAuthListener((event) => {
       switch (event) {
         case 'signedIn':
           // Usuario inició sesión
@@ -133,6 +178,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setIsAuthenticated(false);
           setIsAdmin(false);
           setUserAttributes(null);
+          lastRefreshTimeRef.current = 0;
           break;
         case 'tokenRefresh':
           // Token refrescado, actualizar el usuario
@@ -144,10 +190,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       unsubscribe();
     };
-  }, []);  /**
+  }, [refreshUser]);
+
+  /**
    * Función para iniciar sesión
    */  
-  const login = async (redirectUri?: string) => {
+  const login = useCallback(async (redirectUri?: string) => {
     try {
       // Verificar si ya está autenticado
       try {
@@ -155,7 +203,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (authResult) {
           return; // Ya está autenticado, no necesita login
         }
-      } catch (authCheckError) {
+      } catch {
         // Si getCurrentUser falla, significa que NO está autenticado
         // Continuar con el proceso de login
       }
@@ -180,12 +228,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
       throw err; // Re-lanzar para que LoginButton pueda manejarlo
     }
-  };
+  }, []);
 
   /**
    * Función para cerrar sesión
    */
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await signOut();
       
@@ -195,6 +243,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAdmin(false);
       setUserAttributes(null);
       setError(null);
+      
+      // Limpiar cache y promesas pendientes
+      lastRefreshTimeRef.current = 0;
+      refreshPromiseRef.current = null;
     } catch (err) {
       setError(err as Error);
       // Log completo del error
@@ -204,7 +256,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         error: err,
       });
     }
-  };
+  }, []);
 
   /**
    * Valores del contexto
@@ -218,8 +270,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error,
     login,
     logout,
-    refreshUser
-  }), [user, isAuthenticated, isLoading, isAdmin, userAttributes, error]);
+    refreshUser,
+  }), [user, isAuthenticated, isLoading, isAdmin, userAttributes, error, login, logout, refreshUser]);
 
   return (
     <AuthContext.Provider value={contextValue}>
