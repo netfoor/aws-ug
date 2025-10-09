@@ -147,7 +147,7 @@ Documentación técnica del sistema de autenticación.
 
 ## 🎯 Estado del Proyecto
 
-### ✅ Completado (Fases 1 y 2)
+### ✅ Completado (Fases 1, 2 y 3)
 
 **Migración Server-Side:**
 - ✅ Implementado `@aws-amplify/adapter-nextjs`
@@ -169,18 +169,20 @@ Documentación técnica del sistema de autenticación.
 - ✅ Login funcionando correctamente
 
 **Tests:**
-- ✅ 32/34 tests unitarios pasando (94.1%)
+- ✅ 95/95 tests pasando (100%)
+- ✅ Tests de auth-context y navigation arreglados
+- ✅ 21 tests de rate limiting
+- ✅ 40 tests de CSRF protection
 - ✅ Build sin errores
 - ✅ Arreglado loop infinito en `/auth/callback`
 
 ---
 
-### ⏳ Pendiente (Fases 3 y 4)
+### ⏳ Pendiente (Fase 4)
 
-**Fase 3 - Tests:**
-- ⏳ Arreglar 2 tests fallidos en `auth-context.test.tsx`
-- ⏳ Actualizar mocks para rate limiting y CSRF
+**Tests E2E:**
 - ⏳ Re-habilitar 6 tests E2E pausados
+- ⏳ Actualizar para nueva arquitectura server-side
 
 **Fase 4 - Optimización:**
 - ⏳ Optimizar token refresh logic
@@ -195,12 +197,12 @@ Documentación técnica del sistema de autenticación.
 | Métrica | Valor |
 |---------|-------|
 | **Compilación** | ✅ SUCCESS |
-| **Tests unitarios** | 32/34 (94.1%) |
+| **Tests unitarios** | 95/95 (100%) |
 | **Tests E2E** | 0/6 (pausados) |
 | **Seguridad** | ⭐⭐⭐⭐⭐ Producción |
 | **Archivos doc** | 9 archivos organizados |
 | **Código eliminado** | ~150KB (40+ archivos) |
-| **Tiempo invertido** | ~4-5 horas (Fases 1+2) |
+| **Tiempo invertido** | ~6-7 horas (Fases 1+2+3) |
 
 ---
 
