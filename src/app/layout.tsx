@@ -1,25 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import AmplifyClientProvider from "@/components/AmplifyClientProvider";
 import { AuthProvider } from "../context/auth-context";
-//import ThemeProviderWrapper from "../components/theme/ThemeProviderWrapper";
-
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { ThemeProvider } from "../providers/ThemeProvider";
+import { Navigation } from "../components/layout/Navigation";
 
 export const metadata: Metadata = {
-  title: "AWS UG Puebla - User Group",
-  description: "AWS User Group Puebla - Community for cloud enthusiasts, developers, and DevOps professionals.",
+  title: "AWS UG Puebla - User Group Oficial",
+  description: "AWS User Group Puebla - Comunidad oficial para entusiastas de la nube, desarrolladores y profesionales DevOps.",
 };
 
 export default async function RootLayout({
@@ -28,18 +17,23 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#0a0b40" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* <ThemeProviderWrapper> */}
+      <body className="font-amazon min-h-screen bg-background text-text-primary theme-transition">
+        <ThemeProvider>
           <AmplifyClientProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              <div className="flex flex-col min-h-screen">
+                <Navigation />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
+            </AuthProvider>
           </AmplifyClientProvider>
-        {/* </ThemeProviderWrapper> */}
+        </ThemeProvider>
       </body>
     </html>
   );
