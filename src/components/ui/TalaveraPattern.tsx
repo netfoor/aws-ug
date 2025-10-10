@@ -19,89 +19,88 @@ export function TalaveraPattern({
   const sizes = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
-    lg: 'w-20 h-20'
+    lg: 'w-16 h-16'
   };
 
   const patterns = {
     corner: (
-      <svg viewBox="0 0 80 80" className={cn(sizes[size], animate && 'animate-talavera-float')}>
+      <svg viewBox="0 0 100 100" className={cn(sizes[size], animate && 'animate-talavera-float')}>
         <defs>
-          <radialGradient id="talavera-gradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="var(--pattern-primary)" stopOpacity="0.8"/>
-            <stop offset="100%" stopColor="var(--pattern-primary)" stopOpacity="0.3"/>
+          <radialGradient id="talavera-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--pattern-primary)" stopOpacity="0.15"/>
+            <stop offset="100%" stopColor="var(--pattern-primary)" stopOpacity="0.05"/>
           </radialGradient>
-          <pattern id="talavera-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-            <circle cx="10" cy="10" r="2" fill="var(--pattern-primary)" opacity="0.4"/>
-          </pattern>
         </defs>
         
-        <circle cx="40" cy="40" r="35" fill="url(#talavera-gradient)" stroke="var(--pattern-primary)" strokeWidth="2"/>
-        <circle cx="40" cy="40" r="28" fill="url(#talavera-dots)"/>
-        <circle cx="40" cy="40" r="20" fill="none" stroke="var(--pattern-primary)" strokeWidth="1.5" opacity="0.6"/>
-        <circle cx="40" cy="40" r="12" fill="none" stroke="var(--pattern-primary)" strokeWidth="1" opacity="0.8"/>
+        {/* Círculo base */}
+        <circle cx="50" cy="50" r="45" fill="url(#talavera-grad)" stroke="var(--pattern-primary)" strokeWidth="1.5" opacity="0.3"/>
         
-        <g transform="translate(40,40)">
-          <circle r="4" fill="var(--pattern-primary)"/>
+        {/* Flor de 8 pétalos - patrón clásico de Talavera */}
+        <g transform="translate(50,50)">
           {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
             <g key={i} transform={`rotate(${angle})`}>
-              <ellipse rx="8" ry="3" fill="var(--pattern-primary)" opacity="0.5"/>
+              <ellipse cx="0" cy="-20" rx="6" ry="12" fill="var(--pattern-primary)" opacity="0.2"/>
             </g>
           ))}
+          
+          {/* Círculos concéntricos */}
+          <circle r="15" fill="none" stroke="var(--pattern-primary)" strokeWidth="1" opacity="0.25"/>
+          <circle r="8" fill="none" stroke="var(--pattern-primary)" strokeWidth="1" opacity="0.3"/>
+          <circle r="3" fill="var(--pattern-primary)" opacity="0.4"/>
         </g>
       </svg>
     ),
     
     border: (
-      <svg viewBox="0 0 400 30" className={cn('w-full h-8', animate && 'animate-talavera-pulse')}>
+      <svg viewBox="0 0 400 40" className={cn('w-full h-6', animate && 'animate-talavera-pulse')}>
         <defs>
-          <pattern id="border-pattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-            <circle cx="15" cy="15" r="8" fill="none" stroke="var(--pattern-primary)" strokeWidth="1.5" opacity="0.4"/>
-            <circle cx="15" cy="15" r="3" fill="var(--pattern-primary)" opacity="0.6"/>
-            <path d="M15,7 L15,23 M7,15 L23,15" stroke="var(--pattern-primary)" strokeWidth="0.5" opacity="0.3"/>
+          <pattern id="border-tile" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+            <circle cx="20" cy="20" r="12" fill="none" stroke="var(--pattern-primary)" strokeWidth="1" opacity="0.2"/>
+            <circle cx="20" cy="20" r="6" fill="none" stroke="var(--pattern-primary)" strokeWidth="0.8" opacity="0.25"/>
+            <circle cx="20" cy="20" r="2" fill="var(--pattern-primary)" opacity="0.3"/>
           </pattern>
         </defs>
-        <rect width="400" height="30" fill="url(#border-pattern)"/>
+        <rect width="400" height="40" fill="url(#border-tile)"/>
       </svg>
     ),
     
     background: (
-      <svg viewBox="0 0 200 200" className={cn('w-full h-full absolute inset-0 opacity-[0.03]', animate && 'animate-talavera-pulse')} preserveAspectRatio="xMidYMid slice">
+      <svg viewBox="0 0 400 400" className={cn('w-full h-full absolute inset-0 opacity-[0.02]', animate && 'animate-talavera-pulse')} preserveAspectRatio="xMidYMid slice">
         <defs>
-          <pattern id="bg-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-            <circle cx="20" cy="20" r="12" fill="none" stroke="var(--pattern-primary)" strokeWidth="1"/>
-            <circle cx="20" cy="20" r="6" fill="none" stroke="var(--pattern-primary)" strokeWidth="0.5"/>
-            <circle cx="20" cy="20" r="2" fill="var(--pattern-primary)"/>
-            <path d="M20,8 L20,32 M8,20 L32,20" stroke="var(--pattern-primary)" strokeWidth="0.5" opacity="0.5"/>
-            {[0, 90, 180, 270].map((angle, i) => (
-              <g key={i} transform={`rotate(${angle} 20 20)`}>
-                <path d="M20,14 Q24,16 20,18" fill="none" stroke="var(--pattern-primary)" strokeWidth="0.5" opacity="0.3"/>
-              </g>
-            ))}
+          <pattern id="bg-tile" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+            {/* Flor de Talavera simplificada */}
+            <g transform="translate(40,40)">
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                <g key={i} transform={`rotate(${angle})`}>
+                  <ellipse cx="0" cy="-18" rx="4" ry="10" fill="var(--pattern-primary)"/>
+                </g>
+              ))}
+              <circle r="8" fill="none" stroke="var(--pattern-primary)" strokeWidth="1"/>
+              <circle r="3" fill="var(--pattern-primary)"/>
+            </g>
           </pattern>
         </defs>
-        <rect width="200" height="200" fill="url(#bg-pattern)"/>
+        <rect width="400" height="400" fill="url(#bg-tile)"/>
       </svg>
     ),
     
     floating: (
       <div className={cn(
-        'absolute opacity-10 pointer-events-none',
+        'absolute opacity-5 pointer-events-none',
         animate && 'animate-talavera-float',
         sizes[size],
         className
       )}>
-        <svg viewBox="0 0 60 60" className="w-full h-full">
-          <defs>
-            <radialGradient id="float-gradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="var(--pattern-primary)" stopOpacity="0.8"/>
-              <stop offset="100%" stopColor="var(--pattern-primary)" stopOpacity="0.2"/>
-            </radialGradient>
-          </defs>
-          <circle cx="30" cy="30" r="25" fill="url(#float-gradient)"/>
-          <circle cx="30" cy="30" r="20" fill="none" stroke="var(--pattern-primary)" strokeWidth="1"/>
-          <circle cx="30" cy="30" r="12" fill="none" stroke="var(--pattern-primary)" strokeWidth="0.8"/>
-          <circle cx="30" cy="30" r="4" fill="var(--pattern-primary)"/>
-          <path d="M30,10 L30,50 M10,30 L50,30" stroke="var(--pattern-primary)" strokeWidth="0.5" opacity="0.5"/>
+        <svg viewBox="0 0 80 80" className="w-full h-full">
+          <g transform="translate(40,40)">
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+              <g key={i} transform={`rotate(${angle})`}>
+                <ellipse cx="0" cy="-22" rx="5" ry="12" fill="var(--pattern-primary)"/>
+              </g>
+            ))}
+            <circle r="12" fill="none" stroke="var(--pattern-primary)" strokeWidth="1.5"/>
+            <circle r="5" fill="var(--pattern-primary)"/>
+          </g>
         </svg>
       </div>
     )
