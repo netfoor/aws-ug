@@ -41,24 +41,24 @@
 - [x] Modelos de datos iniciales
 
 #### Tareas Específicas:
-1. **Setup Inicial**
+1. **Setup Inicial** [x]
    - Crear proyecto Amplify Gen 2
    - Configurar repositorio Git
    - Setup entorno de desarrollo
 
-2. **Autenticación**
+2. **Autenticación** [ ]
    - Configurar AWS Cognito (email/password)
    - Implementar OAuth con Meetup
    - Crear flujos de registro/login
    - Gestión de roles (Member, Speaker, Admin)
 
-3. **Frontend Básico**
+3. **Frontend Básico** [x]
    - Landing page con información del User Group
    - Formulario de registro/login
    - Dashboard básico post-login
    - Navegación principal
 
-4. **Modelos de Datos**
+4. **Modelos de Datos** [ ]
    - Esquema User (Cognito + DynamoDB)
    - Esquema Event básico
    - Configuración inicial de DynamoDB

@@ -5,10 +5,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helper?: string;
+  helperText?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, error, helper, ...props }, ref) => {
+  ({ className, type, label, error, helper, helperText, ...props }, ref) => {
+    const helperMessage = helperText || helper;
+    
     return (
       <div className="space-y-2">
         {label && (
@@ -29,8 +32,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {error && (
           <p className="text-sm text-red-500">{error}</p>
         )}
-        {helper && !error && (
-          <p className="text-sm text-text-secondary">{helper}</p>
+        {helperMessage && !error && (
+          <p className="text-sm text-text-secondary">{helperMessage}</p>
         )}
       </div>
     );

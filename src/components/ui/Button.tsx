@@ -18,7 +18,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-secondary text-primary border border-border hover:bg-secondary/80 shadow-sm hover:shadow-md active:scale-95',
       accent: 'bg-accent text-white hover:bg-accent/90 shadow-talavera hover:shadow-talavera-lg active:scale-95 font-semibold',
       outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-secondary talavera-border active:scale-95',
-      ghost: 'text-primary hover:bg-secondary/50 active:scale-95'
+      ghost: 'text-text-primary hover:bg-secondary/50 active:scale-95'
     };
 
     const sizes = {
@@ -28,7 +28,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     if (asChild) {
-      return React.cloneElement(children as React.ReactElement, {
+      return React.cloneElement(children as React.ReactElement<any>, {
         className: cn(
           baseStyles,
           variants[variant],

@@ -5,21 +5,57 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      setImageDimensions({
+        width: img.width * 0.2,
+        height: img.height * 0.2
+      });
+      console.log('Original:', img.width, 'x', img.height);
+      console.log('Scaled 20%:', img.width * 0.2, 'x', img.height * 0.2);
+    };
+    img.src = '/talavera.png';
+  }, []);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      setImageDimensions({
+        width: img.width * 0.2,
+        height: img.height * 0.2
+      });
+      console.log('Original:', img.width, 'x', img.height);
+      console.log('Scaled 20%:', img.width * 0.2, 'x', img.height * 0.2);
+    };
+    img.src = '/talavera.png';
+  }, []);
 
   return (
     <div className="min-h-screen theme-transition">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background">
+      <section className="relative py-20 px-4 pb-38 overflow-hidden bg-gradient-to-br from-background via-surface to-primary/10">
         <TalaveraPattern variant="background" />
-        <div className="absolute top-10 right-10 opacity-20">
-          <TalaveraPattern variant="corner" size="lg" animate />
-        </div>
-        <div className="absolute bottom-10 left-10 opacity-20">
-          <TalaveraPattern variant="corner" size="lg" animate />
-        </div>
+        
+        {/* Talavera images - Top */}
+        {imageDimensions.width > 0 && Array.from({length: Math.ceil(window.innerWidth / imageDimensions.width) + 1}).map((_, i) => (
+          <div key={i} className="absolute top-0 left-0 opacity-30 pointer-events-none origin-top-left" style={{transform: `scale(0.2) translateX(${(imageDimensions.width * i) / 0.2}px)`}}>
+            <img src="/talavera.png" alt="" />
+          </div>
+        ))}
+        
+        {/* Talavera images - Bottom */}
+        {imageDimensions.width > 0 && Array.from({length: Math.ceil(window.innerWidth / imageDimensions.width) + 1}).map((_, i) => (
+          <div key={`bottom-${i}`} className="absolute bottom-0 left-0 opacity-30 pointer-events-none origin-bottom-left" style={{transform: `scale(0.2) translateX(${(imageDimensions.width * i) / 0.2}px)`}}>
+            <img src="/talavera.png" alt="" />
+          </div>
+        ))}
         
         <div className="container mx-auto text-center relative z-10">
           <div className="flex justify-center mb-8 animate-fade-in">
@@ -59,6 +95,9 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* Red line to show section boundary */}
+      <div className="w-full h-1 bg-red-500"></div>
 
       {/* User Status Card */}
       {isAuthenticated && user && (
