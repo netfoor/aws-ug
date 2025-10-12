@@ -41,6 +41,15 @@ body {
   font-family: var(--font-amazon);
 }
 
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
 .talavera-border {
   border: 2px solid var(--color-primary);
   position: relative;

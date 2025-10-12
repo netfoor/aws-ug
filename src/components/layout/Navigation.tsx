@@ -36,7 +36,7 @@ export function Navigation({ className }: NavigationProps) {
           <Link href="/" className="flex items-center space-x-3">
             <div className="relative h-10 w-10 flex-shrink-0">
               <Image
-                src="/Logo-UG-Puebla.png"
+                src="/Logo.png"
                 alt="AWS User Group Puebla"
                 width={40}
                 height={40}

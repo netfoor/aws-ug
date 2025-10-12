@@ -5,37 +5,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
-import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => {
-      setImageDimensions({
-        width: img.width * 0.2,
-        height: img.height * 0.2
-      });
-      console.log('Original:', img.width, 'x', img.height);
-      console.log('Scaled 20%:', img.width * 0.2, 'x', img.height * 0.2);
-    };
-    img.src = '/talavera.png';
-  }, []);
-
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => {
-      setImageDimensions({
-        width: img.width * 0.2,
-        height: img.height * 0.2
-      });
-      console.log('Original:', img.width, 'x', img.height);
-      console.log('Scaled 20%:', img.width * 0.2, 'x', img.height * 0.2);
-    };
-    img.src = '/talavera.png';
-  }, []);
 
   return (
     <div className="min-h-screen theme-transition">
@@ -43,32 +15,35 @@ export default function Home() {
       <section className="relative py-20 px-4 pb-38 overflow-hidden bg-gradient-to-br from-background via-surface to-primary/10">
         <TalaveraPattern variant="background" />
         
-        {/* Talavera images - Top */}
-        {imageDimensions.width > 0 && Array.from({length: Math.ceil(window.innerWidth / imageDimensions.width) + 1}).map((_, i) => (
-          <div key={i} className="absolute top-0 left-0 opacity-30 pointer-events-none origin-top-left" style={{transform: `scale(0.2) translateX(${(imageDimensions.width * i) / 0.2}px)`}}>
-            <img src="/talavera.png" alt="" />
-          </div>
-        ))}
-        
-        {/* Talavera images - Bottom */}
-        {imageDimensions.width > 0 && Array.from({length: Math.ceil(window.innerWidth / imageDimensions.width) + 1}).map((_, i) => (
-          <div key={`bottom-${i}`} className="absolute bottom-0 left-0 opacity-30 pointer-events-none origin-bottom-left" style={{transform: `scale(0.2) translateX(${(imageDimensions.width * i) / 0.2}px)`}}>
-            <img src="/talavera.png" alt="" />
-          </div>
-        ))}
+        {/* Talavera borders */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-16 opacity-30 pointer-events-none"
+          style={{
+            backgroundImage: 'url(/talavera.png)',
+            backgroundRepeat: 'repeat-x',
+            backgroundSize: '240px auto'
+          }}
+        ></div>
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-16 opacity-30 pointer-events-none"
+          style={{
+            backgroundImage: 'url(/talavera.png)',
+            backgroundRepeat: 'repeat-x',
+            backgroundSize: '240px auto'
+          }}
+        ></div>
         
         <div className="container mx-auto text-center relative z-10">
-          <div className="flex justify-center mb-8 animate-fade-in">
-            <div className="relative">
-              <TalaveraPattern variant="corner" size="lg" animate />
-              <div className="absolute inset-0 bg-accent/10 blur-3xl rounded-full"></div>
+          <div className="flex justify-center mb-8 mt-12 animate-fade-in">
+            <div className="relative group cursor-pointer">
+              <img 
+                src="/Logo.png" 
+                alt="AWS User Group Puebla" 
+                className="h-32 md:h-48 w-auto transition-all duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-4 group-hover:drop-shadow-2xl animate-bounce-slow"
+              />
+              <div className="absolute inset-0 bg-accent/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-slide-up">
-            <span className="block text-text-primary">AWS User Group</span>
-            <span className="block text-accent mt-2 drop-shadow-lg">Puebla</span>
-          </h1>
           
           <p className="text-lg md:text-xl text-text-secondary max-w-3xl mx-auto mb-8 animate-fade-in leading-relaxed">
             Únete a la comunidad oficial de desarrolladores y profesionales de AWS en Puebla. 
