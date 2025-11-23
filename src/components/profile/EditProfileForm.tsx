@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -12,33 +12,128 @@ interface EditProfileFormProps {
 }
 
 export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
-  const { profile, updateProfile, loading } = useUserProfile();
+  const { profile, updateProfile, loading, error } = useUserProfile();
   const [formData, setFormData] = useState<Partial<UserProfile>>({
-    givenName: profile?.givenName || '',
-    familyName: profile?.familyName || '',
-    email: profile?.email || '',
-    phoneNumber: profile?.phoneNumber || '',
-    company: profile?.company || '',
-    bio: profile?.bio || '',
-    newsletterOptIn: profile?.newsletterOptIn || false,
-    socialLinks: profile?.socialLinks || {},
+    givenName: '',
+    familyName: '',
+    email: '',
+    phoneNumber: '',
+    company: '',
+    bio: '',
+    newsletterOptIn: false,
+    socialLinks: {},
   });
 
-  const [interests, setInterests] = useState<string>(
-    profile?.interests?.join(', ') || ''
-  );
+  const [interests, setInterests] = useState<string>('');
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  // ✅ NUEVO: Sincronizar formData cuando profile cambia
+  useEffect(() => {
+    if (profile) {
+      console.log('📝 EditProfileForm: Cargando datos del perfil:', profile);
+      setFormData({
+        givenName: profile.givenName || '',
+        familyName: profile.familyName || '',
+        email: profile.email || '',
+        phoneNumber: profile.phoneNumber || '',
+        company: profile.company || '',
+        bio: profile.bio || '',
+        newsletterOptIn: profile.newsletterOptIn || false,
+        socialLinks: profile.socialLinks || {},
+      });
+      setInterests(profile.interests?.join(', ') || '');
+    }
+  }, [profile]);
+
+  // ✅ Función de validación
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    // Validar campos requeridos
+    if (!formData.givenName?.trim()) {
+      errors.givenName = 'El nombre es requerido';
+    }
+    
+    if (!formData.familyName?.trim()) {
+      errors.familyName = 'El apellido es requerido';
+    }
+    
+    if (!formData.email?.trim()) {
+      errors.email = 'El email es requerido';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'El email no es válido';
+    }
+    
+    // Validar social links (URLs)
+    if (formData.socialLinks) {
+      const urlPattern = /^https?:\/\/.+/i;
+      
+      if (formData.socialLinks.linkedin && !urlPattern.test(formData.socialLinks.linkedin)) {
+        errors.linkedin = 'LinkedIn debe ser una URL válida (ej: https://linkedin.com/in/usuario)';
+      }
+      
+      if (formData.socialLinks.twitter && !urlPattern.test(formData.socialLinks.twitter)) {
+        errors.twitter = 'Twitter debe ser una URL válida (ej: https://twitter.com/usuario)';
+      }
+      
+      if (formData.socialLinks.github && !urlPattern.test(formData.socialLinks.github)) {
+        errors.github = 'GitHub debe ser una URL válida (ej: https://github.com/usuario)';
+      }
+      
+      if (formData.socialLinks.website && !urlPattern.test(formData.socialLinks.website)) {
+        errors.website = 'Website debe ser una URL válida (ej: https://ejemplo.com)';
+      }
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Resetear estados
+    setSaveError(null);
+    setSaveSuccess(false);
+    setValidationErrors({});
+    
+    // ✅ Validar antes de enviar
+    if (!validateForm()) {
+      console.log('❌ Validación falló:', validationErrors);
+      setSaveError('Por favor corrige los errores en el formulario');
+      return;
+    }
+    
+    console.log('📤 EditProfileForm: Intentando guardar perfil...');
+    console.log('📋 Datos del formulario:', formData);
     
     const updatedProfile = {
       ...formData,
       interests: interests.split(',').map(i => i.trim()).filter(Boolean),
     };
 
-    const success = await updateProfile(updatedProfile);
-    if (success) {
-      onSuccess?.();
+    console.log('📋 Perfil actualizado a enviar:', updatedProfile);
+
+    try {
+      const success = await updateProfile(updatedProfile);
+      
+      if (success) {
+        console.log('✅ Perfil guardado exitosamente en DynamoDB');
+        setSaveSuccess(true);
+        
+        // Mostrar mensaje de éxito brevemente antes de cerrar
+        setTimeout(() => {
+          onSuccess?.(); // ← ProfilePage recargará el perfil antes de cerrar
+        }, 1500);
+      } else {
+        console.error('❌ Error al guardar perfil: updateProfile retornó false');
+        setSaveError('No se pudo guardar el perfil. Por favor intenta de nuevo.');
+      }
+    } catch (err) {
+      console.error('❌ Excepción al guardar perfil:', err);
+      setSaveError(err instanceof Error ? err.message : 'Error desconocido');
     }
   };
 
@@ -62,6 +157,23 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
         <CardTitle>Editar Perfil</CardTitle>
       </CardHeader>
       <CardContent>
+        {/* Mensajes de error/éxito */}
+        {(saveError || error) && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-800">
+              <strong>Error:</strong> {saveError || error}
+            </p>
+          </div>
+        )}
+        
+        {saveSuccess && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+            <p className="text-sm text-green-800">
+              <strong>¡Éxito!</strong> Tu perfil se ha guardado correctamente.
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Información Personal */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -72,7 +184,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
                 onChange={(e) => handleInputChange('givenName', e.target.value)}
                 required
                 placeholder="Tu nombre"
+                className={validationErrors.givenName ? 'border-red-500' : ''}
               />
+              {validationErrors.givenName && (
+                <p className="text-red-500 text-xs mt-1">{validationErrors.givenName}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Apellido *</label>
@@ -81,7 +197,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
                 onChange={(e) => handleInputChange('familyName', e.target.value)}
                 required
                 placeholder="Tu apellido"
+                className={validationErrors.familyName ? 'border-red-500' : ''}
               />
+              {validationErrors.familyName && (
+                <p className="text-red-500 text-xs mt-1">{validationErrors.familyName}</p>
+              )}
             </div>
           </div>
 
@@ -93,7 +213,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
               onChange={(e) => handleInputChange('email', e.target.value)}
               required
               placeholder="tu@email.com"
+              className={validationErrors.email ? 'border-red-500' : ''}
             />
+            {validationErrors.email && (
+              <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>
+            )}
           </div>
 
           <div>
@@ -147,7 +271,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
                   value={formData.socialLinks?.linkedin || ''}
                   onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
                   placeholder="https://linkedin.com/in/tu-perfil"
+                  className={validationErrors.linkedin ? 'border-red-500' : ''}
                 />
+                {validationErrors.linkedin && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors.linkedin}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">GitHub</label>
@@ -155,7 +283,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
                   value={formData.socialLinks?.github || ''}
                   onChange={(e) => handleSocialLinkChange('github', e.target.value)}
                   placeholder="https://github.com/tu-usuario"
+                  className={validationErrors.github ? 'border-red-500' : ''}
                 />
+                {validationErrors.github && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors.github}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Twitter</label>
@@ -163,7 +295,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
                   value={formData.socialLinks?.twitter || ''}
                   onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
                   placeholder="https://twitter.com/tu-usuario"
+                  className={validationErrors.twitter ? 'border-red-500' : ''}
                 />
+                {validationErrors.twitter && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors.twitter}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Sitio Web</label>
@@ -171,7 +307,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
                   value={formData.socialLinks?.website || ''}
                   onChange={(e) => handleSocialLinkChange('website', e.target.value)}
                   placeholder="https://tu-sitio.com"
+                  className={validationErrors.website ? 'border-red-500' : ''}
                 />
+                {validationErrors.website && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors.website}</p>
+                )}
               </div>
             </div>
           </div>

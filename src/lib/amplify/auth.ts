@@ -181,5 +181,41 @@ async function getUserAttributes(user: AuthUser): Promise<Record<string, unknown
   }
 }
 
+/**
+ * Obtiene el role del usuario basado en los grupos de Cognito
+ * 
+ * LÓGICA: Los grupos de Cognito son la fuente de verdad para los roles
+ * - Si está en grupo "ADMINS" → role = "ADMIN"
+ * - Si está en grupo "SPEAKERS" → role = "SPEAKER"  
+ * - Si está en grupo "MEMBERS" o ninguno → role = "MEMBER"
+ * 
+ * IMPORTANTE: El orden importa (ADMIN tiene prioridad sobre SPEAKER)
+ * 
+ * @param user Usuario autenticado (opcional, se puede llamar sin parámetro)
+ * @returns El role del usuario: 'ADMIN' | 'SPEAKER' | 'MEMBER'
+ */
+export async function getUserRoleFromCognito(user?: AuthUser): Promise<'ADMIN' | 'SPEAKER' | 'MEMBER'> {
+  try {
+    const session = await fetchAuthSession();
+    const groups = (session.tokens?.accessToken?.payload['cognito:groups'] || []) as string[];
+    
+    // Verificar grupos en orden de prioridad (ADMIN > SPEAKER > MEMBER)
+    if (Array.isArray(groups)) {
+      if (groups.includes('ADMINS')) {
+        return 'ADMIN';
+      }
+      if (groups.includes('SPEAKERS')) {
+        return 'SPEAKER';
+      }
+    }
+    
+    // Por defecto, todos son MEMBER
+    return 'MEMBER';
+  } catch (error) {
+    console.error('Error obteniendo role desde Cognito:', error);
+    return 'MEMBER';
+  }
+}
+
 // Export utility functions for auth context
 export { checkIsUserAdmin, getUserAttributes };

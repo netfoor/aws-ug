@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import { useAuth } from '@/context/auth-context';
+import { getUserRoleFromCognito } from '@/lib/amplify/auth';
 import type { Schema } from '../../amplify/data/resource';
 
 const client = generateClient<Schema>();
@@ -38,9 +39,30 @@ export function useUserProfile() {
     setError(null);
     
     try {
+      // IMPORTANTE: Obtener el role desde los grupos de Cognito (fuente de verdad)
+      const roleFromCognito = await getUserRoleFromCognito();
+      
       const { data: userData } = await client.models.User.get({ id: user.userId });
       
       if (userData) {
+        // Parsear socialLinks de JSON string a objeto
+        let parsedSocialLinks = {};
+        if (userData.socialLinks) {
+          try {
+            // Si es string JSON, parsear
+            if (typeof userData.socialLinks === 'string') {
+              parsedSocialLinks = JSON.parse(userData.socialLinks);
+            } else {
+              // Si ya es objeto (por alguna razón), usarlo directamente
+              parsedSocialLinks = userData.socialLinks as any;
+            }
+          } catch (e) {
+            console.error('Error parsing socialLinks:', e);
+            parsedSocialLinks = {};
+          }
+        }
+        
+        // Usar los datos de DynamoDB pero el ROLE viene de Cognito
         setProfile({
           id: userData.id ?? undefined,
           givenName: (userData.givenName as string) || '',
@@ -50,10 +72,10 @@ export function useUserProfile() {
           company: userData.company ?? undefined,
           bio: userData.bio ?? undefined,
           interests: (userData.interests ?? []).filter((interest): interest is string => interest !== null),
-          role: (userData.role as 'MEMBER' | 'SPEAKER' | 'ADMIN') ?? 'MEMBER',
+          role: roleFromCognito, // ← CAMBIO: Ahora viene de Cognito, no de DynamoDB
           newsletterOptIn: userData.newsletterOptIn ?? false,
           avatarUrl: userData.avatarUrl ?? undefined,
-          socialLinks: (userData.socialLinks as any) ?? {},
+          socialLinks: parsedSocialLinks,
         });
       } else {
         // Crear perfil inicial desde atributos de Cognito
@@ -62,7 +84,7 @@ export function useUserProfile() {
           familyName: String(userAttributes?.family_name || ''),
           email: String(userAttributes?.email || ''),
           phoneNumber: userAttributes?.phone_number ? String(userAttributes.phone_number) : undefined,
-          role: 'MEMBER',
+          role: roleFromCognito, // ← CAMBIO: Role viene de Cognito
           newsletterOptIn: false,
           interests: [],
           socialLinks: {},
@@ -78,14 +100,27 @@ export function useUserProfile() {
   };
 
   const updateProfile = async (updatedProfile: Partial<UserProfile>) => {
-    if (!user?.userId) throw new Error('Usuario no autenticado');
+    if (!user?.userId) {
+      console.error('❌ useUserProfile.updateProfile: No hay userId');
+      throw new Error('Usuario no autenticado');
+    }
+    
+    console.log('🔄 useUserProfile.updateProfile: Iniciando actualización...');
+    console.log('👤 User ID:', user.userId);
+    console.log('📋 Datos a actualizar:', updatedProfile);
     
     setLoading(true);
     setError(null);
     
     try {
+      // IMPORTANTE: Obtener el role actual desde Cognito (siempre usar como fuente de verdad)
+      const roleFromCognito = await getUserRoleFromCognito();
+      console.log('🎭 Role desde Cognito:', roleFromCognito);
+      
       // Verificar si el usuario ya existe
+      console.log('🔍 Buscando usuario existente en DynamoDB...');
       const { data: existingUser } = await client.models.User.get({ id: user.userId });
+      console.log('📦 Usuario existente:', existingUser ? 'SÍ' : 'NO');
 
       const baseData = {
         id: user.userId,
@@ -93,47 +128,117 @@ export function useUserProfile() {
         familyName: updatedProfile.familyName || profile?.familyName || '',
         email: updatedProfile.email || profile?.email || '',
         interests: updatedProfile.interests || profile?.interests || [],
-        role: updatedProfile.role || profile?.role || 'MEMBER',
+        role: roleFromCognito, // ← CAMBIO: Sincronizar el role de Cognito a DynamoDB
         newsletterOptIn: updatedProfile.newsletterOptIn ?? profile?.newsletterOptIn ?? false,
       };
 
-      // Campos opcionales
+      // Campos opcionales - IMPORTANTE: Solo incluir si tienen valores válidos
       const optionalFields: any = {};
+      
+      // Phone number
       if (updatedProfile.phoneNumber || profile?.phoneNumber) {
         optionalFields.phoneNumber = updatedProfile.phoneNumber || profile?.phoneNumber;
       }
+      
+      // Company
       if (updatedProfile.company || profile?.company) {
         optionalFields.company = updatedProfile.company || profile?.company;
       }
+      
+      // Bio
       if (updatedProfile.bio || profile?.bio) {
         optionalFields.bio = updatedProfile.bio || profile?.bio;
       }
+      
+      // Avatar URL
       if (updatedProfile.avatarUrl || profile?.avatarUrl) {
         optionalFields.avatarUrl = updatedProfile.avatarUrl || profile?.avatarUrl;
       }
-      if (updatedProfile.socialLinks || profile?.socialLinks) {
-        optionalFields.socialLinks = updatedProfile.socialLinks || profile?.socialLinks || {};
+      
+      // Social Links - CRÍTICO: Sanitizar y convertir a JSON string
+      const socialLinks = updatedProfile.socialLinks || profile?.socialLinks;
+      if (socialLinks && typeof socialLinks === 'object') {
+        // Filtrar valores undefined, null y strings vacíos
+        const cleanedSocialLinks: Record<string, string> = {};
+        Object.entries(socialLinks).forEach(([key, value]) => {
+          if (value && typeof value === 'string' && value.trim() !== '') {
+            cleanedSocialLinks[key] = value;
+          }
+        });
+        
+        // Solo incluir si hay al menos un link válido
+        if (Object.keys(cleanedSocialLinks).length > 0) {
+          // IMPORTANTE: a.json() en Amplify requiere un string JSON, no un objeto
+          optionalFields.socialLinks = JSON.stringify(cleanedSocialLinks);
+          console.log('🔗 Social links sanitizados:', cleanedSocialLinks);
+          console.log('📦 Social links como JSON string:', optionalFields.socialLinks);
+        } else {
+          console.log('⚠️ No hay social links válidos, omitiendo campo');
+        }
       }
 
+      let result;
+      
       if (existingUser) {
         // Actualizar usuario existente
-        await client.models.User.update({
+        console.log('✏️ Actualizando usuario existente...');
+        result = await client.models.User.update({
           ...baseData,
           ...optionalFields,
         });
+        console.log('📦 Resultado de actualización:', result);
       } else {
         // Crear nuevo usuario
-        await client.models.User.create({
+        console.log('➕ Creando nuevo usuario...');
+        result = await client.models.User.create({
           ...baseData,
           ...optionalFields,
         });
+        console.log('📦 Resultado de creación:', result);
       }
 
-      setProfile(prev => ({ ...prev, ...updatedProfile } as UserProfile));
+      // IMPORTANTE: Verificar si hay errores en la respuesta
+      if (result.errors && result.errors.length > 0) {
+        console.error('❌ Error en la operación de DynamoDB:', result.errors);
+        result.errors.forEach((error: any, index: number) => {
+          console.error(`Error ${index + 1}:`, {
+            message: error.message,
+            errorType: error.errorType,
+            path: error.path,
+            locations: error.locations
+          });
+        });
+        
+        setError(`Error al guardar en DynamoDB: ${result.errors[0].message}`);
+        return false;
+      }
+
+      // Verificar si se creó/actualizó correctamente
+      if (!result.data) {
+        console.error('❌ No se recibió data en la respuesta');
+        setError('Error: No se pudo guardar el perfil');
+        return false;
+      }
+
+      console.log('✅ Operación exitosa, data recibida:', result.data);
+
+      // Actualizar el estado local con el role de Cognito
+      setProfile(prev => ({ 
+        ...prev, 
+        ...updatedProfile,
+        role: roleFromCognito // ← Asegurar que el role siempre venga de Cognito
+      } as UserProfile));
+      
+      console.log('✅ useUserProfile.updateProfile: Perfil actualizado exitosamente');
       return true;
     } catch (err) {
-      setError('Error al actualizar el perfil');
-      console.error('Error updating profile:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      setError('Error al actualizar el perfil: ' + errorMessage);
+      console.error('❌ useUserProfile.updateProfile: Error:', {
+        message: errorMessage,
+        error: err,
+        stack: err instanceof Error ? err.stack : undefined
+      });
       return false;
     } finally {
       setLoading(false);

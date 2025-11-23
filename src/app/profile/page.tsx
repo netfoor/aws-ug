@@ -12,7 +12,7 @@ import { EditProfileForm } from '@/components/profile/EditProfileForm';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading, isAdmin, userAttributes } = useAuth();
-  const { profile, loading: profileLoading } = useUserProfile();
+  const { profile, loading: profileLoading, refetch } = useUserProfile();
   const [isEditing, setIsEditing] = useState(false);
 
   if (isLoading || profileLoading) {
@@ -56,7 +56,11 @@ export default function ProfilePage() {
         
         <div className="container mx-auto px-4 py-8 relative z-10">
           <EditProfileForm
-            onSuccess={() => setIsEditing(false)}
+            onSuccess={async () => {
+              // Recargar el perfil en ProfilePage antes de cerrar el formulario
+              await refetch();
+              setIsEditing(false);
+            }}
             onCancel={() => setIsEditing(false)}
           />
         </div>
@@ -98,15 +102,41 @@ export default function ProfilePage() {
               <CardTitle className="text-2xl">{displayName}</CardTitle>
               <p className="text-text-secondary">{typeof displayEmail === 'string' ? displayEmail : ''}</p>
               <div className="flex justify-center gap-2 mt-4">
-                <Badge variant={profile?.role === 'ADMIN' ? 'warning' : profile?.role === 'SPEAKER' ? 'accent' : 'default'}>
+                <Badge 
+                  variant={profile?.role === 'ADMIN' ? 'warning' : profile?.role === 'SPEAKER' ? 'accent' : 'default'}
+                  title="Este role se asigna automáticamente desde los grupos de Cognito"
+                >
                   {profile?.role || 'MEMBER'}
                 </Badge>
+                {isAdmin && (
+                  <Badge variant="warning" title="Tienes permisos de administrador desde Cognito">
+                    🔑 Admin Access
+                  </Badge>
+                )}
                 {profile?.newsletterOptIn && (
                   <Badge variant="primary">Newsletter Suscrito</Badge>
                 )}
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Información de Role */}
+              <div className="bg-secondary/30 border border-border rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 text-accent mt-0.5">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm mb-1">Sobre tu role</h4>
+                    <p className="text-sm text-text-secondary">
+                      Tu role <strong>{profile?.role || 'MEMBER'}</strong> se asigna automáticamente desde los grupos de AWS Cognito. 
+                      {isAdmin ? ' Como administrador, tienes acceso completo a todas las funciones.' : ' Para cambiar tu role, contacta a un administrador.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Información Personal */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">Información Personal</h3>

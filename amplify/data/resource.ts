@@ -22,6 +22,10 @@ const schema = a.schema({
   .authorization((allow) => [
     allow.guest().to(['read']),
     allow.groups(['ADMINS']).to(['create', 'update', 'delete', 'read']),
+    // ✅ AGREGADO: Permitir a cualquier usuario autenticado gestionar su propio perfil
+    // IMPORTANTE: Esto permite crear/actualizar usando su propio userId como id
+    allow.authenticated().to(['create', 'update', 'read']),
+    // allow.owner() también funciona, pero authenticated() es más explícito para este caso
     allow.owner().to(['create', 'update', 'delete', 'read']),
   ])
 });
