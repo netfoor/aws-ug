@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.6.10",
+    "@aws-sdk/client-cognito-identity-provider": "^3.936.0",
     "autoprefixer": "^10.4.21",
     "aws-amplify": "^6.15.7",
     "clsx": "^2.1.1",
