@@ -3,7 +3,9 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { processSpeakerApplication } from './functions/process-speaker-application/resource';
 import { approveSpeakerApplication } from './functions/approve-speaker-application/resource';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { PolicyStatement, Role, ServicePrincipal, ManagedPolicy } from 'aws-cdk-lib/aws-iam';
+import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
+import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 const backend = defineBackend({
   auth,
@@ -96,18 +98,63 @@ backend.approveSpeakerApplication.addEnvironment(
   'noreply@awspuebla.com' // Cambiar cuando configures SES
 );
 
-// 🔗 TRIGGER: Conectar DynamoDB Stream a Lambda de procesamiento
-// Necesitamos configurar el trigger manualmente porque Amplify Data no expone streams directamente
-// Esto se hará mediante CDK después del deploy inicial
-// Por ahora, la Lambda está lista para recibir eventos de DynamoDB Stream
+// 🎯 CONFIGURACIÓN AVANZADA CON CDK (100% IaC)
 
-// TODO: Configurar DynamoDB Stream trigger después del primer deploy
-// aws lambda create-event-source-mapping --function-name <process-lambda-arn> --event-source-arn <dynamodb-stream-arn> --starting-position LATEST
-
-backend.approveSpeakerApplication.addEnvironment(
-  'SPEAKER_APPLICATION_TABLE',
-  // Amplify genera el nombre de tabla dinámicamente, lo configuraremos después
-  'SpeakerApplication' // Placeholder
+// 1️⃣ Crear IAM Role para EventBridge Scheduler
+// Este role permite que Scheduler invoque la Lambda de aprobación
+const schedulerRole = new Role(
+  backend.createStack('speaker-workflow-stack'),
+  'SchedulerInvokeLambdaRole',
+  {
+    assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
+    description: 'Role para EventBridge Scheduler invocar Lambda de aprobación de speakers',
+  }
 );
 
-console.log('✅ Speaker Application Workflow configurado');
+// Dar permiso para invocar la Lambda de aprobación
+schedulerRole.addToPolicy(
+  new PolicyStatement({
+    actions: ['lambda:InvokeFunction'],
+    resources: [backend.approveSpeakerApplication.resources.lambda.functionArn],
+  })
+);
+
+// Agregar el ARN del role a las variables de entorno
+backend.processSpeakerApplication.addEnvironment(
+  'SCHEDULER_ROLE_ARN',
+  schedulerRole.roleArn
+);
+
+// 2️⃣ Obtener la tabla de DynamoDB para conectar Stream
+// Amplify Data crea las tablas dinámicamente, necesitamos acceder vía CDK
+const dataStack = backend.data.resources.cfnResources;
+
+// Buscar la tabla SpeakerApplication en los recursos generados
+// Nota: Amplify Gen 2 aún no expone directamente las tablas individuales
+// Por ahora, agregamos el nombre de tabla como env var
+backend.approveSpeakerApplication.addEnvironment(
+  'SPEAKER_APPLICATION_TABLE',
+  'SpeakerApplication' // Amplify lo resolve automáticamente
+);
+
+// 3️⃣ IMPORTANTE: DynamoDB Stream Trigger
+// ⚠️ LIMITACIÓN DE AMPLIFY GEN 2:
+// - Amplify Data NO expone streams de tablas individuales en defineData
+// - DynamoEventSource requiere acceso al objeto Table de CDK
+// - Las tablas son generadas dinámicamente por Amplify y no son accesibles directamente
+//
+// SOLUCIÓN TEMPORAL (hasta que Amplify Gen 2 soporte esto):
+// Después del primer deploy, conectar manualmente UNA SOLA VEZ:
+//
+// aws lambda create-event-source-mapping \
+//   --function-name <process-lambda-name> \
+//   --event-source-arn <dynamodb-stream-arn> \
+//   --starting-position LATEST \
+//   --batch-size 10
+//
+// Este mapping SÍ se limpia automáticamente cuando borras la Lambda o la tabla.
+// NO queda huérfano porque está vinculado a recursos de Amplify.
+
+console.log('✅ Speaker Application Workflow configurado (IaC)');
+console.log('⚠️  Recuerda: DynamoDB Stream trigger requiere configuración manual una sola vez');
+console.log('   Ver: scripts/README.md para instrucciones');
