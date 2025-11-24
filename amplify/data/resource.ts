@@ -27,7 +27,45 @@ const schema = a.schema({
     allow.authenticated().to(['create', 'update', 'read']),
     // allow.owner() también funciona, pero authenticated() es más explícito para este caso
     allow.owner().to(['create', 'update', 'delete', 'read']),
+  ]),
+
+  // 🎤 SPEAKER APPLICATION: Sistema de postulación para speakers
+  SpeakerApplication: a.model({
+    id: a.id(),
+    userId: a.string().required(), // Cognito user ID
+    email: a.string().required(),
+    
+    // Datos de la postulación
+    motivation: a.string().required(), // ¿Por qué quieres ser speaker?
+    topics: a.string().array().required(), // Temas que te gustaría presentar
+    experience: a.string(), // Experiencia previa (opcional)
+    previousTalksLinks: a.string().array(), // Links a charlas anteriores (opcional)
+    
+    // Estado del proceso (default PENDING se maneja en Lambda)
+    status: a.enum(['PENDING', 'APPROVED', 'REJECTED']),
+    
+    // Timestamps
+    submittedAt: a.datetime().required(),
+    reviewedAt: a.datetime(),
+    
+    // Metadata para tracking
+    schedulerArn: a.string(), // ARN del EventBridge Schedule
+    rejectionReason: a.string(), // Solo si status = REJECTED
+    
+    // Owner field para authorization
+    owner: a.string(),
+  })
+  .secondaryIndexes((index) => [
+    index('userId').sortKeys(['submittedAt']).queryField('applicationsByUser'),
+    index('status').sortKeys(['submittedAt']).queryField('applicationsByStatus'),
   ])
+  .authorization((allow) => [
+    // Usuarios pueden crear su propia postulación y leer las suyas
+    allow.authenticated().to(['create', 'read']),
+    allow.owner().to(['read']),
+    // Solo ADMINS pueden ver todas y modificar estados
+    allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
+  ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
