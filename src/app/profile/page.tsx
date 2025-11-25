@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
-import { EditProfileForm } from '@/components/profile/EditProfileForm';
+import { EditProfileForm, SpeakerApplicationForm, SpeakerApplicationStatus } from '@/components/profile';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading, isAdmin, userAttributes } = useAuth();
@@ -206,6 +206,23 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Speaker Application Section */}
+          {profile?.role !== 'SPEAKER' && profile?.role !== 'ADMIN' && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-text-primary mb-4">🎤 Conviértete en Speaker</h2>
+              <SpeakerApplicationStatus userId={user.userId} />
+              <div className="mt-4">
+                <SpeakerApplicationForm 
+                  userId={user.userId}
+                  userEmail={String(displayEmail)}
+                  onSuccess={async () => {
+                    await refetch();
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
