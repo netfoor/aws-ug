@@ -19,10 +19,23 @@ const backend = defineBackend({
 // Lambda 1: Process Speaker Application
 // - Necesita enviar emails via SES
 // - Necesita crear schedules en EventBridge
+// - Necesita leer DynamoDB Streams
 backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     actions: ['ses:SendEmail', 'ses:SendRawEmail'],
     resources: ['*'], // SES requiere * o ARN específico del dominio
+  })
+);
+
+backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'dynamodb:GetRecords',
+      'dynamodb:GetShardIterator',
+      'dynamodb:DescribeStream',
+      'dynamodb:ListStreams',
+    ],
+    resources: [`arn:aws:dynamodb:${backend.auth.resources.userPool.stack.region}:${backend.auth.resources.userPool.stack.account}:table/SpeakerApplication-*/stream/*`],
   })
 );
 
