@@ -14,7 +14,7 @@ interface NavigationProps {
 
 export function Navigation({ className }: NavigationProps) {
   const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isAdmin } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -115,6 +115,15 @@ export function Navigation({ className }: NavigationProps) {
                     >
                       Perfil
                     </Link>
+                    {isAdmin && (
+                      <Link
+                        href="/admin/speakers"
+                        className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50 border-t border-border"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        🛡️ Panel Admin
+                      </Link>
+                    )}
                     <button
                       onClick={() => { logout(); setIsUserMenuOpen(false); }}
                       className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-secondary/50 rounded-b-lg"
@@ -172,6 +181,15 @@ export function Navigation({ className }: NavigationProps) {
                   >
                     Perfil
                   </Link>
+                  {isAdmin && (
+                    <Link
+                      href="/admin/speakers"
+                      className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      🛡️ Panel Admin
+                    </Link>
+                  )}
                   <button
                     onClick={() => { logout(); setIsMenuOpen(false); }}
                     className="w-full text-left px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"

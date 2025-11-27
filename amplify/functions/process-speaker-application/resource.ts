@@ -19,5 +19,5 @@ export const processSpeakerApplication = defineFunction({
   name: 'process-speaker-application',
   entry: './handler.ts',
   timeoutSeconds: 30,
-  resourceGroupName: 'data', // Parte del stack de data para acceder a DynamoDB
+  resourceGroupName: 'auth', // Mover a auth porque necesita schedulerRole que está en auth
 });
