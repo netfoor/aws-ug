@@ -145,6 +145,29 @@ Documentación técnica del sistema de autenticación.
 
 ---
 
+### 🎤 [Sistema de Speakers](./SPEAKER_WORKFLOW_TECHNICAL.md)
+
+Documentación completa del sistema de postulación para speakers.
+
+- **[SPEAKER_WORKFLOW_TECHNICAL.md](./SPEAKER_WORKFLOW_TECHNICAL.md)** ⭐⭐⭐  
+  **Documentación técnica completa del flujo de postulación de speakers:**
+  - 🏗️ Arquitectura del sistema con diagramas
+  - 📂 Todos los archivos involucrados explicados línea por línea
+  - 🔄 Flujo detallado paso a paso (9 pasos completos)
+  - 📧 2 emails automáticos (confirmación + aprobación)
+  - ⏰ EventBridge Scheduler (5 min delay)
+  - 📊 Monitoreo con CloudWatch Logs
+  - 🐛 Troubleshooting completo
+  - ✅ 99% IaC (Infrastructure as Code)
+  
+- **[SPEAKER_WORKFLOW_SETUP.md](./SPEAKER_WORKFLOW_SETUP.md)**  
+  Guía de setup inicial e IaC (Infrastructure as Code) del sistema.
+
+- **[SPEAKER_SYSTEM_SETUP.md](./SPEAKER_SYSTEM_SETUP.md)**  
+  Guía de post-deploy setup y scripts de configuración.
+
+---
+
 ## 🎯 Estado del Proyecto
 
 ### ✅ Completado (Fases 1, 2 y 3)

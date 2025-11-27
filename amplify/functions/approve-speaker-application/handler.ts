@@ -15,8 +15,19 @@ const sesClient = new SESClient({ region: process.env.AWS_REGION });
 
 // ⚙️ CONFIGURACIÓN
 const USER_POOL_ID = process.env.USER_POOL_ID;
-const SPEAKER_APPLICATION_TABLE = process.env.SPEAKER_APPLICATION_TABLE;
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'noreply@awspuebla.com';
+const TABLE_PREFIX = process.env.SPEAKER_APPLICATION_TABLE_PREFIX || 'SpeakerApplication';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
+
+// 🔍 Función para obtener el nombre real de la tabla dinámicamente
+async function getTableName(): Promise<string> {
+  const { ListTablesCommand } = await import('@aws-sdk/client-dynamodb');
+  const response = await ddbClient.send(new ListTablesCommand({}));
+  const tableName = response.TableNames?.find(name => name.startsWith(TABLE_PREFIX));
+  if (!tableName) {
+    throw new Error(`No se encontró tabla con prefijo: ${TABLE_PREFIX}`);
+  }
+  return tableName;
+}
 
 interface ApprovalEvent {
   applicationId: string;
@@ -148,11 +159,15 @@ export const handler: Handler<ApprovalEvent> = async (event) => {
   }
 
   try {
+    // 0️⃣ Obtener el nombre real de la tabla
+    const tableName = await getTableName();
+    console.log(`📋 Usando tabla: ${tableName}`);
+
     // 1️⃣ Obtener la aplicación de DynamoDB
     console.log(`📖 Obteniendo aplicación: ${applicationId}`);
     const getResult = await docClient.send(
       new GetCommand({
-        TableName: SPEAKER_APPLICATION_TABLE,
+        TableName: tableName,
         Key: { id: applicationId },
       })
     );
@@ -178,7 +193,7 @@ export const handler: Handler<ApprovalEvent> = async (event) => {
     console.log('📝 Actualizando estado a APPROVED');
     await docClient.send(
       new UpdateCommand({
-        TableName: SPEAKER_APPLICATION_TABLE,
+        TableName: tableName,
         Key: { id: applicationId },
         UpdateExpression: 'SET #status = :approved, reviewedAt = :now',
         ExpressionAttributeNames: {

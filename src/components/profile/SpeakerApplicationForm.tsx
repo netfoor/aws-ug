@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '@/amplify/data/resource';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import type { Schema } from '../../../amplify/data/resource';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Label } from '../ui/Label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card';
 import { Loader2, Plus, X, CheckCircle, Clock, XCircle } from 'lucide-react';
 
 const client = generateClient<Schema>();
@@ -183,7 +183,8 @@ export default function SpeakerApplicationForm({
                   <Button
                     type="button"
                     variant="outline"
-                    size="icon"
+                    size="sm"
+                    className="w-10 h-10 p-0"
                     onClick={() => removeTopicField(index)}
                   >
                     <X className="h-4 w-4" />
@@ -231,7 +232,8 @@ export default function SpeakerApplicationForm({
                   <Button
                     type="button"
                     variant="outline"
-                    size="icon"
+                    size="sm"
+                    className="w-10 h-10 p-0"
                     onClick={() => removeLinkField(index)}
                   >
                     <X className="h-4 w-4" />

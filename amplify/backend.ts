@@ -66,9 +66,14 @@ backend.approveSpeakerApplication.resources.lambda.addToRolePolicy(
     actions: [
       'dynamodb:UpdateItem',
       'dynamodb:GetItem',
+      'dynamodb:Query',
+      'dynamodb:Scan',
+      'dynamodb:ListTables', // Necesario para encontrar la tabla dinámicamente
     ],
     resources: [
-      `arn:aws:dynamodb:${backend.auth.resources.userPool.stack.region}:${backend.auth.resources.userPool.stack.account}:table/SpeakerApplication-*`,
+      `arn:aws:dynamodb:*:*:table/SpeakerApplication-*`,
+      `arn:aws:dynamodb:*:*:table/User-*`,
+      '*', // ListTables requiere acceso global
     ],
   })
 );
@@ -98,7 +103,7 @@ backend.processSpeakerApplication.addEnvironment(
 
 backend.processSpeakerApplication.addEnvironment(
   'SENDER_EMAIL',
-  'noreply@awspuebla.com' // Cambiar cuando configures SES
+  'fortino.romero.man@gmail.com' // Cambiar cuando configures SES
 );
 
 backend.approveSpeakerApplication.addEnvironment(
@@ -108,7 +113,7 @@ backend.approveSpeakerApplication.addEnvironment(
 
 backend.approveSpeakerApplication.addEnvironment(
   'SENDER_EMAIL',
-  'noreply@awspuebla.com' // Cambiar cuando configures SES
+  'fortino.romero.man@gmail.com' // Cambiar cuando configures SES
 );
 
 // 🎯 CONFIGURACIÓN AVANZADA CON CDK (100% IaC)
@@ -138,16 +143,13 @@ backend.processSpeakerApplication.addEnvironment(
   schedulerRole.roleArn
 );
 
-// 2️⃣ Obtener la tabla de DynamoDB para conectar Stream
-// Amplify Data crea las tablas dinámicamente, necesitamos acceder vía CDK
-const dataStack = backend.data.resources.cfnResources;
-
-// Buscar la tabla SpeakerApplication en los recursos generados
-// Nota: Amplify Gen 2 aún no expone directamente las tablas individuales
-// Por ahora, agregamos el nombre de tabla como env var
+// 2️⃣ Obtener acceso a las tablas de DynamoDB
+// Amplify Data crea las tablas dinámicamente
+// El nombre real será: SpeakerApplication-{hash}-{environment}
+// La Lambda lo obtendrá dinámicamente listando tablas con ese prefijo
 backend.approveSpeakerApplication.addEnvironment(
-  'SPEAKER_APPLICATION_TABLE',
-  'SpeakerApplication' // Amplify lo resolve automáticamente
+  'SPEAKER_APPLICATION_TABLE_PREFIX',
+  'SpeakerApplication'
 );
 
 // 3️⃣ IMPORTANTE: DynamoDB Stream Trigger

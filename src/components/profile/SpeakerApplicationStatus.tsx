@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '@/amplify/data/resource';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import type { Schema } from '../../../amplify/data/resource';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react';
 
 const client = generateClient<Schema>();
@@ -142,7 +142,7 @@ export default function SpeakerApplicationStatus({ userId }: SpeakerApplicationS
             <div>
               <p className="font-semibold text-gray-900">Temas propuestos:</p>
               <div className="flex flex-wrap gap-2 mt-1">
-                {application.topics.map((topic, index) => (
+                {application.topics.map((topic: string | null, index: number) => (
                   <Badge key={index} variant="primary" size="sm">
                     {topic}
                   </Badge>

@@ -9,7 +9,7 @@ const sesClient = new SESClient({ region: process.env.AWS_REGION });
 const schedulerClient = new SchedulerClient({ region: process.env.AWS_REGION });
 
 // ⚙️ CONFIGURACIÓN
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'noreply@awspuebla.com';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
 const APPROVAL_DELAY_MINUTES = 5; // Delay antes de auto-aprobar
 const APPROVE_LAMBDA_ARN = process.env.APPROVE_LAMBDA_ARN;
 
