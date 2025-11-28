@@ -46,8 +46,19 @@ export async function POST(request: NextRequest) {
     }
 
     // 3️⃣ Invocar Lambda reject-speaker-application
-    // Buscar el nombre real de la Lambda (incluye sufijo de Amplify)
-    const lambdaFunctionName = process.env.REJECT_SPEAKER_LAMBDA_NAME || 'amplify-awsug-netfoor-san-rejectspeakerapplication-gFWQr24sWBzR';
+    // El nombre viene de amplify_outputs.json (generado por Amplify)
+    const outputs = await import('../../../../../amplify_outputs.json') as any;
+    const lambdaFunctionName = outputs.custom?.rejectSpeakerLambdaName;
+    
+    if (!lambdaFunctionName) {
+      return NextResponse.json(
+        {
+          error: 'Lambda reject-speaker no encontrada en amplify_outputs.json',
+          hint: 'Ejecuta "npx ampx sandbox" para generar amplify_outputs.json con los nombres de las Lambdas',
+        },
+        { status: 501 }
+      );
+    }
     
     const payload = {
       applicationId,
@@ -64,16 +75,42 @@ export async function POST(request: NextRequest) {
       Payload: JSON.stringify(payload),
     });
 
-    const response = await lambdaClient.send(command);
-    const result = JSON.parse(new TextDecoder().decode(response.Payload));
+    let response;
+    try {
+      response = await lambdaClient.send(command);
+    } catch (awsErr: any) {
+      console.error('❌ Error invoking Lambda:', awsErr);
+      if (awsErr.name === 'ResourceNotFoundException' || awsErr.Code === 'ResourceNotFoundException') {
+        return NextResponse.json(
+          { error: 'Lambda no encontrada', details: awsErr.message },
+          { status: 502 }
+        );
+      }
+      return NextResponse.json(
+        { error: 'Error al invocar la Lambda', details: awsErr.message || String(awsErr) },
+        { status: 502 }
+      );
+    }
+
+    // Intentar decodificar el payload de la Lambda (puede ser vacío)
+    let result: any = null;
+    try {
+      if (response.Payload) {
+        const decoded = new TextDecoder().decode(response.Payload);
+        result = decoded ? JSON.parse(decoded) : null;
+      }
+    } catch (parseErr) {
+      console.warn('⚠️ No se pudo parsear payload de Lambda:', parseErr);
+      result = { raw: response.Payload ? new TextDecoder().decode(response.Payload) : null };
+    }
 
     console.log('✅ Lambda response:', result);
 
-    // 4️⃣ Verificar si hubo error en la Lambda
+    // 4️⃣ Verificar si hubo error en la Lambda (FunctionError indica excepción dentro de la Lambda)
     if (response.FunctionError) {
-      console.error('❌ Lambda error:', result);
+      console.error('❌ Lambda internal error:', result);
       return NextResponse.json(
-        { error: 'Error al ejecutar el rechazo', details: result },
+        { error: 'Error interno en la Lambda', details: result },
         { status: 500 }
       );
     }

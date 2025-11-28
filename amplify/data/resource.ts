@@ -66,6 +66,39 @@ const schema = a.schema({
     // Solo ADMINS pueden ver todas y modificar estados
     allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
   ]),
+
+  // 🔔 NOTIFICATIONS: Sistema de notificaciones in-app
+  Notification: a.model({
+    id: a.id(),
+    userId: a.string().required(), // Usuario que recibe la notificación
+    
+    // Contenido de la notificación
+    type: a.enum(['SPEAKER_APPROVED', 'SPEAKER_REJECTED', 'NEW_EVENT', 'COMMENT', 'ANNOUNCEMENT']),
+    title: a.string().required(), // Título corto
+    message: a.string().required(), // Mensaje descriptivo
+    
+    // Metadata
+    read: a.boolean().default(false), // Si fue leída o no
+    link: a.string(), // URL a donde navegar al hacer click (opcional)
+    icon: a.string(), // Emoji o nombre del icono (opcional)
+    
+    // Timestamps
+    createdAt: a.datetime().required(),
+    readAt: a.datetime(), // Cuando se marcó como leída
+    
+    // Owner field
+    owner: a.string(),
+  })
+  .secondaryIndexes((index) => [
+    index('userId').sortKeys(['createdAt']).queryField('notificationsByUser'),
+  ])
+  .authorization((allow) => [
+    // Usuario solo puede leer y actualizar sus propias notificaciones
+    allow.owner().to(['read', 'update']),
+    // ADMINS y sistema pueden crear notificaciones para cualquier usuario
+    allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
+    allow.authenticated().to(['read']), // Leer solo las propias
+  ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

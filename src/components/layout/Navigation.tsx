@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/Button';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { cn } from '@/lib/utils';
 
 interface NavigationProps {
@@ -84,6 +85,9 @@ export function Navigation({ className }: NavigationProps) {
                 </svg>
               )}
             </Button>
+
+            {/* 🔔 Notificaciones */}
+            <NotificationBell />
 
             {isAuthenticated ? (
               <div className="relative hidden sm:block">

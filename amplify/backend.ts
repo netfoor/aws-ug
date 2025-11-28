@@ -170,10 +170,12 @@ backend.manualApproveSpeaker.resources.lambda.addToRolePolicy(
       'dynamodb:Query',
       'dynamodb:Scan',
       'dynamodb:ListTables',
+      'dynamodb:PutItem', // Para crear notificaciones
     ],
     resources: [
       `arn:aws:dynamodb:*:*:table/SpeakerApplication-*`,
       `arn:aws:dynamodb:*:*:table/User-*`,
+      `arn:aws:dynamodb:*:*:table/Notification-*`, // Tabla de notificaciones
       '*',
     ],
   })
@@ -221,6 +223,11 @@ backend.manualApproveSpeaker.addEnvironment(
   'SpeakerApplication'
 );
 
+backend.manualApproveSpeaker.addEnvironment(
+  'NOTIFICATION_TABLE_PREFIX',
+  'Notification'
+);
+
 // Lambda 4: Reject Speaker Application (Admin Panel)
 // - Necesita actualizar DynamoDB
 // - Necesita enviar emails via SES
@@ -233,9 +240,11 @@ backend.rejectSpeakerApplication.resources.lambda.addToRolePolicy(
       'dynamodb:Query',
       'dynamodb:Scan',
       'dynamodb:ListTables',
+      'dynamodb:PutItem', // Para crear notificaciones
     ],
     resources: [
       `arn:aws:dynamodb:*:*:table/SpeakerApplication-*`,
+      `arn:aws:dynamodb:*:*:table/Notification-*`, // Tabla de notificaciones
       '*',
     ],
   })
@@ -266,6 +275,11 @@ backend.rejectSpeakerApplication.addEnvironment(
 backend.rejectSpeakerApplication.addEnvironment(
   'SPEAKER_APPLICATION_TABLE_PREFIX',
   'SpeakerApplication'
+);
+
+backend.rejectSpeakerApplication.addEnvironment(
+  'NOTIFICATION_TABLE_PREFIX',
+  'Notification'
 );
 
 // 🌐 PERMISOS PARA API ROUTES (Admin Panel)
@@ -304,3 +318,11 @@ console.log('✅ Permisos de invocación Lambda agregados para API routes');
 console.log('✅ Speaker Application Workflow configurado (IaC)');
 console.log('⚠️  Recuerda: DynamoDB Stream trigger requiere configuración manual una sola vez');
 console.log('   Ver: scripts/README.md para instrucciones');
+
+// 🔗 Exportar nombres de Lambdas como outputs para consumir desde frontend
+backend.addOutput({
+  custom: {
+    manualApproveLambdaName: backend.manualApproveSpeaker.resources.lambda.functionName,
+    rejectSpeakerLambdaName: backend.rejectSpeakerApplication.resources.lambda.functionName,
+  },
+});

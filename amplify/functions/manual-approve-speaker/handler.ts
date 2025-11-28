@@ -3,18 +3,50 @@
  * 
  * Aprobación MANUAL de postulación de speaker por admin.
  * Similar a approve-speaker-application pero con diferencias:
- * - Triggered por API Gateway (no EventBridge)
- * - Cancela el schedule automático de EventBridge si existe
- * - Ejecuta inmediatamente (no espera 5 min)
- * 
- * Flujo:
- * 1️⃣ Recibe applicationId del admin panel
- * 2️⃣ Cancela schedule de EventBridge (si existe)
- * 3️⃣ Obtiene datos de DynamoDB
- * 4️⃣ Actualiza status → APPROVED
- * 5️⃣ Agrega usuario a grupo SPEAKERS en Cognito
- * 6️⃣ Envía email de aprobación
+ * - Triggered por API   console.log(`✅ Email de aprobación enviado: ${email}`);
+}
+/**
+ * Crea notificación in-app para el usuario
  */
+async function createNotification(userId: string, notificationTableName: string): Promise<void> {
+  const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
+  const { randomUUID } = await import('crypto');
+  
+  const now = new Date().toISOString();
+  await docClient.send(new PutCommand({
+    TableName: notificationTableName,
+    Item: {
+      id: randomUUID(),
+      userId,
+      type: 'SPEAKER_APPROVED',
+      title: '🎉 ¡Tu postulación fue aprobada!',
+      message: 'Felicitaciones, ahora eres parte del equipo de speakers de AWS User Group Puebla. Ya puedes proponer charlas para nuestros eventos.',
+      read: false,
+      link: '/profile',
+      icon: '🎤',
+      createdAt: now,
+      updatedAt: now,
+      owner: userId,
+    },
+  }));
+  
+  console.log(`✅ Notificación creada para usuario ${userId}`);
+}
+
+// ========================================
+// 🎯 HANDLER PRINCIPAL
+// ========================================y (no EventBridge)
+// * - Cancela el schedule automático de EventBridge si existe
+// * - Ejecuta inmediatamente (no espera 5 min)
+// * 
+// * Flujo:
+// * 1️⃣ Recibe applicationId del admin panel
+// * 2️⃣ Cancela schedule de EventBridge (si existe)
+// * 3️⃣ Obtiene datos de DynamoDB
+// * 4️⃣ Actualiza status → APPROVED
+// * 5️⃣ Agrega usuario a grupo SPEAKERS en Cognito
+// * 6️⃣ Envía email de aprobación
+// */
 
 import type { Handler } from 'aws-lambda';
 import { 
@@ -43,6 +75,7 @@ import {
 // 🔧 CONFIGURACIÓN
 // ========================================
 const TABLE_PREFIX = process.env.SPEAKER_APPLICATION_TABLE_PREFIX || 'SpeakerApplication';
+const NOTIFICATION_TABLE_PREFIX = process.env.NOTIFICATION_TABLE_PREFIX || 'Notification';
 const USER_POOL_ID = process.env.USER_POOL_ID;
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
 const REGION = process.env.AWS_REGION || 'us-east-1';
@@ -82,12 +115,12 @@ interface SpeakerApplication {
 /**
  * Obtiene el nombre real de la tabla DynamoDB con sufijo
  */
-async function getTableName(): Promise<string> {
+async function getTableName(prefix: string): Promise<string> {
   const response = await ddbClient.send(new ListTablesCommand({}));
-  const tableName = response.TableNames?.find(name => name.startsWith(TABLE_PREFIX));
+  const tableName = response.TableNames?.find(name => name.startsWith(prefix));
   
   if (!tableName) {
-    throw new Error(`❌ No se encontró tabla con prefijo: ${TABLE_PREFIX}`);
+    throw new Error(`❌ No se encontró tabla con prefijo: ${prefix}`);
   }
   
   return tableName;
@@ -211,9 +244,10 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
   }
 
   try {
-    // 0️⃣ Obtener nombre real de la tabla
-    const tableName = await getTableName();
-    console.log(`📋 Usando tabla: ${tableName}`);
+    // 0️⃣ Obtener nombres reales de las tablas
+    const tableName = await getTableName(TABLE_PREFIX);
+    const notificationTableName = await getTableName(NOTIFICATION_TABLE_PREFIX);
+    console.log(`📋 Usando tablas: ${tableName}, ${notificationTableName}`);
 
     // 1️⃣ Obtener datos de la postulación
     console.log(`📖 Obteniendo postulación: ${applicationId}`);
@@ -275,6 +309,11 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
     await sendApprovalEmail(application.email, userName);
 
     console.log('✅ Email de aprobación enviado');
+
+    // 6️⃣ Crear notificación in-app
+    await createNotification(userId, notificationTableName);
+
+    console.log('✅ Notificación in-app creada');
 
     // ========================================
     // 🎉 ÉXITO

@@ -33,6 +33,7 @@ import {
 // 🔧 CONFIGURACIÓN
 // ========================================
 const TABLE_PREFIX = process.env.SPEAKER_APPLICATION_TABLE_PREFIX || 'SpeakerApplication';
+const NOTIFICATION_TABLE_PREFIX = process.env.NOTIFICATION_TABLE_PREFIX || 'Notification';
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
 const REGION = process.env.AWS_REGION || 'us-east-1';
 
@@ -71,12 +72,12 @@ interface SpeakerApplication {
 /**
  * Obtiene el nombre real de la tabla DynamoDB con sufijo
  */
-async function getTableName(): Promise<string> {
+async function getTableName(prefix: string): Promise<string> {
   const response = await ddbClient.send(new ListTablesCommand({}));
-  const tableName = response.TableNames?.find(name => name.startsWith(TABLE_PREFIX));
+  const tableName = response.TableNames?.find(name => name.startsWith(prefix));
   
   if (!tableName) {
-    throw new Error(`❌ No se encontró tabla con prefijo: ${TABLE_PREFIX}`);
+    throw new Error(`❌ No se encontró tabla con prefijo: ${prefix}`);
   }
   
   return tableName;
@@ -195,6 +196,34 @@ async function sendRejectionEmail(
   console.log(`✅ Email de rechazo enviado a: ${email}`);
 }
 
+/**
+ * Crea notificación in-app para el usuario
+ */
+async function createNotification(userId: string, rejectionReason: string, notificationTableName: string): Promise<void> {
+  const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
+  const { randomUUID } = await import('crypto');
+  
+  const now = new Date().toISOString();
+  await docClient.send(new PutCommand({
+    TableName: notificationTableName,
+    Item: {
+      id: randomUUID(),
+      userId,
+      type: 'SPEAKER_REJECTED',
+      title: 'Actualización sobre tu postulación',
+      message: `Tu postulación como speaker fue revisada. Feedback: ${rejectionReason}. Te animamos a seguir participando y aplicar nuevamente en el futuro.`,
+      read: false,
+      link: '/profile',
+      icon: '📋',
+      createdAt: now,
+      updatedAt: now,
+      owner: userId,
+    },
+  }));
+  
+  console.log(`✅ Notificación creada para usuario ${userId}`);
+}
+
 // ========================================
 // 🎯 HANDLER PRINCIPAL
 // ========================================
@@ -208,9 +237,10 @@ export const handler: Handler<RejectionEvent> = async (event) => {
   }
 
   try {
-    // 0️⃣ Obtener nombre real de la tabla
-    const tableName = await getTableName();
-    console.log(`📋 Usando tabla: ${tableName}`);
+    // 0️⃣ Obtener nombres reales de las tablas
+    const tableName = await getTableName(TABLE_PREFIX);
+    const notificationTableName = await getTableName(NOTIFICATION_TABLE_PREFIX);
+    console.log(`📋 Usando tablas: ${tableName}, ${notificationTableName}`);
 
     // 1️⃣ Obtener datos de la postulación
     console.log(`📖 Obteniendo postulación: ${applicationId}`);
@@ -263,6 +293,11 @@ export const handler: Handler<RejectionEvent> = async (event) => {
     await sendRejectionEmail(application.email, userName, rejectionReason);
 
     console.log('✅ Email de rechazo enviado');
+
+    // 5️⃣ Crear notificación in-app
+    await createNotification(userId, rejectionReason, notificationTableName);
+
+    console.log('✅ Notificación in-app creada');
 
     // ========================================
     // 🎉 ÉXITO
