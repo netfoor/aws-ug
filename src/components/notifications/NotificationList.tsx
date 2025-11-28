@@ -70,16 +70,16 @@ export function NotificationList({
   };
 
   return (
-    <div className="divide-y divide-gray-200 dark:divide-gray-700">
+    <div className="divide-y divide-border">
       {notifications.map((notification) => {
         const hasLink = notification.link && notification.link.trim() !== '';
 
         const NotificationContent = (
           <div
-            className={`p-4 transition-colors ${
+            className={`p-4 transition-all theme-transition ${
               !notification.read
-                ? 'bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20'
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                ? 'bg-accent/10 hover:bg-accent/20'
+                : 'hover:bg-secondary/30'
             } ${hasLink ? 'cursor-pointer' : ''}`}
             onClick={() => {
               if (!notification.read && notification.id) {
@@ -98,8 +98,8 @@ export function NotificationList({
                 <div className="flex items-start justify-between gap-2">
                   <h4 className={`text-sm font-semibold ${
                     !notification.read
-                      ? 'text-gray-900 dark:text-gray-100'
-                      : 'text-gray-700 dark:text-gray-300'
+                      ? 'text-text-primary'
+                      : 'text-text-secondary'
                   }`}>
                     {notification.title}
                   </h4>
@@ -110,12 +110,12 @@ export function NotificationList({
                   )}
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                <p className="text-sm text-text-secondary mt-1 line-clamp-2">
                   {notification.message}
                 </p>
 
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-xs text-gray-500 dark:text-gray-500">
+                  <span className="text-xs text-text-secondary opacity-75">
                     {getRelativeTime(notification.createdAt)}
                   </span>
 

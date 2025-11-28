@@ -125,7 +125,7 @@ export function Navigation({ className }: NavigationProps) {
                         className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50 border-t border-border"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
-                        🛡️ Panel Admin
+                        Panel Admin
                       </Link>
                     )}
                     <button
@@ -191,7 +191,7 @@ export function Navigation({ className }: NavigationProps) {
                       className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      🛡️ Panel Admin
+                      Panel Admin
                     </Link>
                   )}
                   <button

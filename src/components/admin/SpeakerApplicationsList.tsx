@@ -82,12 +82,12 @@ export function SpeakerApplicationsList({
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div className="bg-surface rounded-lg shadow theme-transition">
         <div className="p-6">
-          <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+          <div className="h-8 w-64 bg-secondary/30 rounded animate-pulse mb-4"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div key={i} className="h-20 bg-secondary/30 rounded animate-pulse"></div>
             ))}
           </div>
         </div>
@@ -96,10 +96,10 @@ export function SpeakerApplicationsList({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div className="bg-surface rounded-lg shadow theme-transition">
       {/* Header con filtros */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="p-6 border-b border-border">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">
           Postulaciones de Speakers
         </h3>
 
@@ -111,20 +111,20 @@ export function SpeakerApplicationsList({
               placeholder="Buscar por email o motivación..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-gray-100"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary theme-transition"
             />
           </div>
 
           {/* Filtros de status */}
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:flex md:gap-2">
             {(['ALL', 'PENDING', 'APPROVED', 'REJECTED'] as FilterStatus[]).map((status) => (
               <button
                 key={status}
                 onClick={() => setFilterStatus(status)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-2 md:px-4 py-2 rounded-lg text-[10px] sm:text-xs md:text-sm font-medium transition-all theme-transition ${
                   filterStatus === status
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    ? 'bg-accent text-white'
+                    : 'bg-background text-text-secondary hover:bg-secondary/30'
                 }`}
               >
                 {status === 'ALL' ? 'Todas' : status === 'PENDING' ? 'Pendientes' : status === 'APPROVED' ? 'Aprobadas' : 'Rechazadas'}
@@ -138,47 +138,47 @@ export function SpeakerApplicationsList({
       <div className="overflow-x-auto">
         {filteredApplications.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-text-secondary">
               No se encontraron postulaciones con los filtros seleccionados.
             </p>
           </div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+            <thead className="bg-background theme-transition">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Usuario
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Estado
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Fecha
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Temas
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Acciones
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-surface divide-y divide-border theme-transition">
               {filteredApplications.map((application) => (
                 <tr 
                   key={application.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="hover:bg-background/50 transition-all theme-transition"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/80 to-accent flex items-center justify-center text-white font-semibold">
                         {application.email[0].toUpperCase()}
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <div className="text-sm font-medium text-text-primary">
                           {application.email}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <div className="text-xs text-text-secondary flex items-center gap-1">
                           <Mail className="w-3 h-3" />
                           {application.userId}
                         </div>
@@ -189,8 +189,8 @@ export function SpeakerApplicationsList({
                     {getStatusBadge(application.status || 'PENDING')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-gray-400" />
+                    <div className="text-sm text-text-primary flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-text-secondary" />
                       {formatDate(application.submittedAt)}
                     </div>
                   </td>
@@ -200,14 +200,14 @@ export function SpeakerApplicationsList({
                         topic && (
                           <span 
                             key={index}
-                            className="inline-block px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+                            className="inline-block px-2 py-1 text-xs bg-secondary/30 text-text-primary rounded theme-transition"
                           >
                             {topic}
                           </span>
                         )
                       ))}
                       {application.topics && application.topics.length > 2 && (
-                        <span className="inline-block px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+                        <span className="inline-block px-2 py-1 text-xs text-text-secondary">
                           +{application.topics.length - 2}
                         </span>
                       )}
@@ -232,8 +232,8 @@ export function SpeakerApplicationsList({
       </div>
 
       {/* Footer con contador */}
-      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+      <div className="px-6 py-4 border-t border-border">
+        <p className="text-sm text-text-secondary">
           Mostrando {filteredApplications.length} de {applications.length} postulaciones
         </p>
       </div>

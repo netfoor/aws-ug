@@ -17,7 +17,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 'bg-primary text-secondary hover:bg-primary/90 shadow-talavera hover:shadow-talavera-lg active:scale-95',
       secondary: 'bg-secondary text-primary border border-border hover:bg-secondary/80 shadow-sm hover:shadow-md active:scale-95',
       accent: 'bg-accent text-white hover:bg-accent/90 shadow-talavera hover:shadow-talavera-lg active:scale-95 font-semibold',
-      outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-secondary talavera-border active:scale-95',
+      outline: 'border-2 border-border text-text-primary hover:bg-secondary/30 hover:border-accent active:scale-95',
       ghost: 'text-text-primary hover:bg-secondary/50 active:scale-95'
     };
 

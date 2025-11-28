@@ -130,7 +130,7 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm mb-1">Sobre tu role</h4>
                     <p className="text-sm text-text-secondary">
-                      Tu role <strong>{profile?.role || 'MEMBER'}</strong> se asigna automáticamente desde los grupos de AWS Cognito. 
+                      Tu role <strong>{profile?.role || 'MEMBER'}</strong> se asigna automáticamente. 
                       {isAdmin ? ' Como administrador, tienes acceso completo a todas las funciones.' : ' Para cambiar tu role, contacta a un administrador.'}
                     </p>
                   </div>

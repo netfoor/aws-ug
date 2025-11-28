@@ -158,10 +158,10 @@ export default function AdminSpeakersPage() {
   // Loading de autenticación
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background theme-transition">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-orange-500 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Verificando permisos...</p>
+          <Loader2 className="w-12 h-12 text-accent animate-spin mx-auto mb-4" />
+          <p className="text-text-secondary">Verificando permisos...</p>
         </div>
       </div>
     );
@@ -170,19 +170,19 @@ export default function AdminSpeakersPage() {
   // No es admin
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background theme-transition">
         <div className="text-center max-w-md">
           <ShieldAlert className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="text-2xl font-bold text-text-primary mb-2">
             Acceso Denegado
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-text-secondary mb-6">
             No tienes permisos para acceder al panel de administración.
             Esta página está reservada solo para administradores.
           </p>
           <a
             href="/dashboard"
-            className="inline-block px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+            className="inline-block px-6 py-3 bg-accent text-white rounded-lg hover:opacity-90 transition-all"
           >
             Volver al Dashboard
           </a>
@@ -192,23 +192,23 @@ export default function AdminSpeakersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background theme-transition">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-surface border-b border-border theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-3xl font-bold text-text-primary">
                 Panel de Administración
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-text-secondary mt-1">
                 Gestión de postulaciones de speakers
               </p>
             </div>
             <button
               onClick={loadApplications}
               disabled={isLoading}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? (
                 <>
@@ -226,7 +226,7 @@ export default function AdminSpeakersPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg theme-transition">
             <p className="text-red-800 dark:text-red-200">{error}</p>
           </div>
         )}

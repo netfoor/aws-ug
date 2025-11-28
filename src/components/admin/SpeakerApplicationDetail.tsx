@@ -110,27 +110,27 @@ export function SpeakerApplicationDetail({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-surface rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden theme-transition">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-xl font-bold">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent/80 to-accent flex items-center justify-center text-white text-xl font-bold">
               {application.email[0].toUpperCase()}
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              <h2 className="text-xl font-bold text-text-primary">
                 Detalle de Postulación
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-text-secondary">
                 {application.email}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            className="p-2 hover:bg-background rounded-full transition-all theme-transition"
           >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <X className="w-5 h-5 text-text-secondary" />
           </button>
         </div>
 
@@ -155,35 +155,35 @@ export function SpeakerApplicationDetail({
           {/* Info Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="flex items-start gap-3">
-              <User className="w-5 h-5 text-gray-400 mt-0.5" />
+              <User className="w-5 h-5 text-text-secondary mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">User ID</p>
-                <p className="text-sm text-gray-900 dark:text-gray-100 font-mono">{application.userId}</p>
+                <p className="text-sm font-medium text-text-secondary">User ID</p>
+                <p className="text-sm text-text-primary font-mono">{application.userId}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
+              <Mail className="w-5 h-5 text-text-secondary mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
-                <p className="text-sm text-gray-900 dark:text-gray-100">{application.email}</p>
+                <p className="text-sm font-medium text-text-secondary">Email</p>
+                <p className="text-sm text-text-primary">{application.email}</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+              <Calendar className="w-5 h-5 text-text-secondary mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de envío</p>
-                <p className="text-sm text-gray-900 dark:text-gray-100">{formatDate(application.submittedAt)}</p>
+                <p className="text-sm font-medium text-text-secondary">Fecha de envío</p>
+                <p className="text-sm text-text-primary">{formatDate(application.submittedAt)}</p>
               </div>
             </div>
 
             {application.reviewedAt && (
               <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+                <Calendar className="w-5 h-5 text-text-secondary mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de revisión</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-100">{formatDate(application.reviewedAt)}</p>
+                  <p className="text-sm font-medium text-text-secondary">Fecha de revisión</p>
+                  <p className="text-sm text-text-primary">{formatDate(application.reviewedAt)}</p>
                 </div>
               </div>
             )}
@@ -192,11 +192,11 @@ export function SpeakerApplicationDetail({
           {/* Motivación */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
-              <MessageSquare className="w-5 h-5 text-orange-500" />
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Motivación</h3>
+              <MessageSquare className="w-5 h-5 text-accent" />
+              <h3 className="font-semibold text-text-primary">Motivación</h3>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+            <div className="bg-background rounded-lg p-4 theme-transition">
+              <p className="text-text-primary whitespace-pre-wrap">
                 {application.motivation}
               </p>
             </div>
@@ -205,15 +205,15 @@ export function SpeakerApplicationDetail({
           {/* Temas */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
-              <Tag className="w-5 h-5 text-orange-500" />
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Temas de interés</h3>
+              <Tag className="w-5 h-5 text-accent" />
+              <h3 className="font-semibold text-text-primary">Temas de interés</h3>
             </div>
             <div className="flex flex-wrap gap-2">
               {application.topics?.map((topic: string | null, index: number) => (
                 topic && (
                   <span
                     key={index}
-                    className="px-3 py-1.5 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full text-sm font-medium"
+                    className="px-3 py-1.5 bg-accent/20 text-accent rounded-full text-sm font-medium theme-transition"
                   >
                     {topic}
                   </span>
@@ -226,11 +226,11 @@ export function SpeakerApplicationDetail({
           {application.experience && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
-                <Award className="w-5 h-5 text-orange-500" />
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Experiencia</h3>
+                <Award className="w-5 h-5 text-accent" />
+                <h3 className="font-semibold text-text-primary">Experiencia</h3>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+              <div className="bg-background rounded-lg p-4 theme-transition">
+                <p className="text-text-primary whitespace-pre-wrap">
                   {application.experience}
                 </p>
               </div>
@@ -241,8 +241,8 @@ export function SpeakerApplicationDetail({
           {application.previousTalksLinks && application.previousTalksLinks.length > 0 && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
-                <LinkIcon className="w-5 h-5 text-orange-500" />
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Charlas anteriores</h3>
+                <LinkIcon className="w-5 h-5 text-accent" />
+                <h3 className="font-semibold text-text-primary">Charlas anteriores</h3>
               </div>
               <div className="space-y-2">
                 {application.previousTalksLinks.map((link: string | null, index: number) => (
@@ -252,7 +252,7 @@ export function SpeakerApplicationDetail({
                       href={link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block p-3 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      className="block p-3 bg-background rounded-lg hover:bg-secondary/30 transition-all theme-transition"
                     >
                       <p className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all">
                         {link}
@@ -301,7 +301,7 @@ export function SpeakerApplicationDetail({
 
         {/* Footer con acciones */}
         {isPending && (
-          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <div className="px-6 py-4 border-t border-border flex justify-end gap-3">
             {!showRejectForm ? (
               <>
                 <Button
@@ -365,7 +365,7 @@ export function SpeakerApplicationDetail({
         )}
 
         {!isPending && (
-          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+          <div className="px-6 py-4 border-t border-border flex justify-end">
             <Button variant="outline" onClick={onClose}>
               Cerrar
             </Button>

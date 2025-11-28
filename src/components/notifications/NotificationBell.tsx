@@ -124,7 +124,7 @@ export function NotificationBell() {
       {/* Botón de campana */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+        className="relative p-2 text-text-secondary hover:text-text-primary hover:bg-secondary/30 rounded-full transition-all theme-transition"
         aria-label="Notificaciones"
       >
         <Bell className="w-5 h-5" />
@@ -137,42 +137,53 @@ export function NotificationBell() {
         )}
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown / Modal Full-Screen */}
       {isOpen && (
         <>
           {/* Overlay para cerrar */}
           <div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0 bg-black/50 z-40 md:bg-transparent"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Panel de notificaciones */}
-          <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-[80vh] overflow-hidden flex flex-col">
+          <div className="fixed inset-x-0 top-0 md:absolute md:right-0 md:left-auto md:top-auto mt-0 md:mt-2 w-full md:w-96 bg-surface rounded-none md:rounded-lg shadow-xl border-0 md:border border-border z-50 h-screen md:h-auto md:max-h-[80vh] overflow-hidden flex flex-col theme-transition animate-in slide-in-from-top md:slide-in-from-top-2 duration-300">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <div className="p-4 border-b border-border flex items-center justify-between bg-surface safe-top">
+              <h3 className="text-lg font-semibold text-text-primary">
                 Notificaciones
               </h3>
-              {unreadCount > 0 && (
+              <div className="flex items-center gap-2">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-sm text-accent hover:underline"
+                  >
+                    Marcar todas
+                  </button>
+                )}
                 <button
-                  onClick={markAllAsRead}
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  onClick={() => setIsOpen(false)}
+                  className="md:hidden p-2 hover:bg-secondary/30 rounded-full transition-colors"
+                  aria-label="Cerrar"
                 >
-                  Marcar todas como leídas
+                  <svg className="w-5 h-5 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
-              )}
+              </div>
             </div>
 
             {/* Lista de notificaciones */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto safe-bottom">
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+                  <Loader2 className="w-6 h-6 text-text-secondary animate-spin" />
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 px-4">
-                  <Bell className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                  <Bell className="w-12 h-12 text-text-secondary/50 mb-3" />
+                  <p className="text-sm text-text-secondary text-center">
                     No tienes notificaciones
                   </p>
                 </div>
