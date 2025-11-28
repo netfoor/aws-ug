@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { CheckCircle, XCircle, Calendar, MessageSquare, Megaphone, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, Calendar, MessageSquare, Megaphone, ExternalLink, FileText } from 'lucide-react';
 import type { Schema } from '../../../amplify/data/resource';
 
 type Notification = Schema['Notification']['type'];
@@ -41,6 +41,8 @@ export function NotificationList({
         return <CheckCircle className="w-6 h-6 text-green-500" />;
       case 'SPEAKER_REJECTED':
         return <XCircle className="w-6 h-6 text-red-500" />;
+      case 'NEW_SPEAKER_APPLICATION':
+        return <FileText className="w-6 h-6 text-indigo-500" />;
       case 'NEW_EVENT':
         return <Calendar className="w-6 h-6 text-blue-500" />;
       case 'COMMENT':

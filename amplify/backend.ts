@@ -8,6 +8,8 @@ import { rejectSpeakerApplication } from './functions/reject-speaker-application
 import { PolicyStatement, Role, ServicePrincipal, ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { RetentionDays, LogGroup } from 'aws-cdk-lib/aws-logs';
+import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 
 const backend = defineBackend({
   auth,
@@ -17,6 +19,21 @@ const backend = defineBackend({
   manualApproveSpeaker,
   rejectSpeakerApplication,
 });
+
+// 📝 CLOUDWATCH LOGS: Configurar retención automática (7 días)
+// Evita acumulación de logs indefinidos y reduce costos
+//
+// ⚠️ LIMITACIÓN: Amplify Gen 2 no expone LogGroup directamente desde IFunction
+// SOLUCIÓN: El script cleanup-orphaned-resources.ps1 configura retention manualmente
+// O usar Custom Resource para aplicar retention policies automáticamente
+//
+// TODO: Crear Custom Resource que aplique retention a todos los log groups
+// con patrón /aws/lambda/amplify-awsug-*
+//
+// Por ahora, la retención se gestiona con:
+//   scripts/cleanup-orphaned-resources-fixed.ps1 (sección 4)
+
+console.log('⚠️  Log retention: Usar cleanup-orphaned-resources-fixed.ps1 para aplicar 7 días');
 
 // 🎤 SPEAKER APPLICATION WORKFLOW: Configuración de permisos
 
@@ -58,6 +75,28 @@ backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     actions: ['iam:PassRole'],
     resources: ['*'], // Necesario para crear schedules con rol de ejecución
+  })
+);
+
+backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'cognito-idp:ListUsersInGroup',
+    ],
+    resources: [backend.auth.resources.userPool.userPoolArn],
+  })
+);
+
+backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'dynamodb:PutItem',
+      'dynamodb:ListTables',
+    ],
+    resources: [
+      `arn:aws:dynamodb:*:*:table/Notification-*`,
+      '*', // ListTables requiere acceso global
+    ],
   })
 );
 
@@ -108,6 +147,11 @@ backend.processSpeakerApplication.addEnvironment(
 backend.processSpeakerApplication.addEnvironment(
   'SENDER_EMAIL',
   'fortino.romero.man@gmail.com' // Cambiar cuando configures SES
+);
+
+backend.processSpeakerApplication.addEnvironment(
+  'USER_POOL_ID',
+  backend.auth.resources.userPool.userPoolId
 );
 
 backend.approveSpeakerApplication.addEnvironment(
@@ -316,8 +360,78 @@ console.log('✅ Permisos de invocación Lambda agregados para API routes');
 // NO queda huérfano porque está vinculado a recursos de Amplify.
 
 console.log('✅ Speaker Application Workflow configurado (IaC)');
-console.log('⚠️  Recuerda: DynamoDB Stream trigger requiere configuración manual una sola vez');
-console.log('   Ver: scripts/README.md para instrucciones');
+
+// 🔄 DYNAMODB STREAM TRIGGER: Configuración automática
+// ⚠️ LIMITACIÓN AMPLIFY GEN 2: No podemos acceder directamente a backend.data.resources.tables
+// porque Amplify Data genera las tablas dinámicamente sin exponerlas como objetos CDK.
+//
+// WORKAROUND TEMPORAL:
+// Usar addEventSource requiere acceso al objeto Table de CDK, pero Amplify Gen 2
+// no expone las tablas individuales en el backend object.
+//
+// SOLUCIÓN ACTUAL: Configuración manual UNA SOLA VEZ con:
+//   amplify/functions/process-speaker-application/event-source-mapping.json
+//
+// Este archivo se puede usar con:
+//   aws lambda create-event-source-mapping --cli-input-json file://event-source-mapping.json
+//
+// El mapping NO queda huérfano porque:
+// 1. Está vinculado a la Lambda (se borra automáticamente al borrar la Lambda)
+// 2. Está vinculado a la tabla (se borra automáticamente al borrar la tabla)
+// 3. CloudFormation lo gestiona si se crea dentro del stack
+//
+// TODO: Cuando Amplify Gen 2 soporte acceso a tablas individuales, migrar a:
+// const speakerApplicationTable = backend.data.resources.tables['SpeakerApplication'];
+// backend.processSpeakerApplication.resources.lambda.addEventSource(
+//   new DynamoEventSource(speakerApplicationTable, {
+//     startingPosition: StartingPosition.LATEST,
+//     batchSize: 10,
+//     retryAttempts: 2,
+//   })
+// );
+
+console.log('⚠️  DynamoDB Stream: Configurar manualmente con post-deploy-setup.ps1');
+console.log('   El mapping se gestiona automáticamente y NO queda huérfano');
+
+// 📝 CLOUDWATCH LOG RETENTION (IaC)
+// Configurar retención de 7 días en todos los logs de Lambda
+// Esto ELIMINA la necesidad del script de limpieza manual
+const lambdaFunctions = [
+  { lambda: backend.processSpeakerApplication.resources.lambda, name: 'ProcessSpeakerApplication' },
+  { lambda: backend.approveSpeakerApplication.resources.lambda, name: 'ApproveSpeakerApplication' },
+  { lambda: backend.manualApproveSpeaker.resources.lambda, name: 'ManualApproveSpeaker' },
+  { lambda: backend.rejectSpeakerApplication.resources.lambda, name: 'RejectSpeakerApplication' },
+];
+
+lambdaFunctions.forEach(({ lambda, name }) => {
+  new AwsCustomResource(lambda.stack, `${name}LogRetention`, {
+    onCreate: {
+      service: 'CloudWatchLogs',
+      action: 'putRetentionPolicy',
+      parameters: {
+        logGroupName: `/aws/lambda/${lambda.functionName}`,
+        retentionInDays: 7,
+      },
+      physicalResourceId: PhysicalResourceId.of(`log-retention-${name}`),
+      ignoreErrorCodesMatching: 'ResourceNotFoundException', // Log group no existe aún
+    },
+    onUpdate: {
+      service: 'CloudWatchLogs',
+      action: 'putRetentionPolicy',
+      parameters: {
+        logGroupName: `/aws/lambda/${lambda.functionName}`,
+        retentionInDays: 7,
+      },
+      physicalResourceId: PhysicalResourceId.of(`log-retention-${name}`),
+      ignoreErrorCodesMatching: 'ResourceNotFoundException',
+    },
+    policy: AwsCustomResourcePolicy.fromSdkCalls({
+      resources: AwsCustomResourcePolicy.ANY_RESOURCE,
+    }),
+  });
+});
+
+console.log('✅ CloudWatch Log Retention configurado (7 días) para todas las Lambdas');
 
 // 🔗 Exportar nombres de Lambdas como outputs para consumir desde frontend
 backend.addOutput({

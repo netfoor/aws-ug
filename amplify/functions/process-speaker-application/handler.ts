@@ -4,14 +4,100 @@ import {
   SchedulerClient, 
   CreateScheduleCommand
 } from '@aws-sdk/client-scheduler';
+import { CognitoIdentityProviderClient, ListUsersInGroupCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const sesClient = new SESClient({ region: process.env.AWS_REGION });
 const schedulerClient = new SchedulerClient({ region: process.env.AWS_REGION });
+const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION });
+const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
+const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
 // ⚙️ CONFIGURACIÓN
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
 const APPROVAL_DELAY_MINUTES = 5; // Delay antes de auto-aprobar
 const APPROVE_LAMBDA_ARN = process.env.APPROVE_LAMBDA_ARN;
+const USER_POOL_ID = process.env.USER_POOL_ID;
+const NOTIFICATION_TABLE_PREFIX = 'Notification';
+
+/**
+ * 🔍 Obtiene el nombre real de la tabla con el prefijo dado
+ */
+async function getTableName(prefix: string): Promise<string> {
+  const { ListTablesCommand } = await import('@aws-sdk/client-dynamodb');
+  const response = await dynamoClient.send(new ListTablesCommand({}));
+  const table = response.TableNames?.find((name) => name.startsWith(prefix));
+  
+  if (!table) {
+    throw new Error(`❌ No se encontró tabla con prefijo: ${prefix}`);
+  }
+  
+  console.log(`✅ Tabla encontrada: ${table}`);
+  return table;
+}
+
+/**
+ * 👥 Obtiene todos los usuarios del grupo ADMINS
+ */
+async function getAdminUsers(): Promise<Array<{ userId: string; username: string }>> {
+  if (!USER_POOL_ID) {
+    throw new Error('❌ USER_POOL_ID no configurado');
+  }
+
+  console.log('👥 Obteniendo usuarios del grupo ADMINS...');
+  
+  const response = await cognitoClient.send(new ListUsersInGroupCommand({
+    UserPoolId: USER_POOL_ID,
+    GroupName: 'ADMINS',
+    Limit: 60,
+  }));
+
+  const admins = (response.Users || []).map(user => ({
+    userId: user.Attributes?.find(attr => attr.Name === 'sub')?.Value || '',
+    username: user.Username || '',
+  })).filter(admin => admin.userId);
+
+  console.log(`✅ Se encontraron ${admins.length} administradores`);
+  return admins;
+}
+
+/**
+ * 🔔 Crea notificaciones para todos los admins
+ */
+async function notifyAdmins(applicationId: string, applicantEmail: string) {
+  console.log('🔔 Creando notificaciones para administradores...');
+  
+  const notificationTableName = await getTableName(NOTIFICATION_TABLE_PREFIX);
+  const admins = await getAdminUsers();
+  const now = new Date().toISOString();
+  const { randomUUID } = await import('crypto');
+
+  for (const admin of admins) {
+    try {
+      await docClient.send(new PutCommand({
+        TableName: notificationTableName,
+        Item: {
+          id: randomUUID(),
+          userId: admin.userId,
+          type: 'NEW_SPEAKER_APPLICATION',
+          title: '📝 Nueva postulación de speaker',
+          message: `${applicantEmail} ha enviado una postulación para ser speaker. Revisa los detalles en el panel de administración.`,
+          read: false,
+          link: `/admin/speakers?status=PENDING`,
+          icon: '🎤',
+          createdAt: now,
+          updatedAt: now,
+          owner: admin.username,
+        },
+      }));
+      
+      console.log(`✅ Notificación creada para admin: ${admin.username}`);
+    } catch (error) {
+      console.error(`❌ Error creando notificación para ${admin.username}:`, error);
+    }
+  }
+}
 
 /**
  * 📧 Envía email de confirmación "Solicitud Recibida"
@@ -177,6 +263,9 @@ export const handler: DynamoDBStreamHandler = async (event) => {
 
       // 2️⃣ Programar auto-aprobación
       const schedulerArn = await scheduleAutoApproval(applicationId, userId);
+
+      // 3️⃣ Notificar a todos los admins
+      await notifyAdmins(applicationId, email);
 
       // TODO: Actualizar DynamoDB con schedulerArn para tracking
       // Esto lo haremos después de configurar permisos

@@ -73,7 +73,7 @@ const schema = a.schema({
     userId: a.string().required(), // Usuario que recibe la notificación
     
     // Contenido de la notificación
-    type: a.enum(['SPEAKER_APPROVED', 'SPEAKER_REJECTED', 'NEW_EVENT', 'COMMENT', 'ANNOUNCEMENT']),
+    type: a.enum(['SPEAKER_APPROVED', 'SPEAKER_REJECTED', 'NEW_SPEAKER_APPLICATION', 'NEW_EVENT', 'COMMENT', 'ANNOUNCEMENT']),
     title: a.string().required(), // Título corto
     message: a.string().required(), // Mensaje descriptivo
     

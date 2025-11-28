@@ -124,7 +124,6 @@ if ($tableName) {
     Write-Host "   ⚠️  Tabla SpeakerApplication no encontrada" -ForegroundColor Yellow
 }
 
-
 # ========================================
 # 4. LIMPIAR LOGS ANTIGUOS (OPCIONAL)
 # ========================================
@@ -155,7 +154,6 @@ if ($confirmLogs -eq "s" -or $confirmLogs -eq "S") {
 } else {
     Write-Host "   ⏭️  Saltando limpieza de logs" -ForegroundColor Gray
 }
-
 
 # ========================================
 # RESUMEN
