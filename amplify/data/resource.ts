@@ -67,6 +67,53 @@ const schema = a.schema({
     allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
   ]),
 
+  // 🎯 TALK PROPOSAL: Propuestas de charlas de speakers aprobados
+  TalkProposal: a.model({
+    id: a.id(),
+    userId: a.string().required(), // Speaker que propone (debe tener rol SPEAKER)
+    speakerName: a.string().required(),
+    speakerEmail: a.string().required(),
+    
+    // Datos de la propuesta de charla
+    title: a.string().required(), // Título de la charla
+    description: a.string().required(), // Descripción detallada
+    topics: a.string().array().required(), // Temas que cubre
+    duration: a.integer().required(), // Duración en minutos (15, 30, 45, 60)
+    targetAudience: a.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'ALL']),
+    requiredEquipment: a.string().array(), // Proyector, micrófono, etc.
+    additionalNotes: a.string(), // Notas adicionales para el admin
+    
+    // Estado de la propuesta
+    status: a.enum(['PENDING', 'APPROVED', 'REJECTED', 'EVENT_CREATED']),
+    
+    // Vinculación con evento (cuando se crea)
+    eventId: a.string(), // ID del evento creado desde esta propuesta
+    
+    // Review del admin
+    reviewedBy: a.string(), // userId del admin que revisó
+    reviewedAt: a.datetime(),
+    rejectionReason: a.string(), // Si fue rechazada
+    adminNotes: a.string(), // Notas internas del admin
+    
+    // Timestamps
+    submittedAt: a.datetime().required(),
+    updatedAt: a.datetime(),
+    
+    // Owner field
+    owner: a.string(),
+  })
+  .secondaryIndexes((index) => [
+    index('userId').sortKeys(['submittedAt']).queryField('proposalsByUser'),
+    index('status').sortKeys(['submittedAt']).queryField('proposalsByStatus'),
+  ])
+  .authorization((allow) => [
+    // Speakers (usuarios con rol SPEAKER) pueden crear propuestas y ver las suyas
+    allow.authenticated().to(['create', 'read']),
+    allow.owner().to(['read', 'update']), // Solo actualizar sus propias propuestas (por si necesitan editar antes de aprobar)
+    // ADMINS pueden ver todas y actualizar estados
+    allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
+  ]),
+
   // 🔔 NOTIFICATIONS: Sistema de notificaciones in-app
   Notification: a.model({
     id: a.id(),
