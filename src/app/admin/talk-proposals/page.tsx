@@ -8,6 +8,7 @@ import { Loader2, ShieldAlert, Lightbulb, Clock, Users, CheckCircle, XCircle, Ca
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Label } from '@/components/ui/Label';
+import CreateEventModal from '@/components/CreateEventModal';
 
 const client = generateClient<Schema>();
 
@@ -21,10 +22,9 @@ type FilterStatus = 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'EVENT_CREATED
  * Lista todas las propuestas de charlas con opciones de aprobar/rechazar.
  */
 export default function TalkProposalsAdminPage() {
-  const { user, isAuthenticated, isLoading: authLoading, userAttributes } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, isAdmin } = useAuth();
   
   const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [proposals, setProposals] = useState<TalkProposal[]>([]);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('PENDING');
   const [error, setError] = useState<string | null>(null);
@@ -32,22 +32,20 @@ export default function TalkProposalsAdminPage() {
   // Modal state
   const [selectedProposal, setSelectedProposal] = useState<TalkProposal | null>(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Verificar permisos de admin
   useEffect(() => {
-    if (!authLoading && isAuthenticated && userAttributes) {
-      const role = userAttributes['custom:role'] as string | undefined;
-      if (role === 'ADMIN') {
-        setIsAdmin(true);
+    if (!authLoading) {
+      if (isAuthenticated && isAdmin) {
         loadProposals();
       } else {
-        setIsAdmin(false);
         setIsLoading(false);
       }
     }
-  }, [authLoading, isAuthenticated, userAttributes]);
+  }, [authLoading, isAuthenticated, isAdmin]);
 
   // Cargar propuestas
   const loadProposals = async () => {
@@ -401,8 +399,8 @@ export default function TalkProposalsAdminPage() {
                     variant="accent"
                     size="sm"
                     onClick={() => {
-                      // TODO: Implementar creación de evento en Fase 1
-                      alert('Función de crear evento próximamente (Fase 1)');
+                      setSelectedProposal(proposal);
+                      setShowCreateEventModal(true);
                     }}
                     className="w-full"
                   >
@@ -473,6 +471,21 @@ export default function TalkProposalsAdminPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de crear evento */}
+      {showCreateEventModal && selectedProposal && (
+        <CreateEventModal
+          proposal={selectedProposal}
+          isOpen={showCreateEventModal}
+          onClose={() => {
+            setShowCreateEventModal(false);
+            setSelectedProposal(null);
+          }}
+          onSuccess={() => {
+            loadProposals(); // Recargar lista para ver el nuevo estado
+          }}
+        />
       )}
     </div>
   );

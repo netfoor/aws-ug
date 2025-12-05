@@ -146,6 +146,117 @@ const schema = a.schema({
     allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
     allow.authenticated().to(['read']), // Leer solo las propias
   ]),
+
+  // 📅 EVENT: Eventos de la comunidad
+  Event: a.model({
+    id: a.id(),
+    title: a.string().required(),
+    description: a.string().required(),
+    slug: a.string().required(), // URL-friendly (ej: intro-aws-lambda-2024)
+    
+    // Vinculación con propuesta de charla (si se creó desde una)
+    talkProposalId: a.string(),
+    
+    // Speaker
+    speakerId: a.string().required(), // userId del speaker
+    speakerName: a.string().required(),
+    speakerEmail: a.string().required(),
+    speakerBio: a.string(),
+    speakerAvatar: a.string(), // URL de avatar
+    
+    // Detalles del evento
+    eventType: a.enum(['TALK', 'WORKSHOP', 'MEETUP', 'NETWORKING']),
+    topics: a.string().array().required(), // Tags de temas
+    
+    // Fecha y ubicación
+    startDate: a.datetime().required(), // ISO timestamp
+    endDate: a.datetime().required(),
+    timezone: a.string().default('America/Mexico_City'),
+    location: a.string().required(), // Nombre del lugar
+    locationAddress: a.string(), // Dirección completa
+    isVirtual: a.boolean().default(false),
+    virtualLink: a.string(), // Zoom, Meet, etc.
+    
+    // Capacidad
+    maxAttendees: a.integer(), // null = ilimitado
+    isUnlimited: a.boolean().default(false),
+    
+    // Visibilidad y estado
+    status: a.enum(['DRAFT', 'PUBLISHED', 'CANCELLED', 'COMPLETED']),
+    isPublic: a.boolean().default(true),
+    requiresApproval: a.boolean().default(false), // Para eventos privados
+    
+    // Media
+    coverImageUrl: a.string(), // S3 URL
+    
+    // Metadata
+    createdBy: a.string().required(), // userId del admin que creó
+    createdAt: a.datetime().required(),
+    updatedAt: a.datetime(),
+    publishedAt: a.datetime(),
+    
+    // Stats (se actualizan desde EventRegistration)
+    goingCount: a.integer().default(0),
+    checkedInCount: a.integer().default(0),
+    invitedCount: a.integer().default(0),
+    notGoingCount: a.integer().default(0),
+  })
+  .secondaryIndexes((index) => [
+    index('slug').queryField('eventBySlug'),
+    index('status').sortKeys(['startDate']).queryField('eventsByStatus'),
+    index('speakerId').sortKeys(['startDate']).queryField('eventsBySpeaker'),
+  ])
+  .authorization((allow) => [
+    // Eventos públicos pueden ser leídos por cualquiera (incluso guest)
+    allow.guest().to(['read']),
+    allow.authenticated().to(['read']),
+    // Solo ADMINS pueden crear, actualizar, eliminar
+    allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
+  ]),
+
+  // 🎟️ EVENT REGISTRATION: Registros de asistentes a eventos
+  EventRegistration: a.model({
+    id: a.id(),
+    eventId: a.string().required(),
+    userId: a.string().required(),
+    
+    // Estado del registro
+    status: a.enum(['GOING', 'NOT_GOING', 'INVITED', 'WAITLIST']),
+    
+    // Check-in
+    checkedIn: a.boolean().default(false),
+    checkedInAt: a.datetime(),
+    checkedInBy: a.string(), // userId del admin que hizo check-in
+    checkInMethod: a.enum(['QR_SCAN', 'MANUAL', 'SELF_CHECKIN']),
+    
+    // QR Code único para check-in
+    qrCodeToken: a.string().required(), // UUID único
+    
+    // Metadata
+    registeredAt: a.datetime().required(),
+    invitedBy: a.string(), // userId del que invitó (si aplica)
+    cancelledAt: a.datetime(),
+    
+    // Datos del usuario (desnormalizados para queries rápidas)
+    userName: a.string().required(),
+    userEmail: a.string().required(),
+    userAvatar: a.string(),
+    
+    // Owner field
+    owner: a.string(),
+  })
+  .secondaryIndexes((index) => [
+    index('eventId').sortKeys(['registeredAt']).queryField('registrationsByEvent'),
+    index('userId').sortKeys(['registeredAt']).queryField('registrationsByUser'),
+    index('qrCodeToken').queryField('registrationByQrToken'),
+  ])
+  .authorization((allow) => [
+    // Usuario puede crear su propio registro y leer sus registros
+    allow.authenticated().to(['create', 'read']),
+    allow.owner().to(['read', 'update']), // Actualizar su propio registro (ej: cancelar)
+    // ADMINS pueden ver todos los registros y hacer check-in
+    allow.groups(['ADMINS']).to(['create', 'read', 'update', 'delete']),
+  ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

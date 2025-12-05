@@ -5,6 +5,7 @@ import { processSpeakerApplication } from './functions/process-speaker-applicati
 import { approveSpeakerApplication } from './functions/approve-speaker-application/resource';
 import { manualApproveSpeaker } from './functions/manual-approve-speaker/resource';
 import { rejectSpeakerApplication } from './functions/reject-speaker-application/resource';
+import { createEventFromProposal } from './functions/create-event-from-proposal/resource';
 import { PolicyStatement, Role, ServicePrincipal, ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
@@ -18,6 +19,7 @@ const backend = defineBackend({
   approveSpeakerApplication,
   manualApproveSpeaker,
   rejectSpeakerApplication,
+  createEventFromProposal,
 });
 
 // 📝 CLOUDWATCH LOGS: Configurar retención automática (7 días)
@@ -395,12 +397,44 @@ console.log('   El mapping se gestiona automáticamente y NO queda huérfano');
 
 // 📝 CLOUDWATCH LOG RETENTION (IaC)
 // Configurar retención de 7 días en todos los logs de Lambda
+// Lambda 5: Create Event From Proposal
+// - Necesita leer TalkProposal (GetItem)
+// - Necesita crear Event (PutItem)
+// - Necesita actualizar TalkProposal con eventId y status (UpdateItem)
+backend.createEventFromProposal.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'dynamodb:GetItem',
+      'dynamodb:PutItem',
+      'dynamodb:UpdateItem',
+      'dynamodb:Query',
+      'dynamodb:Scan',
+      'dynamodb:ListTables',
+    ],
+    resources: [
+      `arn:aws:dynamodb:*:*:table/TalkProposal-*`,
+      `arn:aws:dynamodb:*:*:table/Event-*`,
+      '*',
+    ],
+  })
+);
+
+backend.createEventFromProposal.addEnvironment(
+  'TALK_PROPOSAL_TABLE_PREFIX',
+  'TalkProposal'
+);
+backend.createEventFromProposal.addEnvironment(
+  'EVENT_TABLE_PREFIX',
+  'Event'
+);
+
 // Esto ELIMINA la necesidad del script de limpieza manual
 const lambdaFunctions = [
   { lambda: backend.processSpeakerApplication.resources.lambda, name: 'ProcessSpeakerApplication' },
   { lambda: backend.approveSpeakerApplication.resources.lambda, name: 'ApproveSpeakerApplication' },
   { lambda: backend.manualApproveSpeaker.resources.lambda, name: 'ManualApproveSpeaker' },
   { lambda: backend.rejectSpeakerApplication.resources.lambda, name: 'RejectSpeakerApplication' },
+  { lambda: backend.createEventFromProposal.resources.lambda, name: 'CreateEventFromProposal' },
 ];
 
 lambdaFunctions.forEach(({ lambda, name }) => {
@@ -438,5 +472,6 @@ backend.addOutput({
   custom: {
     manualApproveLambdaName: backend.manualApproveSpeaker.resources.lambda.functionName,
     rejectSpeakerLambdaName: backend.rejectSpeakerApplication.resources.lambda.functionName,
+    createEventFromProposalLambdaName: backend.createEventFromProposal.resources.lambda.functionName,
   },
 });

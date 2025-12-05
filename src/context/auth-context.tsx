@@ -9,7 +9,8 @@ import {
   signInWithHostedUI,
   createAuthListener,
   checkIsUserAdmin,
-  getUserAttributes
+  getUserAttributes,
+  getUserRoleFromCognito
 } from '@/lib/amplify/auth';
 
 /**
@@ -82,11 +83,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
           // Extract user info
           const isAdmin = await checkIsUserAdmin(user);
           const attributes = await getUserAttributes(user);
+          const role = await getUserRoleFromCognito(user);
+          
+          // Override custom:role con el rol de Cognito groups (fuente de verdad)
+          const updatedAttributes = attributes ? { ...attributes, 'custom:role': role } : null;
           
           setUser(user);
           setIsAuthenticated(true);
           setIsAdmin(isAdmin);
-          setUserAttributes(attributes);
+          setUserAttributes(updatedAttributes);
           setError(null);
           lastRefreshTimeRef.current = Date.now();
         } else {

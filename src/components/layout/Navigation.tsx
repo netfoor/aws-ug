@@ -15,13 +15,16 @@ interface NavigationProps {
 
 export function Navigation({ className }: NavigationProps) {
   const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated, user, logout, isAdmin } = useAuth();
+  const { isAuthenticated, user, logout, isAdmin, userAttributes } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
+  const userRole = userAttributes?.['custom:role'] as string | undefined;
+  const isSpeaker = userRole === 'SPEAKER' || userRole === 'ADMIN';
+
   const navItems = [
     { href: '/', label: 'Inicio' },
-    { href: '/eventos', label: 'Eventos' },
+    { href: '/events', label: 'Eventos' },
     { href: '/comunidad', label: 'Comunidad' },
     { href: '/speakers', label: 'Speakers' },
     { href: '/blog', label: 'Blog' },
@@ -119,14 +122,50 @@ export function Navigation({ className }: NavigationProps) {
                     >
                       Perfil
                     </Link>
+                    {isSpeaker && (
+                      <>
+                        <div className="border-t border-border" />
+                        <Link
+                          href="/speaker/propose-talk"
+                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Proponer Charla
+                        </Link>
+                        <Link
+                          href="/speaker/my-proposals"
+                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Mis Propuestas
+                        </Link>
+                      </>
+                    )}
                     {isAdmin && (
-                      <Link
-                        href="/admin/speakers"
-                        className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50 border-t border-border"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        Panel Admin
-                      </Link>
+                      <>
+                        <div className="border-t border-border" />
+                        <Link
+                          href="/admin/speakers"
+                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Panel Admin
+                        </Link>
+                        <Link
+                          href="/admin/talk-proposals"
+                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Gestionar Propuestas
+                        </Link>
+                        <Link
+                          href="/admin/events"
+                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Gestión de Eventos
+                        </Link>
+                      </>
                     )}
                     <button
                       onClick={() => { logout(); setIsUserMenuOpen(false); }}
@@ -185,14 +224,48 @@ export function Navigation({ className }: NavigationProps) {
                   >
                     Perfil
                   </Link>
+                  {isSpeaker && (
+                    <>
+                      <Link
+                        href="/speaker/propose-talk"
+                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Proponer Charla
+                      </Link>
+                      <Link
+                        href="/speaker/my-proposals"
+                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Mis Propuestas
+                      </Link>
+                    </>
+                  )}
                   {isAdmin && (
-                    <Link
-                      href="/admin/speakers"
-                      className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Panel Admin
-                    </Link>
+                    <>
+                      <Link
+                        href="/admin/speakers"
+                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Panel Admin
+                      </Link>
+                      <Link
+                        href="/admin/talk-proposals"
+                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Gestionar Propuestas
+                      </Link>
+                      <Link
+                        href="/admin/events"
+                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Gestión de Eventos
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={() => { logout(); setIsMenuOpen(false); }}

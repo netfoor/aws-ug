@@ -25,7 +25,7 @@ export default function ProposeTalkPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSpeaker, setIsSpeaker] = useState(false);
+  const [isSpeaker, setIsSpeaker] = useState<boolean | null>(null);
 
   // Form state
   const [title, setTitle] = useState('');
@@ -42,14 +42,22 @@ export default function ProposeTalkPage() {
   useEffect(() => {
     if (!authLoading && isAuthenticated && user && userAttributes) {
       const role = userAttributes['custom:role'] as string | undefined;
-      if (role === 'SPEAKER' || role === 'ADMIN') {
+      const hasRightRole = role === 'SPEAKER' || role === 'ADMIN';
+      
+      if (hasRightRole && !isSpeaker) {
         setIsSpeaker(true);
-      } else {
+      } else if (!hasRightRole && isSpeaker !== false) {
         setIsSpeaker(false);
-        setError('Solo los speakers aprobados pueden proponer charlas. Primero debes aplicar para ser speaker.');
       }
     }
-  }, [authLoading, isAuthenticated, user, userAttributes]);
+  }, [authLoading, isAuthenticated, user, userAttributes, isSpeaker]);
+
+  // Redirigir solo después de confirmar que no es speaker
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && isSpeaker === false) {
+      router.push('/profile#speaker-section');
+    }
+  }, [authLoading, isAuthenticated, isSpeaker, router]);
 
   // Agregar topic
   const handleAddTopic = () => {
@@ -131,7 +139,7 @@ export default function ProposeTalkPage() {
   };
 
   // Loading state
-  if (authLoading || isLoading) {
+  if (authLoading || isLoading || isSpeaker === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background theme-transition">
         <div className="text-center">
@@ -143,7 +151,7 @@ export default function ProposeTalkPage() {
   }
 
   // No es speaker
-  if (!isAuthenticated || !isSpeaker) {
+  if (!isAuthenticated || isSpeaker === false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background theme-transition p-4">
         <div className="max-w-md w-full bg-surface rounded-lg shadow-lg p-8 text-center theme-transition">
@@ -164,7 +172,7 @@ export default function ProposeTalkPage() {
             </Button>
             <Button
               variant="accent"
-              onClick={() => router.push('/apply-speaker')}
+              onClick={() => router.push('/profile#speaker-section')}
               className="flex-1"
             >
               Aplicar para Speaker

@@ -2,8 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { CheckCircle, XCircle, Calendar, MessageSquare, Megaphone, ExternalLink, FileText } from 'lucide-react';
+import { CheckCircle, XCircle, Calendar, MessageSquare, Megaphone, ExternalLink, FileText, RefreshCw } from 'lucide-react';
 import type { Schema } from '../../../amplify/data/resource';
+import { useAuth } from '@/context/auth-context';
+import { Button } from '@/components/ui/Button';
 
 type Notification = Schema['Notification']['type'];
 
@@ -27,6 +29,37 @@ export function NotificationList({
   onMarkAsRead,
   onClose,
 }: NotificationListProps) {
+  const { refreshUser, logout } = useAuth();
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  // Refrescar sesión del usuario (forzar re-login)
+  const handleRefreshSession = async (notificationId: string) => {
+    setIsRefreshing(true);
+    
+    const confirmed = confirm(
+      '🔄 Para activar tus nuevos permisos, necesitas cerrar sesión y volver a iniciar.\n\n¿Continuar?'
+    );
+    
+    if (!confirmed) {
+      setIsRefreshing(false);
+      return;
+    }
+    
+    try {
+      // Marcar como leída antes de hacer logout
+      onMarkAsRead(notificationId);
+      
+      // Esperar un momento para que se guarde
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Hacer logout - esto redirigirá automáticamente a /login
+      window.location.href = '/logout';
+    } catch (error) {
+      console.error('Error refreshing session:', error);
+      alert('❌ Error al cerrar sesión. Intenta manualmente desde el menú.');
+      setIsRefreshing(false);
+    }
+  };
 
   // Obtener icono según tipo de notificación
   const getIcon = (type: string | null | undefined, icon: string | null | undefined) => {
@@ -113,6 +146,49 @@ export function NotificationList({
                 <p className="text-sm text-text-secondary mt-1 line-clamp-2">
                   {notification.message}
                 </p>
+
+                {/* Botón de Refrescar Sesión para notificaciones de cambio de rol */}
+                {!notification.read && notification.type === 'SPEAKER_APPROVED' && notification.id && (
+                  <Button
+                    variant="accent"
+                    size="sm"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      
+                      const confirmed = confirm('🔄 Para activar tus nuevos permisos de speaker, necesitas cerrar sesión y volver a iniciar.\\n\\n¿Cerrar sesión ahora?');
+                      
+                      if (confirmed) {
+                        setIsRefreshing(true);
+                        try {
+                          // Marcar como leída
+                          onMarkAsRead(notification.id!);
+                          // Esperar un momento
+                          await new Promise(resolve => setTimeout(resolve, 500));
+                          // Hacer logout (esto redirigirá a Cognito Hosted UI)
+                          await logout();
+                        } catch (error) {
+                          console.error('Error logging out:', error);
+                          setIsRefreshing(false);
+                        }
+                      }
+                    }}
+                    disabled={isRefreshing}
+                    className="mt-3 w-full text-xs"
+                  >
+                    {isRefreshing ? (
+                      <>
+                        <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                        Cerrando sesión...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        Activar Permisos (Re-login)
+                      </>
+                    )}
+                  </Button>
+                )}
 
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-xs text-text-secondary opacity-75">

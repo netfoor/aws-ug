@@ -209,7 +209,7 @@ export default function ProfilePage() {
 
           {/* Speaker Application Section */}
           {profile?.role !== 'SPEAKER' && profile?.role !== 'ADMIN' && (
-            <div className="mb-8">
+            <div id="speaker-section" className="mb-8 scroll-mt-20">
               <h2 className="text-2xl font-bold text-text-primary mb-4">🎤 Conviértete en Speaker</h2>
               <SpeakerApplicationStatus userId={user.userId} />
               <div className="mt-4">

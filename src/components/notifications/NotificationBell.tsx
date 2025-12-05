@@ -17,9 +17,10 @@ const client = generateClient<Schema>();
  * - Dropdown con lista de notificaciones
  * - Auto-refresh cada 30 segundos
  * - Marcado de leídas/no leídas
+ * - Auto-refresh de sesión cuando se detecta cambio de rol
  */
 export function NotificationBell() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const [notifications, setNotifications] = useState<Schema['Notification']['type'][]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -54,6 +55,16 @@ export function NotificationBell() {
 
       setNotifications(sorted);
       setUnreadCount(sorted.filter((n) => !n.read).length);
+
+      // 🔄 Auto-refresh de sesión si hay notificación de cambio de rol no leída
+      const hasRoleChangeNotification = sorted.some(
+        (n) => !n.read && (n.type === 'SPEAKER_APPROVED' || n.type === 'SPEAKER_REJECTED')
+      );
+      
+      if (hasRoleChangeNotification && refreshUser) {
+        console.log('🔄 Detectado cambio de rol, refrescando sesión...');
+        await refreshUser();
+      }
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {
