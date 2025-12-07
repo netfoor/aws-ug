@@ -83,6 +83,13 @@ export default function TalkProposalsAdminPage() {
 
     setIsProcessing(true);
     try {
+      // Encontrar la propuesta para obtener datos del speaker
+      const proposal = proposals.find(p => p.id === proposalId);
+      if (!proposal) {
+        setError('Propuesta no encontrada');
+        return;
+      }
+
       const { data, errors } = await client.models.TalkProposal.update({
         id: proposalId,
         status: 'APPROVED',
@@ -94,6 +101,24 @@ export default function TalkProposalsAdminPage() {
         console.error('Errors approving proposal:', errors);
         setError('Error al aprobar la propuesta');
         return;
+      }
+
+      // 🔔 Notificar al speaker
+      try {
+        await client.models.Notification.create({
+          userId: proposal.userId,
+          type: 'NEW_EVENT',
+          title: '✅ ¡Propuesta aprobada!',
+          message: `Tu propuesta "${proposal.title}" ha sido aprobada. Pronto la convertiremos en un evento.`,
+          read: false,
+          link: '/speaker/my-proposals',
+          icon: '🎉',
+          createdAt: new Date().toISOString(),
+          owner: proposal.userId,
+        });
+        console.log('✅ Notificación enviada al speaker');
+      } catch (notifyError) {
+        console.warn('⚠️ Error al notificar speaker (no crítico):', notifyError);
       }
 
       // Recargar lista
@@ -125,6 +150,24 @@ export default function TalkProposalsAdminPage() {
         console.error('Errors rejecting proposal:', errors);
         setError('Error al rechazar la propuesta');
         return;
+      }
+
+      // 🔔 Notificar al speaker sobre el rechazo
+      try {
+        await client.models.Notification.create({
+          userId: selectedProposal.userId,
+          type: 'COMMENT',
+          title: '❌ Propuesta no aprobada',
+          message: `Tu propuesta "${selectedProposal.title}" no fue aprobada. Razón: ${rejectionReason.trim()}`,
+          read: false,
+          link: '/speaker/my-proposals',
+          icon: '💬',
+          createdAt: new Date().toISOString(),
+          owner: selectedProposal.userId,
+        });
+        console.log('✅ Notificación de rechazo enviada al speaker');
+      } catch (notifyError) {
+        console.warn('⚠️ Error al notificar speaker (no crítico):', notifyError);
       }
 
       // Recargar lista

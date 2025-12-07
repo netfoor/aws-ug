@@ -76,6 +76,8 @@ export function NotificationList({
         return <XCircle className="w-6 h-6 text-red-500" />;
       case 'NEW_SPEAKER_APPLICATION':
         return <FileText className="w-6 h-6 text-indigo-500" />;
+      case 'NEW_TALK_PROPOSAL':
+        return <FileText className="w-6 h-6 text-blue-500" />;
       case 'NEW_EVENT':
         return <Calendar className="w-6 h-6 text-blue-500" />;
       case 'COMMENT':

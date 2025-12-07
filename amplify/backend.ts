@@ -6,6 +6,7 @@ import { approveSpeakerApplication } from './functions/approve-speaker-applicati
 import { manualApproveSpeaker } from './functions/manual-approve-speaker/resource';
 import { rejectSpeakerApplication } from './functions/reject-speaker-application/resource';
 import { createEventFromProposal } from './functions/create-event-from-proposal/resource';
+import { notifyAdminsNewProposal } from './functions/notify-admins-new-proposal/resource';
 import { PolicyStatement, Role, ServicePrincipal, ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
@@ -20,6 +21,7 @@ const backend = defineBackend({
   manualApproveSpeaker,
   rejectSpeakerApplication,
   createEventFromProposal,
+  notifyAdminsNewProposal,
 });
 
 // 📝 CLOUDWATCH LOGS: Configurar retención automática (7 días)
@@ -328,8 +330,8 @@ backend.rejectSpeakerApplication.addEnvironment(
   'Notification'
 );
 
-// 🌐 PERMISOS PARA API ROUTES (Admin Panel)
-// Las API routes necesitan invocar las Lambdas de admin
+// 🌐 PERMISOS PARA API ROUTES (Admin Panel + Speakers)
+// Las API routes necesitan invocar las Lambdas de admin y notificaciones
 // Esto se aplica al rol de Amplify Auth authenticated
 backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
   new PolicyStatement({
@@ -337,6 +339,7 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
     resources: [
       backend.manualApproveSpeaker.resources.lambda.functionArn,
       backend.rejectSpeakerApplication.resources.lambda.functionArn,
+      backend.notifyAdminsNewProposal.resources.lambda.functionArn,
     ],
   })
 );
@@ -428,6 +431,40 @@ backend.createEventFromProposal.addEnvironment(
   'Event'
 );
 
+// Lambda 6: Notify Admins New Proposal
+// - Necesita listar usuarios del grupo ADMINS en Cognito
+// - Necesita crear notificaciones en DynamoDB
+backend.notifyAdminsNewProposal.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'cognito-idp:ListUsersInGroup',
+    ],
+    resources: [backend.auth.resources.userPool.userPoolArn],
+  })
+);
+
+backend.notifyAdminsNewProposal.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'dynamodb:PutItem',
+      'dynamodb:ListTables',
+    ],
+    resources: [
+      `arn:aws:dynamodb:*:*:table/Notification-*`,
+      '*',
+    ],
+  })
+);
+
+backend.notifyAdminsNewProposal.addEnvironment(
+  'USER_POOL_ID',
+  backend.auth.resources.userPool.userPoolId
+);
+backend.notifyAdminsNewProposal.addEnvironment(
+  'NOTIFICATION_TABLE_PREFIX',
+  'Notification'
+);
+
 // Esto ELIMINA la necesidad del script de limpieza manual
 const lambdaFunctions = [
   { lambda: backend.processSpeakerApplication.resources.lambda, name: 'ProcessSpeakerApplication' },
@@ -435,6 +472,7 @@ const lambdaFunctions = [
   { lambda: backend.manualApproveSpeaker.resources.lambda, name: 'ManualApproveSpeaker' },
   { lambda: backend.rejectSpeakerApplication.resources.lambda, name: 'RejectSpeakerApplication' },
   { lambda: backend.createEventFromProposal.resources.lambda, name: 'CreateEventFromProposal' },
+  { lambda: backend.notifyAdminsNewProposal.resources.lambda, name: 'NotifyAdminsNewProposal' },
 ];
 
 lambdaFunctions.forEach(({ lambda, name }) => {
@@ -473,5 +511,6 @@ backend.addOutput({
     manualApproveLambdaName: backend.manualApproveSpeaker.resources.lambda.functionName,
     rejectSpeakerLambdaName: backend.rejectSpeakerApplication.resources.lambda.functionName,
     createEventFromProposalLambdaName: backend.createEventFromProposal.resources.lambda.functionName,
+    notifyAdminsNewProposalLambdaName: backend.notifyAdminsNewProposal.resources.lambda.functionName,
   },
 });

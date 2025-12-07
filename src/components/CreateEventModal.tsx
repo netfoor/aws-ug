@@ -134,10 +134,11 @@ export default function CreateEventModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-surface rounded-lg shadow-xl max-w-2xl w-full p-6 theme-transition my-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+    <div className="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
+        <div className="bg-surface rounded-lg shadow-xl max-w-2xl w-full p-6 theme-transition">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-text-primary">
             Crear Evento
           </h2>
@@ -350,6 +351,7 @@ export default function CreateEventModal({
             </Button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

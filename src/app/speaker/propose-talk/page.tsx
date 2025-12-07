@@ -128,6 +128,34 @@ export default function ProposeTalkPage() {
         return;
       }
 
+      if (!data) {
+        setError('Error: No se recibió respuesta al crear la propuesta.');
+        return;
+      }
+
+      // 🔔 Notificar a admins sobre la nueva propuesta
+      // Requiere Lambda porque frontend no puede listar usuarios de Cognito
+      try {
+        const notifyResponse = await fetch('/api/speaker/notify-admins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            proposalId: data.id,
+            speakerName: `${givenName} ${familyName}`.trim(),
+            title: title,
+          }),
+        });
+
+        if (notifyResponse.ok) {
+          console.log('✅ Notificaciones enviadas a administradores');
+        } else {
+          console.warn('⚠️ Error al notificar admins:', await notifyResponse.text());
+        }
+      } catch (notifyError) {
+        // No bloquear el flujo si falla la notificación
+        console.warn('⚠️ Error al notificar admins (no crítico):', notifyError);
+      }
+
       // Redirigir a página de éxito o dashboard
       router.push('/speaker/my-proposals?success=true');
     } catch (err) {
