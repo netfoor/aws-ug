@@ -226,44 +226,50 @@ export default function AdminEventsPage() {
       {/* Header */}
       <div className="bg-surface border-b border-border theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-text-primary">
-                Gestión de Eventos
-              </h1>
-              <p className="text-text-secondary mt-1">
-                Administra todos los eventos de la comunidad
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={loadEvents}
-                disabled={isLoading}
-                className="px-4 py-2 bg-secondary text-text-primary rounded-lg hover:bg-secondary/80 disabled:opacity-50 transition-all"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 inline mr-2 animate-spin" />
-                    Cargando...
-                  </>
-                ) : (
-                  'Actualizar'
-                )}
-              </button>
-              <Button
-                variant="outline"
-                onClick={() => alert('🚧 Crear evento desde cero próximamente. Por ahora usa "Crear desde Propuesta".')}
-              >
+          {/* Título y descripción */}
+          <div className="mb-4 md:mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
+              Gestión de Eventos
+            </h1>
+            <p className="text-text-secondary mt-1 text-sm sm:text-base">
+              Administra todos los eventos de la comunidad
+            </p>
+          </div>
+          
+          {/* Botones - responsive */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={loadEvents}
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-text-primary rounded-lg hover:bg-secondary/80 disabled:opacity-50 transition-all"
+              title="Actualizar lista"
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                  <path d="M3 3v5h5"/>
+                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                  <path d="M16 16h5v5"/>
+                </svg>
+              )}
+              <span className="sm:inline hidden">Actualizar</span>
+            </button>
+            
+            <Link href="/admin/events/new" className="flex-1 sm:flex-initial">
+              <Button variant="outline" className="w-full">
                 <Plus className="w-4 h-4 mr-2" />
                 Crear Nuevo
               </Button>
-              <Link href="/admin/talk-proposals">
-                <Button variant="accent">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Crear desde Propuesta
-                </Button>
-              </Link>
-            </div>
+            </Link>
+            
+            <Link href="/admin/talk-proposals" className="flex-1 sm:flex-initial">
+              <Button variant="accent" className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Crear desde Propuesta
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

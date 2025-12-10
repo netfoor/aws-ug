@@ -150,7 +150,7 @@ export default function MyProposalsPage() {
         {/* Success message */}
         {showSuccess && (
           <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg theme-transition">
-            <p className="text-green-800 dark:text-green-200 font-semibold">
+            <p className="text-green-200 dark:text-green-200 font-semibold">
               ✅ ¡Propuesta enviada exitosamente! Los admins la revisarán pronto.
             </p>
           </div>
