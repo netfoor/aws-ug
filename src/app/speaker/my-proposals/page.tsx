@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 const client = generateClient<Schema>();
 
 type TalkProposal = Schema['TalkProposal']['type'];
+type Event = Schema['Event']['type'];
 
 /**
  * 🎤 Mis Propuestas - Página para speakers
@@ -25,6 +26,7 @@ export default function MyProposalsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [proposals, setProposals] = useState<TalkProposal[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [eventSlugs, setEventSlugs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // Mostrar mensaje de éxito si viene de crear propuesta
@@ -65,11 +67,37 @@ export default function MyProposalsPage() {
       });
 
       setProposals(sorted);
+      
+      // Cargar slugs de eventos para propuestas con EVENT_CREATED
+      loadEventSlugs(sorted);
     } catch (err) {
       console.error('Error loading proposals:', err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const loadEventSlugs = async (proposalsList: TalkProposal[]) => {
+    const slugs: Record<string, string> = {};
+    
+    await Promise.all(
+      proposalsList
+        .filter(p => p.status === 'EVENT_CREATED' && p.eventId)
+        .map(async (proposal) => {
+          if (proposal.eventId) {
+            try {
+              const { data: event } = await client.models.Event.get({ id: proposal.eventId });
+              if (event?.slug) {
+                slugs[proposal.eventId] = event.slug;
+              }
+            } catch (err) {
+              console.warn(`Error cargando slug para evento ${proposal.eventId}:`, err);
+            }
+          }
+        })
+    );
+    
+    setEventSlugs(slugs);
   };
 
   const getStatusBadge = (status: string | null | undefined) => {
@@ -239,7 +267,14 @@ export default function MyProposalsPage() {
                     <Button
                       variant="accent"
                       size="sm"
-                      onClick={() => router.push(`/events/${proposal.eventId}`)}
+                      onClick={() => {
+                        const slug = eventSlugs[proposal.eventId!];
+                        if (slug) {
+                          router.push(`/events/${slug}`);
+                        } else {
+                          console.error('Slug no encontrado para evento:', proposal.eventId);
+                        }
+                      }}
                     >
                       Ver Evento Publicado
                     </Button>
