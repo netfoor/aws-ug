@@ -3,7 +3,7 @@ import {
   CognitoIdentityProviderClient, 
   AdminAddUserToGroupCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, ListTablesCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 // Clientes AWS (se reutilizan entre invocaciones)
@@ -11,8 +11,24 @@ const cognitoClient = new CognitoIdentityProviderClient({});
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
 
-// Nombre de la tabla User (se obtiene de variables de entorno)
-const USER_TABLE_NAME = process.env.USER_TABLE_NAME || '';
+// Prefijo de la tabla User (se obtiene de variables de entorno)
+const USER_TABLE_PREFIX = process.env.USER_TABLE_PREFIX || 'User';
+
+/**
+ * Busca el nombre completo de la tabla User en DynamoDB
+ * (Amplify Gen 2 agrega sufijo aleatorio: User-abc123-dev)
+ */
+async function getUserTableName(): Promise<string> {
+  const response = await ddbClient.send(new ListTablesCommand({}));
+  const tableName = response.TableNames?.find(name => name.startsWith(USER_TABLE_PREFIX));
+  
+  if (!tableName) {
+    throw new Error(`No se encontró tabla con prefijo: ${USER_TABLE_PREFIX}`);
+  }
+  
+  console.log(`✅ Tabla User encontrada: ${tableName}`);
+  return tableName;
+}
 
 /**
  * 🔐 Lambda PreTokenGeneration Handler
@@ -73,9 +89,12 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
     
     console.log('📊 Verificando si usuario existe en DynamoDB...');
     
+    // Obtener nombre de tabla
+    const userTableName = await getUserTableName();
+    
     // Verificar si el usuario ya existe
     const existingUser = await docClient.send(new GetCommand({
-      TableName: USER_TABLE_NAME,
+      TableName: userTableName,
       Key: { id: userId },
     }));
     
@@ -85,7 +104,7 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
       const now = new Date().toISOString();
       
       await docClient.send(new PutCommand({
-        TableName: USER_TABLE_NAME,
+        TableName: userTableName,
         Item: {
           id: userId,
           email: email,

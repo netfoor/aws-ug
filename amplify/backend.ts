@@ -50,17 +50,19 @@ backend.postAuthentication.resources.lambda.addToRolePolicy(
     actions: [
       'dynamodb:GetItem',
       'dynamodb:PutItem',
+      'dynamodb:ListTables', // 🆕 Necesario para buscar tabla por prefijo
     ],
     resources: [
-      `arn:aws:dynamodb:${backend.auth.resources.userPool.stack.region}:${backend.auth.resources.userPool.stack.account}:table/User-*`
+      `arn:aws:dynamodb:${backend.auth.resources.userPool.stack.region}:${backend.auth.resources.userPool.stack.account}:table/User-*`,
+      '*', // ListTables requiere * como resource
     ],
   })
 );
 
-// Pasar nombre de tabla como variable de entorno
+// Pasar prefijo de tabla como variable de entorno (la Lambda buscará la tabla completa)
 backend.postAuthentication.addEnvironment(
-  'USER_TABLE_NAME',
-  `User-${backend.data.resources.cfnResources.amplifyDynamoDbTables.User.ref}`
+  'USER_TABLE_PREFIX',
+  'User'
 );
 
 // 🎤 SPEAKER APPLICATION WORKFLOW: Configuración de permisos
