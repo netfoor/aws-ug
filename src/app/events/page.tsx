@@ -37,6 +37,9 @@ export default function EventsPage() {
   
   // Map de eventId -> coverImageUrl pública
   const [coverImageUrls, setCoverImageUrls] = useState<Record<string, string>>({});
+  
+  // Map de eventId -> contador real de asistentes
+  const [attendeeCounts, setAttendeeCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     loadEvents();
@@ -74,6 +77,9 @@ export default function EventsPage() {
       
       // Cargar URLs de cover images
       loadCoverImages(sorted);
+      
+      // Cargar contadores reales de asistentes
+      loadAttendeeCounts(sorted);
     } catch (err) {
       console.error('Error loading events:', err);
       setError('Error al cargar los eventos');
@@ -104,6 +110,32 @@ export default function EventsPage() {
     );
     
     setCoverImageUrls(urls);
+  };
+
+  const loadAttendeeCounts = async (eventsList: Event[]) => {
+    const client = generateClient<Schema>();
+    const counts: Record<string, number> = {};
+    
+    await Promise.all(
+      eventsList.map(async (event) => {
+        if (event.id) {
+          try {
+            const { data: registrations } = await client.models.EventRegistration.registrationsByEvent({
+              eventId: event.id,
+            });
+            
+            // Contar solo los que confirmaron asistencia (status === 'GOING')
+            const goingCount = registrations?.filter((r) => r.status === 'GOING').length || 0;
+            counts[event.id] = goingCount;
+          } catch (err) {
+            console.warn(`Error obteniendo registros para evento ${event.id}:`, err);
+            counts[event.id] = 0;
+          }
+        }
+      })
+    );
+    
+    setAttendeeCounts(counts);
   };
 
   // Filtrar eventos por búsqueda
@@ -353,7 +385,7 @@ export default function EventsPage() {
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-accent" />
                           <span>
-                            {event.goingCount || 0} asistente{event.goingCount !== 1 ? 's' : ''}
+                            {attendeeCounts[event.id!] || 0} asistente{attendeeCounts[event.id!] !== 1 ? 's' : ''}
                           </span>
                         </div>
                       </div>
