@@ -59,13 +59,11 @@ export function useUserData() {
       }
 
       if (!data) {
-        console.warn('Usuario no encontrado en tabla User:', user.userId);
         setError('Usuario no encontrado');
         return;
       }
 
       setUserData(data);
-      console.log('✅ Datos de usuario cargados desde User table:', data);
 
     } catch (err) {
       console.error('Error en useUserData:', err);

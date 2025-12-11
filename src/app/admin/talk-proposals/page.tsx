@@ -114,14 +114,11 @@ export default function TalkProposalsAdminPage() {
           link: '/speaker/my-proposals',
           icon: '🎉',
           createdAt: new Date().toISOString(),
-          owner: proposal.userId,
-        });
-        console.log('✅ Notificación enviada al speaker');
-      } catch (notifyError) {
-        console.warn('⚠️ Error al notificar speaker (no crítico):', notifyError);
-      }
-
-      // Recargar lista
+            owner: proposal.userId,
+          });
+        } catch (notifyError) {
+          // No bloquear si falla la notificación
+        }      // Recargar lista
       await loadProposals();
       setSelectedProposal(null);
     } catch (err) {

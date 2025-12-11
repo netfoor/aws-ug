@@ -182,8 +182,6 @@ export default function CreateEventPage() {
           contentType: 'image/webp',
         }
       }).result;
-
-      console.log('✅ Cover image subida:', result.path);
       
       // Construir URL pública
       // Formato: https://[bucket].s3.[region].amazonaws.com/[path]
@@ -308,8 +306,6 @@ export default function CreateEventPage() {
         return;
       }
 
-      console.log('✅ Evento creado:', createdEvent.id);
-
       // 2. Subir cover image si existe
       let coverUrl: string | null = null;
       if (coverImage && createdEvent.id) {
@@ -322,10 +318,8 @@ export default function CreateEventPage() {
               id: createdEvent.id,
               coverImageUrl: coverUrl,
             });
-            console.log('✅ Cover image vinculada al evento');
           }
         } catch (uploadErr) {
-          console.warn('⚠️ Error subiendo cover (no crítico):', uploadErr);
           // No fallar si falla el upload, el evento ya está creado
         }
       }
@@ -344,9 +338,8 @@ export default function CreateEventPage() {
           createdAt: new Date().toISOString(),
             owner: speakerApp.userId,
           });
-          console.log('✅ Notificación enviada al speaker');
         } catch (notifErr) {
-          console.warn('⚠️ Error creando notificación (no crítico):', notifErr);
+          // No bloquear si falla la notificación
         }
       }
 

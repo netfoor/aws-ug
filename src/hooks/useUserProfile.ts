@@ -105,22 +105,15 @@ export function useUserProfile() {
       throw new Error('Usuario no autenticado');
     }
     
-    console.log('🔄 useUserProfile.updateProfile: Iniciando actualización...');
-    console.log('👤 User ID:', user.userId);
-    console.log('📋 Datos a actualizar:', updatedProfile);
-    
     setLoading(true);
     setError(null);
     
     try {
       // IMPORTANTE: Obtener el role actual desde Cognito (siempre usar como fuente de verdad)
       const roleFromCognito = await getUserRoleFromCognito();
-      console.log('🎭 Role desde Cognito:', roleFromCognito);
       
       // Verificar si el usuario ya existe
-      console.log('🔍 Buscando usuario existente en DynamoDB...');
       const { data: existingUser } = await client.models.User.get({ id: user.userId });
-      console.log('📦 Usuario existente:', existingUser ? 'SÍ' : 'NO');
 
       const baseData = {
         id: user.userId,
@@ -170,10 +163,6 @@ export function useUserProfile() {
         if (Object.keys(cleanedSocialLinks).length > 0) {
           // IMPORTANTE: a.json() en Amplify requiere un string JSON, no un objeto
           optionalFields.socialLinks = JSON.stringify(cleanedSocialLinks);
-          console.log('🔗 Social links sanitizados:', cleanedSocialLinks);
-          console.log('📦 Social links como JSON string:', optionalFields.socialLinks);
-        } else {
-          console.log('⚠️ No hay social links válidos, omitiendo campo');
         }
       }
 
@@ -181,20 +170,16 @@ export function useUserProfile() {
       
       if (existingUser) {
         // Actualizar usuario existente
-        console.log('✏️ Actualizando usuario existente...');
         result = await client.models.User.update({
           ...baseData,
           ...optionalFields,
         });
-        console.log('📦 Resultado de actualización:', result);
       } else {
         // Crear nuevo usuario
-        console.log('➕ Creando nuevo usuario...');
         result = await client.models.User.create({
           ...baseData,
           ...optionalFields,
         });
-        console.log('📦 Resultado de creación:', result);
       }
 
       // IMPORTANTE: Verificar si hay errores en la respuesta
@@ -220,8 +205,6 @@ export function useUserProfile() {
         return false;
       }
 
-      console.log('✅ Operación exitosa, data recibida:', result.data);
-
       // Actualizar el estado local con el role de Cognito
       setProfile(prev => ({ 
         ...prev, 
@@ -229,7 +212,6 @@ export function useUserProfile() {
         role: roleFromCognito // ← Asegurar que el role siempre venga de Cognito
       } as UserProfile));
       
-      console.log('✅ useUserProfile.updateProfile: Perfil actualizado exitosamente');
       return true;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';

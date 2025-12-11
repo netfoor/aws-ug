@@ -144,8 +144,6 @@ export default function EventDetailPage() {
           status: status,
         });
 
-        console.log(`✅ Registro actualizado a ${status}`);
-
         // 🔔 Notificación de cambio de estado
         try {
           await client.models.Notification.create({
@@ -161,9 +159,8 @@ export default function EventDetailPage() {
             createdAt: new Date().toISOString(),
             owner: user.userId,
           });
-          console.log('✅ Notificación de cambio enviada');
         } catch (notifError) {
-          console.warn('⚠️ Error creando notificación (no crítico):', notifError);
+          // No bloquear el flujo si falla la notificación
         }
 
       } else {
@@ -188,8 +185,6 @@ export default function EventDetailPage() {
           owner: user.userId,
         });
 
-        console.log(`✅ Nuevo registro creado: ${status}`);
-
         // 🔔 Notificación de nuevo registro
         if (status === 'GOING') {
           try {
@@ -204,9 +199,8 @@ export default function EventDetailPage() {
               createdAt: new Date().toISOString(),
               owner: user.userId,
             });
-            console.log('✅ Notificación de registro enviada');
           } catch (notifError) {
-            console.warn('⚠️ Error creando notificación (no crítico):', notifError);
+            // No bloquear el flujo si falla la notificación
           }
         }
 
@@ -221,9 +215,8 @@ export default function EventDetailPage() {
             goingCount: status === 'GOING' ? newCount : currentGoingCount,
             notGoingCount: status === 'NOT_GOING' ? newCount : currentNotGoingCount,
           });
-          console.log(`✅ Contador actualizado: ${status} = ${newCount}`);
         } catch (updateError) {
-          console.warn('⚠️ Error actualizando contadores (no crítico):', updateError);
+          // No bloquear el flujo si falla la actualización de contadores
         }
       }
 

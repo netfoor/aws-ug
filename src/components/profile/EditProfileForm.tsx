@@ -31,7 +31,6 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
   // ✅ NUEVO: Sincronizar formData cuando profile cambia
   useEffect(() => {
     if (profile) {
-      console.log('📝 EditProfileForm: Cargando datos del perfil:', profile);
       setFormData({
         givenName: profile.givenName || '',
         familyName: profile.familyName || '',
@@ -93,26 +92,19 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
     
     // ✅ Validar antes de enviar
     if (!validateForm()) {
-      console.log('❌ Validación falló:', validationErrors);
       setSaveError('Por favor corrige los errores en el formulario');
       return;
     }
-    
-    console.log('📤 EditProfileForm: Intentando guardar perfil...');
-    console.log('📋 Datos del formulario:', formData);
     
     const updatedProfile = {
       ...formData,
       interests: interests.split(',').map(i => i.trim()).filter(Boolean),
     };
 
-    console.log('📋 Perfil actualizado a enviar:', updatedProfile);
-
     try {
       const success = await updateProfile(updatedProfile);
       
       if (success) {
-        console.log('✅ Perfil guardado exitosamente en DynamoDB');
         setSaveSuccess(true);
         
         // Mostrar mensaje de éxito brevemente antes de cerrar

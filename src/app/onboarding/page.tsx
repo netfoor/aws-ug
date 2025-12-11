@@ -132,8 +132,6 @@ export default function OnboardingPage() {
         updatedAt: now,
       });
 
-      console.log('✅ Onboarding completado exitosamente');
-
       // Redirigir al dashboard
       router.push('/dashboard');
 

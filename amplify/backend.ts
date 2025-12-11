@@ -41,8 +41,6 @@ const backend = defineBackend({
 // Por ahora, la retención se gestiona con:
 //   scripts/cleanup-orphaned-resources-fixed.ps1 (sección 4)
 
-console.log('⚠️  Log retention: Usar cleanup-orphaned-resources-fixed.ps1 para aplicar 7 días');
-
 // 🔐 POST-AUTHENTICATION LAMBDA: Crear usuarios en DynamoDB
 // Necesita acceso a la tabla User para crear registros en primer login
 backend.postAuthentication.resources.lambda.addToRolePolicy(
