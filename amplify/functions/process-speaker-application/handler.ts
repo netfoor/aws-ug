@@ -1,25 +1,25 @@
 import { DynamoDBStreamHandler } from 'aws-lambda';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { 
-  SchedulerClient, 
-  CreateScheduleCommand
-} from '@aws-sdk/client-scheduler';
-import { CognitoIdentityProviderClient, ListUsersInGroupCommand } from '@aws-sdk/client-cognito-identity-provider';
+  CognitoIdentityProviderClient, 
+  ListUsersInGroupCommand,
+  AdminAddUserToGroupCommand,
+  AdminGetUserCommand
+} from '@aws-sdk/client-cognito-identity-provider';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 
 const sesClient = new SESClient({ region: process.env.AWS_REGION });
-const schedulerClient = new SchedulerClient({ region: process.env.AWS_REGION });
 const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION });
 const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
 // ⚙️ CONFIGURACIÓN
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
-const APPROVAL_DELAY_MINUTES = 5; // Delay antes de auto-aprobar
-const APPROVE_LAMBDA_ARN = process.env.APPROVE_LAMBDA_ARN;
 const USER_POOL_ID = process.env.USER_POOL_ID;
 const NOTIFICATION_TABLE_PREFIX = 'Notification';
+const SPEAKER_APPLICATION_TABLE_PREFIX = 'SpeakerApplication';
+const USER_TABLE_PREFIX = 'User';
 
 /**
  * 🔍 Obtiene el nombre real de la tabla con el prefijo dado
@@ -96,6 +96,115 @@ async function notifyAdmins(applicationId: string, applicantEmail: string) {
     } catch (error) {
       console.error(`❌ Error creando notificación para ${admin.username}:`, error);
     }
+  }
+}
+
+/**
+ * 📧 Envía email de aprobación
+ */
+async function sendApprovalEmail(email: string, name: string) {
+  console.log(`📧 Enviando email de aprobación a: ${email}`);
+  
+  const params = {
+    Source: SENDER_EMAIL,
+    Destination: {
+      ToAddresses: [email],
+    },
+    Message: {
+      Subject: {
+        Data: '🎉 ¡Tu postulación como Speaker ha sido aprobada!',
+        Charset: 'UTF-8',
+      },
+      Body: {
+        Html: {
+          Data: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                .badge { background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: bold; }
+                .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>🎉 ¡Felicidades!</h1>
+                  <p>Ya eres parte del equipo de Speakers</p>
+                </div>
+                <div class="content">
+                  <h2>¡Hola ${name}!</h2>
+                  <p>Nos complace informarte que tu postulación como <span class="badge">SPEAKER</span> ha sido <strong>aprobada</strong>.</p>
+                  <p><strong>¿Qué significa esto?</strong></p>
+                  <ul>
+                    <li>Ahora tienes el rol de Speaker en AWS Puebla Connect</li>
+                    <li>Puedes proponer charlas y talleres para la comunidad</li>
+                    <li>Acceso a recursos exclusivos para speakers</li>
+                    <li>Visibilidad en el directorio de speakers</li>
+                  </ul>
+                  <p><strong>Próximos pasos:</strong></p>
+                  <ol>
+                    <li>Inicia sesión en AWS Puebla Connect</li>
+                    <li>Completa tu perfil de speaker</li>
+                    <li>Propón tu primera charla</li>
+                  </ol>
+                  <a href="https://awspuebla.com/speaker/propose-talk" class="button">Proponer Charla</a>
+                  <p style="margin-top: 30px;">¡Estamos emocionados de tenerte en el equipo!</p>
+                </div>
+              </div>
+            </body>
+            </html>
+          `,
+          Charset: 'UTF-8',
+        },
+      },
+    },
+  };
+
+  try {
+    await sesClient.send(new SendEmailCommand(params));
+    console.log('✅ Email de aprobación enviado correctamente');
+  } catch (error) {
+    console.error('❌ Error enviando email de aprobación:', error);
+  }
+}
+
+/**
+ * 🔔 Crea notificación in-app para el usuario aprobado
+ */
+async function createApprovalNotification(userId: string, userName: string) {
+  console.log('🔔 Creando notificación de aprobación para usuario...');
+  
+  const notificationTableName = await getTableName(NOTIFICATION_TABLE_PREFIX);
+  const { randomUUID } = await import('crypto');
+  const now = new Date().toISOString();
+
+  try {
+    await docClient.send(new PutCommand({
+      TableName: notificationTableName,
+      Item: {
+        id: randomUUID(),
+        userId,
+        type: 'SPEAKER_APPROVED',
+        title: '🎉 ¡Tu postulación fue aprobada!',
+        message: 'Felicitaciones, ahora eres parte del equipo de speakers de AWS User Group Puebla. Ya puedes proponer charlas para nuestros eventos.',
+        read: false,
+        link: '/speaker/propose-talk',
+        icon: '🎤',
+        createdAt: now,
+        updatedAt: now,
+        owner: userId,
+      },
+    }));
+    
+    console.log('✅ Notificación de aprobación creada');
+  } catch (error) {
+    console.error('❌ Error creando notificación de aprobación:', error);
   }
 }
 
@@ -189,37 +298,101 @@ awspuebla.com
 }
 
 /**
- * ⏰ Crea EventBridge Schedule para auto-aprobación
+ * ✅ Aprueba la aplicación inmediatamente
  */
-async function scheduleAutoApproval(applicationId: string, userId: string) {
-  console.log(`⏰ Programando auto-aprobación para: ${applicationId}`);
+async function approveApplicationImmediately(applicationId: string, userId: string, userEmail: string) {
+  console.log(`⚡ Aprobando aplicación inmediatamente: ${applicationId}`);
   
-  const scheduleTime = new Date(Date.now() + APPROVAL_DELAY_MINUTES * 60 * 1000);
-  const scheduleName = `approve-speaker-${applicationId}`;
-  
-  const params = {
-    Name: scheduleName,
-    ScheduleExpression: `at(${scheduleTime.toISOString().slice(0, 19)})`, // Format: at(yyyy-mm-ddThh:mm:ss)
-    Target: {
-      Arn: APPROVE_LAMBDA_ARN,
-      RoleArn: process.env.SCHEDULER_ROLE_ARN, // IAM role para invocar Lambda
-      Input: JSON.stringify({
-        applicationId,
-        userId,
-      }),
-    },
-    FlexibleTimeWindow: {
-      Mode: 'OFF' as const, // Ejecutar exactamente a la hora programada
-    },
-    State: 'ENABLED' as const,
-  };
-
   try {
-    const response = await schedulerClient.send(new CreateScheduleCommand(params));
-    console.log(`✅ Schedule creado: ${response.ScheduleArn}`);
-    return response.ScheduleArn;
+    // 1️⃣ Obtener nombre de las tablas
+    const speakerAppTableName = await getTableName(SPEAKER_APPLICATION_TABLE_PREFIX);
+    const userTableName = await getTableName(USER_TABLE_PREFIX);
+    
+    // 2️⃣ Actualizar estado en SpeakerApplication a APPROVED
+    console.log('📝 Actualizando estado a APPROVED en DynamoDB');
+    await docClient.send(
+      new UpdateCommand({
+        TableName: speakerAppTableName,
+        Key: { id: applicationId },
+        UpdateExpression: 'SET #status = :approved, reviewedAt = :now',
+        ExpressionAttributeNames: {
+          '#status': 'status',
+        },
+        ExpressionAttributeValues: {
+          ':approved': 'APPROVED',
+          ':now': new Date().toISOString(),
+        },
+      })
+    );
+    console.log('✅ Estado actualizado en SpeakerApplication');
+
+    // 3️⃣ Agregar usuario al grupo SPEAKERS en Cognito
+    console.log(`👤 Agregando usuario ${userId} al grupo SPEAKERS`);
+    try {
+      await cognitoClient.send(
+        new AdminAddUserToGroupCommand({
+          UserPoolId: USER_POOL_ID,
+          Username: userId,
+          GroupName: 'SPEAKERS',
+        })
+      );
+      console.log('✅ Usuario agregado al grupo SPEAKERS');
+    } catch (error: any) {
+      if (error.name !== 'UserNotFoundException') {
+        console.warn('⚠️  Advertencia al agregar a grupo:', error.message);
+      } else {
+        throw error;
+      }
+    }
+
+    // 4️⃣ Actualizar role en User table a SPEAKER
+    console.log(`📋 Actualizando role en User table: ${userId}`);
+    await docClient.send(
+      new UpdateCommand({
+        TableName: userTableName,
+        Key: { id: userId },
+        UpdateExpression: 'SET #role = :role, updatedAt = :now',
+        ExpressionAttributeNames: {
+          '#role': 'role',
+        },
+        ExpressionAttributeValues: {
+          ':role': 'SPEAKER',
+          ':now': new Date().toISOString(),
+        },
+      })
+    );
+    console.log('✅ Role actualizado en User table');
+
+    // 5️⃣ Obtener info completa del usuario
+    let userName = userEmail.split('@')[0];
+    try {
+      const userResult = await cognitoClient.send(
+        new AdminGetUserCommand({
+          UserPoolId: USER_POOL_ID,
+          Username: userId,
+        })
+      );
+
+      const givenNameAttr = userResult.UserAttributes?.find((attr) => attr.Name === 'given_name');
+      const familyNameAttr = userResult.UserAttributes?.find((attr) => attr.Name === 'family_name');
+
+      if (givenNameAttr?.Value) {
+        userName = givenNameAttr.Value;
+        if (familyNameAttr?.Value) userName += ` ${familyNameAttr.Value}`;
+      }
+    } catch (error) {
+      console.warn('⚠️  No se pudo obtener info adicional del usuario:', error);
+    }
+
+    // 6️⃣ Enviar email de aprobación
+    await sendApprovalEmail(userEmail, userName);
+
+    // 7️⃣ Crear notificación in-app
+    await createApprovalNotification(userId, userName);
+
+    console.log(`✅ Aplicación ${applicationId} aprobada exitosamente`);
   } catch (error) {
-    console.error('❌ Error creando schedule:', error);
+    console.error('❌ Error en aprobación automática:', error);
     throw error;
   }
 }
@@ -258,19 +431,16 @@ export const handler: DynamoDBStreamHandler = async (event) => {
 
       console.log(`👤 Procesando aplicación de: ${email} (${applicationId})`);
 
-      // 1️⃣ Enviar email de confirmación
+      // 1️⃣ Enviar email de confirmación "Solicitud Recibida"
       await sendApplicationReceivedEmail(email, userName);
 
-      // 2️⃣ Programar auto-aprobación
-      const schedulerArn = await scheduleAutoApproval(applicationId, userId);
-
-      // 3️⃣ Notificar a todos los admins
+      // 2️⃣ Notificar a todos los admins
       await notifyAdmins(applicationId, email);
 
-      // TODO: Actualizar DynamoDB con schedulerArn para tracking
-      // Esto lo haremos después de configurar permisos
+      // 3️⃣ ⚡ APROBAR INMEDIATAMENTE (sin esperar 5 minutos)
+      await approveApplicationImmediately(applicationId, userId, email);
 
-      console.log(`✅ Aplicación procesada correctamente: ${applicationId}`);
+      console.log(`✅ Aplicación procesada y aprobada correctamente: ${applicationId}`);
     } catch (error) {
       console.error('❌ Error procesando aplicación:', error);
       // No lanzamos error para que otros records se procesen

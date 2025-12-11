@@ -67,7 +67,7 @@ backend.postAuthentication.addEnvironment(
 
 // Lambda 1: Process Speaker Application
 // - Necesita enviar emails via SES
-// - Necesita crear schedules en EventBridge
+// - Necesita aprobar inmediatamente (Cognito + DynamoDB)
 // - Necesita leer DynamoDB Streams
 backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
   new PolicyStatement({
@@ -88,27 +88,12 @@ backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
   })
 );
 
+// ⚡ Permisos para aprobación inmediata (sin EventBridge)
 backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     actions: [
-      'scheduler:CreateSchedule',
-      'scheduler:GetSchedule',
-      'scheduler:DeleteSchedule',
-    ],
-    resources: ['*'], // EventBridge Scheduler
-  })
-);
-
-backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
-  new PolicyStatement({
-    actions: ['iam:PassRole'],
-    resources: ['*'], // Necesario para crear schedules con rol de ejecución
-  })
-);
-
-backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
-  new PolicyStatement({
-    actions: [
+      'cognito-idp:AdminAddUserToGroup',
+      'cognito-idp:AdminGetUser',
       'cognito-idp:ListUsersInGroup',
     ],
     resources: [backend.auth.resources.userPool.userPoolArn],
@@ -168,11 +153,6 @@ backend.approveSpeakerApplication.resources.lambda.addToRolePolicy(
 
 // 📝 Variables de entorno para las Lambdas
 backend.processSpeakerApplication.addEnvironment(
-  'APPROVE_LAMBDA_ARN',
-  backend.approveSpeakerApplication.resources.lambda.functionArn
-);
-
-backend.processSpeakerApplication.addEnvironment(
   'SENDER_EMAIL',
   'fortino.romero.man@gmail.com' // Cambiar cuando configures SES
 );
@@ -192,38 +172,6 @@ backend.approveSpeakerApplication.addEnvironment(
   'fortino.romero.man@gmail.com' // Cambiar cuando configures SES
 );
 
-// 🎯 CONFIGURACIÓN AVANZADA CON CDK (100% IaC)
-
-// 1️⃣ Crear IAM Role para EventBridge Scheduler
-// Este role permite que Scheduler invoque la Lambda de aprobación
-// ⚠️ IMPORTANTE: Crear en el MISMO stack que la Lambda (auth)
-const schedulerRole = new Role(
-  backend.approveSpeakerApplication.resources.lambda.stack,
-  'SchedulerInvokeLambdaRole',
-  {
-    assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
-    description: 'Role para EventBridge Scheduler invocar Lambda de aprobación de speakers',
-  }
-);
-
-// Dar permiso para invocar la Lambda de aprobación
-schedulerRole.addToPolicy(
-  new PolicyStatement({
-    actions: ['lambda:InvokeFunction'],
-    resources: [backend.approveSpeakerApplication.resources.lambda.functionArn],
-  })
-);
-
-// Agregar el ARN del role a las variables de entorno
-backend.processSpeakerApplication.addEnvironment(
-  'SCHEDULER_ROLE_ARN',
-  schedulerRole.roleArn
-);
-
-// 2️⃣ Obtener acceso a las tablas de DynamoDB
-// Amplify Data crea las tablas dinámicamente
-// El nombre real será: SpeakerApplication-{hash}-{environment}
-// La Lambda lo obtendrá dinámicamente listando tablas con ese prefijo
 backend.approveSpeakerApplication.addEnvironment(
   'SPEAKER_APPLICATION_TABLE_PREFIX',
   'SpeakerApplication'
@@ -238,7 +186,6 @@ backend.approveSpeakerApplication.addEnvironment(
 // - Necesita actualizar DynamoDB
 // - Necesita agregar usuarios a grupos de Cognito
 // - Necesita enviar emails via SES
-// - Necesita cancelar schedules de EventBridge
 backend.manualApproveSpeaker.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     actions: [
@@ -275,16 +222,6 @@ backend.manualApproveSpeaker.resources.lambda.addToRolePolicy(
   })
 );
 
-backend.manualApproveSpeaker.resources.lambda.addToRolePolicy(
-  new PolicyStatement({
-    actions: [
-      'scheduler:DeleteSchedule',
-      'scheduler:GetSchedule',
-    ],
-    resources: ['*'],
-  })
-);
-
 backend.manualApproveSpeaker.addEnvironment(
   'USER_POOL_ID',
   backend.auth.resources.userPool.userPoolId
@@ -313,7 +250,6 @@ backend.manualApproveSpeaker.addEnvironment(
 // Lambda 4: Reject Speaker Application (Admin Panel)
 // - Necesita actualizar DynamoDB
 // - Necesita enviar emails via SES
-// - Necesita cancelar schedules de EventBridge
 backend.rejectSpeakerApplication.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     actions: [
@@ -335,16 +271,6 @@ backend.rejectSpeakerApplication.resources.lambda.addToRolePolicy(
 backend.rejectSpeakerApplication.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     actions: ['ses:SendEmail', 'ses:SendRawEmail'],
-    resources: ['*'],
-  })
-);
-
-backend.rejectSpeakerApplication.resources.lambda.addToRolePolicy(
-  new PolicyStatement({
-    actions: [
-      'scheduler:DeleteSchedule',
-      'scheduler:GetSchedule',
-    ],
     resources: ['*'],
   })
 );

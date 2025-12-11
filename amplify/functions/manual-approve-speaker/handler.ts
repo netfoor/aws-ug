@@ -66,10 +66,6 @@ import {
   SESClient, 
   SendEmailCommand 
 } from '@aws-sdk/client-ses';
-import {
-  SchedulerClient,
-  DeleteScheduleCommand,
-} from '@aws-sdk/client-scheduler';
 
 // ========================================
 // 🔧 CONFIGURACIÓN
@@ -88,7 +84,6 @@ const ddbClient = new DynamoDBClient({ region: REGION });
 const docClient = DynamoDBDocumentClient.from(ddbClient);
 const cognitoClient = new CognitoIdentityProviderClient({ region: REGION });
 const sesClient = new SESClient({ region: REGION });
-const schedulerClient = new SchedulerClient({ region: REGION });
 
 // ========================================
 // 📊 TIPOS
@@ -125,25 +120,6 @@ async function getTableName(prefix: string): Promise<string> {
   }
   
   return tableName;
-}
-
-/**
- * Cancela el schedule de EventBridge (aprobación automática)
- */
-async function cancelAutoApprovalSchedule(scheduleName: string): Promise<void> {
-  try {
-    await schedulerClient.send(new DeleteScheduleCommand({
-      Name: scheduleName,
-    }));
-    console.log(`✅ Schedule cancelado: ${scheduleName}`);
-  } catch (error: any) {
-    if (error.name === 'ResourceNotFoundException') {
-      console.log(`⚠️ Schedule ya no existe: ${scheduleName}`);
-    } else {
-      console.error(`❌ Error cancelando schedule:`, error);
-      // No lanzamos error - continuar con aprobación manual
-    }
-  }
 }
 
 /**
@@ -270,15 +246,7 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
 
     console.log(`✅ Postulación encontrada para: ${application.email}`);
 
-    // 2️⃣ Cancelar schedule de aprobación automática (si existe)
-    if (application.schedulerArn) {
-      const scheduleName = application.schedulerArn.split('/').pop();
-      if (scheduleName) {
-        await cancelAutoApprovalSchedule(scheduleName);
-      }
-    }
-
-    // 3️⃣ Actualizar status en DynamoDB
+    // 2️⃣ Actualizar status en DynamoDB
     console.log('📝 Actualizando status a APPROVED...');
     await docClient.send(new UpdateCommand({
       TableName: tableName,
