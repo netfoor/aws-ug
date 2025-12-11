@@ -275,29 +275,40 @@ export default function TalkProposalsAdminPage() {
       {/* Header */}
       <div className="bg-surface border-b border-border theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-text-primary">
-                Propuestas de Charlas
-              </h1>
-              <p className="text-text-secondary mt-1">
-                Gestión de propuestas de speakers
-              </p>
-            </div>
-            <button
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
+              Propuestas de Charlas
+            </h1>
+            <p className="text-text-secondary mt-1 text-sm sm:text-base">
+              Gestión de propuestas de speakers
+            </p>
+          </div>
+          
+          {/* Botón - responsive */}
+          <div className="mt-4">
+            <Button
               onClick={loadProposals}
               disabled={isLoading}
-              className="px-4 py-2 bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              variant="accent"
+              className="w-full sm:w-auto"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 inline mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Cargando...
                 </>
               ) : (
-                'Actualizar'
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mr-2">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                    <path d="M16 16h5v5"/>
+                  </svg>
+                  Actualizar
+                </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

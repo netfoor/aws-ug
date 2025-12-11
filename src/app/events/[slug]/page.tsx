@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
+import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { 
@@ -53,6 +54,9 @@ export default function EventDetailPage() {
   // Lista de asistentes
   const [attendees, setAttendees] = useState<EventRegistration[]>([]);
   const [showAllAttendees, setShowAllAttendees] = useState(false);
+  
+  // Cover image URL pública
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (slug) {
@@ -80,6 +84,21 @@ export default function EventDetailPage() {
 
       const eventData = events[0];
       setEvent(eventData);
+
+      // 1.5. Cargar cover image URL si existe
+      if (eventData.coverImageUrl) {
+        try {
+          const urlResult = await getUrl({
+            path: eventData.coverImageUrl,
+            options: {
+              expiresIn: 3600 // 1 hora
+            }
+          });
+          setCoverImageUrl(urlResult.url.toString());
+        } catch (err) {
+          console.warn('Error obteniendo URL de cover image:', err);
+        }
+      }
 
       // 2. Cargar registros del evento (asistentes)
       const { data: registrations } = await client.models.EventRegistration.registrationsByEvent({
@@ -305,10 +324,10 @@ export default function EventDetailPage() {
       {/* Contenido Principal */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Cover Image (si existe) */}
-        {event.coverImageUrl && (
+        {coverImageUrl && (
           <div className="mb-8 rounded-lg overflow-hidden">
             <img 
-              src={event.coverImageUrl} 
+              src={coverImageUrl} 
               alt={event.title}
               className="w-full h-64 object-cover"
             />

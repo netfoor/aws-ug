@@ -129,22 +129,27 @@ export default function MyProposalsPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background theme-transition">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-text-primary mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2">
               Mis Propuestas de Charlas
             </h1>
-            <p className="text-text-secondary">
+            <p className="text-text-secondary text-sm sm:text-base">
               Gestiona tus propuestas enviadas
             </p>
           </div>
-          <Button
-            variant="accent"
-            onClick={() => router.push('/speaker/propose-talk')}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nueva Propuesta
-          </Button>
+          
+          {/* Botón - responsive */}
+          <div className="mt-4">
+            <Button
+              variant="accent"
+              onClick={() => router.push('/speaker/propose-talk')}
+              className="w-full sm:w-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nueva Propuesta
+            </Button>
+          </div>
         </div>
 
         {/* Success message */}

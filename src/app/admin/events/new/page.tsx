@@ -301,26 +301,23 @@ export default function CreateEventPage() {
       console.log('✅ Evento creado:', createdEvent.id);
 
       // 2. Subir cover image si existe
-      // TODO: Configurar Amplify Storage en amplify/storage/resource.ts
       let coverUrl: string | null = null;
       if (coverImage && createdEvent.id) {
-        console.warn('⚠️ Storage no configurado aún. Cover image no se subirá.');
-        console.log('TODO: Agregar defineStorage en amplify/storage/resource.ts');
-        // try {
-        //   coverUrl = await uploadCoverImage(createdEvent.id);
-        //   
-        //   // Actualizar evento con URL de cover
-        //   if (coverUrl) {
-        //     await client.models.Event.update({
-        //       id: createdEvent.id,
-        //       coverImageUrl: coverUrl,
-        //     });
-        //     console.log('✅ Cover image vinculada al evento');
-        //   }
-        // } catch (uploadErr) {
-        //   console.warn('⚠️ Error subiendo cover (no crítico):', uploadErr);
-        //   // No fallar si falla el upload, el evento ya está creado
-        // }
+        try {
+          coverUrl = await uploadCoverImage(createdEvent.id);
+          
+          // Actualizar evento con URL de cover
+          if (coverUrl) {
+            await client.models.Event.update({
+              id: createdEvent.id,
+              coverImageUrl: coverUrl,
+            });
+            console.log('✅ Cover image vinculada al evento');
+          }
+        } catch (uploadErr) {
+          console.warn('⚠️ Error subiendo cover (no crítico):', uploadErr);
+          // No fallar si falla el upload, el evento ya está creado
+        }
       }
 
       // 3. Notificar al speaker
@@ -495,21 +492,21 @@ export default function CreateEventPage() {
                         key={speakerApp.id}
                         type="button"
                         onClick={() => setSelectedSpeakerId(speakerApp.id || '')}
-                        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                        className={`w-full p-3 sm:p-4 rounded-lg border-2 transition-all text-left ${
                           selectedSpeakerId === speakerApp.id
                             ? 'border-primary bg-primary/5'
                             : 'border-border bg-background hover:border-primary/50'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           {/* Avatar - Iniciales del email */}
                           <div className="flex-shrink-0">
-                            <div className={`w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center ${
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/20 flex items-center justify-center ${
                               selectedSpeakerId === speakerApp.id
                                 ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
                                 : ''
                             }`}>
-                              <span className="text-primary text-lg font-semibold">
+                              <span className="text-primary text-base sm:text-lg font-semibold">
                                 {speakerApp.email?.[0]?.toUpperCase()}
                               </span>
                             </div>
@@ -517,14 +514,14 @@ export default function CreateEventPage() {
 
                           {/* Info */}
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-text-primary">
+                            <h3 className="font-semibold text-text-primary break-words text-sm sm:text-base">
                               {speakerApp.email}
                             </h3>
-                            <p className="text-xs text-text-secondary truncate">
+                            <p className="text-xs text-text-secondary truncate hidden sm:block">
                               ID: {speakerApp.userId?.substring(0, 20)}...
                             </p>
                             {speakerApp.motivation && (
-                              <p className="text-sm text-text-secondary mt-1 line-clamp-1">
+                              <p className="text-xs sm:text-sm text-text-secondary mt-1 line-clamp-2">
                                 {speakerApp.motivation}
                               </p>
                             )}
@@ -533,8 +530,8 @@ export default function CreateEventPage() {
                           {/* Checkmark si está seleccionado */}
                           {selectedSpeakerId === speakerApp.id && (
                             <div className="flex-shrink-0">
-                              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center">
+                                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                               </div>

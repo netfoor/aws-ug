@@ -1,6 +1,7 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
+import { storage } from './storage/resource';
 import { processSpeakerApplication } from './functions/process-speaker-application/resource';
 import { approveSpeakerApplication } from './functions/approve-speaker-application/resource';
 import { manualApproveSpeaker } from './functions/manual-approve-speaker/resource';
@@ -16,6 +17,7 @@ import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from '
 const backend = defineBackend({
   auth,
   data,
+  storage,
   processSpeakerApplication,
   approveSpeakerApplication,
   manualApproveSpeaker,

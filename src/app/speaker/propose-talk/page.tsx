@@ -194,14 +194,14 @@ export default function ProposeTalkPage() {
             <Button
               variant="outline"
               onClick={() => router.push('/dashboard')}
-              className="flex-1"
+              className="flex-1 text-sm"
             >
               Volver
             </Button>
             <Button
               variant="accent"
               onClick={() => router.push('/profile#speaker-section')}
-              className="flex-1"
+              className="flex-1 text-sm"
             >
               Aplicar para Speaker
             </Button>
@@ -298,7 +298,7 @@ export default function ProposeTalkPage() {
                   placeholder="Ej: Lambda, Serverless, DynamoDB"
                   className="flex-1 px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary theme-transition"
                 />
-                <Button type="button" onClick={handleAddTopic} variant="outline">
+                <Button type="button" onClick={handleAddTopic} variant="outline" className="text-sm">
                   Agregar
                 </Button>
               </div>
@@ -386,7 +386,7 @@ export default function ProposeTalkPage() {
                   placeholder="Ej: Proyector, Micrófono, Pizarra"
                   className="flex-1 px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary theme-transition"
                 />
-                <Button type="button" onClick={handleAddEquipment} variant="outline">
+                <Button type="button" onClick={handleAddEquipment} variant="outline" className="text-sm">
                   Agregar
                 </Button>
               </div>
@@ -442,7 +442,7 @@ export default function ProposeTalkPage() {
               variant="outline"
               onClick={() => router.back()}
               disabled={isSubmitting}
-              className="flex-1"
+              className="flex-1 text-sm"
             >
               Cancelar
             </Button>
@@ -450,7 +450,7 @@ export default function ProposeTalkPage() {
               type="submit"
               variant="accent"
               disabled={isSubmitting || topics.length === 0}
-              className="flex-1"
+              className="flex-1 text-sm"
             >
               {isSubmitting ? (
                 <>

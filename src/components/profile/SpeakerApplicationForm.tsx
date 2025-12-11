@@ -269,7 +269,7 @@ export default function SpeakerApplicationForm({
           {/* Submit Button */}
           <Button 
             type="submit" 
-            className="w-full" 
+            className="w-full border-1" 
             size="lg"
             disabled={loading}
           >

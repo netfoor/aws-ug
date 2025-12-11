@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
+import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { 
@@ -33,6 +34,9 @@ export default function EventsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'ALL' | 'PUBLISHED' | 'UPCOMING'>('PUBLISHED');
+  
+  // Map de eventId -> coverImageUrl pública
+  const [coverImageUrls, setCoverImageUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadEvents();
@@ -67,12 +71,39 @@ export default function EventsPage() {
       });
 
       setEvents(sorted);
+      
+      // Cargar URLs de cover images
+      loadCoverImages(sorted);
     } catch (err) {
       console.error('Error loading events:', err);
       setError('Error al cargar los eventos');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const loadCoverImages = async (eventsList: Event[]) => {
+    const urls: Record<string, string> = {};
+    
+    await Promise.all(
+      eventsList.map(async (event) => {
+        if (event.coverImageUrl && event.id) {
+          try {
+            const urlResult = await getUrl({
+              path: event.coverImageUrl,
+              options: {
+                expiresIn: 3600 // 1 hora
+              }
+            });
+            urls[event.id] = urlResult.url.toString();
+          } catch (err) {
+            console.warn(`Error obteniendo URL de cover para evento ${event.id}:`, err);
+          }
+        }
+      })
+    );
+    
+    setCoverImageUrls(urls);
   };
 
   // Filtrar eventos por búsqueda
@@ -267,10 +298,10 @@ export default function EventsPage() {
                 >
                   <div className="bg-surface rounded-lg shadow hover:shadow-xl transition-all theme-transition overflow-hidden h-full flex flex-col">
                     {/* Cover Image */}
-                    {event.coverImageUrl ? (
+                    {event.id && coverImageUrls[event.id] ? (
                       <div className="h-48 bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center overflow-hidden">
                         <img
-                          src={event.coverImageUrl}
+                          src={coverImageUrls[event.id]}
                           alt={event.title || 'Evento'}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
