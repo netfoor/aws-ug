@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserData, getFullName } from '@/hooks/useUserData';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -11,8 +12,9 @@ import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
 import { EditProfileForm, SpeakerApplicationForm, SpeakerApplicationStatus } from '@/components/profile';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, isLoading, isAdmin, userAttributes } = useAuth();
+  const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
   const { profile, loading: profileLoading, refetch } = useUserProfile();
+  const { userData } = useUserData();
   const [isEditing, setIsEditing] = useState(false);
 
   if (isLoading || profileLoading) {
@@ -68,13 +70,10 @@ export default function ProfilePage() {
     );
   }
 
-  const displayName = profile?.givenName && profile?.familyName 
-    ? `${profile.givenName} ${profile.familyName}`
-    : userAttributes?.given_name 
-      ? `${userAttributes.given_name} ${userAttributes.family_name || ''}`
-      : user.signInDetails?.loginId?.split('@')[0] || 'Usuario';
-
-  const displayEmail = profile?.email || userAttributes?.email || user.signInDetails?.loginId || '';
+  // ✅ Simplificado: profile y userData son el mismo objeto (User table)
+  // useUserProfile ya carga desde User table
+  const displayName = getFullName(profile || userData);
+  const displayEmail = profile?.email || userData?.email || user.signInDetails?.loginId || '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background theme-transition">

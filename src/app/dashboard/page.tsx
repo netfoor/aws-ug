@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/auth-context';
+import { useUserData, getFullName, getUserInitials } from '@/hooks/useUserData';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
@@ -8,7 +9,8 @@ import { Badge } from '@/components/ui/Badge';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
 
 export default function DashboardPage() {
-  const { user, isAuthenticated, isLoading, isAdmin, userAttributes } = useAuth();
+  const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
+  const { userData } = useUserData();
 
   if (isLoading) {
     return (
@@ -42,9 +44,8 @@ export default function DashboardPage() {
     );
   }
 
-  const userName = userAttributes?.given_name 
-    ? String(userAttributes.given_name) 
-    : user.signInDetails?.loginId?.split('@')[0] || 'Usuario';
+  // ✅ Obtener nombre desde User table
+  const userName = getFullName(userData);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background theme-transition">
@@ -112,7 +113,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-sm font-medium text-text-secondary mb-1">Verificación</p>
                   <p className="text-2xl font-bold text-text-primary">
-                    {userAttributes?.email_verified ? 'Verificado' : 'Pendiente'}
+                    {userData?.email ? 'Verificado' : 'Pendiente'}
                   </p>
                 </div>
                 <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
@@ -276,18 +277,15 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-14 w-14 bg-gradient-to-br from-accent to-accent/70 rounded-full flex items-center justify-center shadow-talavera">
                     <span className="text-white font-bold text-xl">
-                      {user.signInDetails?.loginId?.charAt(0).toUpperCase() || 'U'}
+                      {getUserInitials(userData)}
                     </span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-text-primary">
-                      {userAttributes?.given_name && userAttributes?.family_name
-                        ? `${String(userAttributes.given_name)} ${String(userAttributes.family_name)}`
-                        : user.signInDetails?.loginId?.split('@')[0] || 'Usuario'
-                      }
+                      {getFullName(userData)}
                     </p>
                     <p className="text-xs text-text-secondary">
-                      {user.signInDetails?.loginId}
+                      {userData?.email || user.signInDetails?.loginId}
                     </p>
                   </div>
                 </div>
@@ -296,16 +294,16 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-secondary">Miembro desde</span>
                     <span className="text-text-primary font-medium">
-                      {userAttributes?.created_at 
-                        ? new Date(Number(userAttributes.created_at) * 1000).toLocaleDateString('es-MX', { month: 'short', year: 'numeric' })
+                      {userData?.createdAt 
+                        ? new Date(userData.createdAt).toLocaleDateString('es-MX', { month: 'short', year: 'numeric' })
                         : 'Hoy'
                       }
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-secondary">Email verificado</span>
-                    <Badge variant={userAttributes?.email_verified ? 'success' : 'warning'} size="sm">
-                      {userAttributes?.email_verified ? 'Sí' : 'No'}
+                    <Badge variant={userData?.email ? 'success' : 'warning'} size="sm">
+                      {userData?.email ? 'Sí' : 'No'}
                     </Badge>
                   </div>
                 </div>

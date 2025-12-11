@@ -76,6 +76,7 @@ import {
 // ========================================
 const TABLE_PREFIX = process.env.SPEAKER_APPLICATION_TABLE_PREFIX || 'SpeakerApplication';
 const NOTIFICATION_TABLE_PREFIX = process.env.NOTIFICATION_TABLE_PREFIX || 'Notification';
+const USER_TABLE_PREFIX = process.env.USER_TABLE_PREFIX || 'User';
 const USER_POOL_ID = process.env.USER_POOL_ID;
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
 const REGION = process.env.AWS_REGION || 'us-east-1';
@@ -247,7 +248,8 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
     // 0️⃣ Obtener nombres reales de las tablas
     const tableName = await getTableName(TABLE_PREFIX);
     const notificationTableName = await getTableName(NOTIFICATION_TABLE_PREFIX);
-    console.log(`📋 Usando tablas: ${tableName}, ${notificationTableName}`);
+    const userTableName = await getTableName(USER_TABLE_PREFIX);
+    console.log(`📋 Usando tablas: ${tableName}, ${notificationTableName}, ${userTableName}`);
 
     // 1️⃣ Obtener datos de la postulación
     console.log(`📖 Obteniendo postulación: ${applicationId}`);
@@ -304,13 +306,30 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
 
     console.log('✅ Usuario agregado al grupo SPEAKERS');
 
-    // 5️⃣ Enviar email de aprobación
+    // 5️⃣ 🎯 Actualizar role en tabla User a SPEAKER
+    console.log(`📋 Actualizando role en User table: ${userId}`);
+    await docClient.send(new UpdateCommand({
+      TableName: userTableName,
+      Key: { id: userId },
+      UpdateExpression: 'SET #role = :role, updatedAt = :now',
+      ExpressionAttributeNames: {
+        '#role': 'role',
+      },
+      ExpressionAttributeValues: {
+        ':role': 'SPEAKER',
+        ':now': new Date().toISOString(),
+      },
+    }));
+
+    console.log('✅ Role actualizado en User table');
+
+    // 6️⃣ Enviar email de aprobación
     const userName = application.email.split('@')[0]; // Fallback si no hay nombre
     await sendApprovalEmail(application.email, userName);
 
     console.log('✅ Email de aprobación enviado');
 
-    // 6️⃣ Crear notificación in-app
+    // 7️⃣ Crear notificación in-app
     await createNotification(userId, notificationTableName);
 
     console.log('✅ Notificación in-app creada');

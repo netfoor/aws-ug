@@ -16,15 +16,16 @@ const sesClient = new SESClient({ region: process.env.AWS_REGION });
 // ⚙️ CONFIGURACIÓN
 const USER_POOL_ID = process.env.USER_POOL_ID;
 const TABLE_PREFIX = process.env.SPEAKER_APPLICATION_TABLE_PREFIX || 'SpeakerApplication';
+const USER_TABLE_PREFIX = process.env.USER_TABLE_PREFIX || 'User';
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
 
 // 🔍 Función para obtener el nombre real de la tabla dinámicamente
-async function getTableName(): Promise<string> {
+async function getTableName(prefix: string): Promise<string> {
   const { ListTablesCommand } = await import('@aws-sdk/client-dynamodb');
   const response = await ddbClient.send(new ListTablesCommand({}));
-  const tableName = response.TableNames?.find(name => name.startsWith(TABLE_PREFIX));
+  const tableName = response.TableNames?.find(name => name.startsWith(prefix));
   if (!tableName) {
-    throw new Error(`No se encontró tabla con prefijo: ${TABLE_PREFIX}`);
+    throw new Error(`No se encontró tabla con prefijo: ${prefix}`);
   }
   return tableName;
 }
@@ -160,8 +161,9 @@ export const handler: Handler<ApprovalEvent> = async (event) => {
 
   try {
     // 0️⃣ Obtener el nombre real de la tabla
-    const tableName = await getTableName();
-    console.log(`📋 Usando tabla: ${tableName}`);
+    const tableName = await getTableName(TABLE_PREFIX);
+    const userTableName = await getTableName(USER_TABLE_PREFIX);
+    console.log(`📋 Usando tablas: ${tableName}, ${userTableName}`);
 
     // 1️⃣ Obtener la aplicación de DynamoDB
     console.log(`📖 Obteniendo aplicación: ${applicationId}`);
@@ -227,7 +229,25 @@ export const handler: Handler<ApprovalEvent> = async (event) => {
       console.warn('⚠️  Advertencia al agregar a grupo:', error.message);
     }
 
-    // 4️⃣ Obtener email del usuario para notificación
+    // 4️⃣ 🎯 Actualizar role en tabla User a SPEAKER
+    console.log(`📋 Actualizando role en User table: ${userId}`);
+    await docClient.send(
+      new UpdateCommand({
+        TableName: userTableName,
+        Key: { id: userId },
+        UpdateExpression: 'SET #role = :role, updatedAt = :now',
+        ExpressionAttributeNames: {
+          '#role': 'role',
+        },
+        ExpressionAttributeValues: {
+          ':role': 'SPEAKER',
+          ':now': new Date().toISOString(),
+        },
+      })
+    );
+    console.log('✅ Role actualizado en User table');
+
+    // 5️⃣ Obtener email del usuario para notificación
     let userEmail = application.email;
     let userName = userEmail.split('@')[0];
 
@@ -253,7 +273,7 @@ export const handler: Handler<ApprovalEvent> = async (event) => {
       console.warn('⚠️  No se pudo obtener info adicional del usuario:', error);
     }
 
-    // 5️⃣ Enviar email de aprobación
+    // 6️⃣ Enviar email de aprobación
     await sendApprovalEmail(userEmail, userName);
 
     console.log(`✅ Aplicación ${applicationId} aprobada exitosamente`);

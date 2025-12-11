@@ -231,6 +231,11 @@ backend.approveSpeakerApplication.addEnvironment(
   'SpeakerApplication'
 );
 
+backend.approveSpeakerApplication.addEnvironment(
+  'USER_TABLE_PREFIX',
+  'User'
+);
+
 // Lambda 3: Manual Approve Speaker (Admin Panel)
 // - Necesita actualizar DynamoDB
 // - Necesita agregar usuarios a grupos de Cognito
@@ -300,6 +305,11 @@ backend.manualApproveSpeaker.addEnvironment(
 backend.manualApproveSpeaker.addEnvironment(
   'NOTIFICATION_TABLE_PREFIX',
   'Notification'
+);
+
+backend.manualApproveSpeaker.addEnvironment(
+  'USER_TABLE_PREFIX',
+  'User'
 );
 
 // Lambda 4: Reject Speaker Application (Admin Panel)

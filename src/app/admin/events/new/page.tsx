@@ -6,6 +6,7 @@ import { generateClient } from 'aws-amplify/data';
 import { uploadData } from 'aws-amplify/storage';
 import type { Schema } from '../../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
+import { useUserData, getFullName } from '@/hooks/useUserData';
 import { 
   Loader2, 
   Calendar, 
@@ -256,18 +257,27 @@ export default function CreateEventPage() {
         return;
       }
 
+      // ✅ Cargar datos del speaker desde User table (fuente única de verdad)
+      const { data: speakerUser } = await client.models.User.get({ id: speakerApp.userId });
+      if (!speakerUser) {
+        setError('Datos del speaker no encontrados');
+        setIsProcessing(false);
+        return;
+      }
+
+      const speakerName = getFullName(speakerUser);
+
       // 1. Crear evento (sin cover image primero)
-      // Nota: SpeakerApplication no tiene nombre, usamos email temporalmente
-      // El speaker actualizará su perfil más tarde
+      // Nota: Ahora obtenemos datos reales del User table
       const { data: createdEvent, errors } = await client.models.Event.create({
         title: title.trim(),
         description: description.trim(),
         slug,
         speakerId: speakerApp.userId, // userId from SpeakerApplication
-        speakerName: speakerApp.email.split('@')[0], // Nombre del email hasta @
-        speakerEmail: speakerApp.email,
-        speakerBio: speakerApp.motivation || undefined, // Usar motivation como bio
-        speakerAvatar: undefined, // No tenemos avatar en SpeakerApplication
+        speakerName, // ✅ Nombre real desde User table
+        speakerEmail: speakerUser.email,
+        speakerBio: speakerUser.bio || speakerApp.motivation || undefined,
+        speakerAvatar: speakerUser.avatarUrl || undefined,
         eventType,
         topics,
         startDate: startDateTime.toISOString(),

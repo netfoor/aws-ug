@@ -6,6 +6,7 @@ import { generateClient } from 'aws-amplify/data';
 import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
+import { useUserData, getFullName } from '@/hooks/useUserData';
 import { 
   Loader2, 
   Calendar, 
@@ -41,7 +42,8 @@ export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
-  const { user, userAttributes, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { userData, isLoading: userDataLoading } = useUserData();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -167,16 +169,17 @@ export default function EventDetailPage() {
       } else {
         // Crear nuevo registro
         const qrToken = `${event.id}-${user.userId}-${Date.now()}`;
-        const givenName = String(userAttributes?.['custom:givenName'] || '');
-        const familyName = String(userAttributes?.['custom:familyName'] || '');
-        const userEmail = String(userAttributes?.email || '');
-        const avatarUrl = userAttributes?.['custom:avatarUrl'] ? String(userAttributes['custom:avatarUrl']) : undefined;
+        
+        // ✅ Obtener datos de User table (fuente única de verdad)
+        const fullName = getFullName(userData);
+        const userEmail = userData?.email || '';
+        const avatarUrl = userData?.avatarUrl || undefined;
         
         await client.models.EventRegistration.create({
           eventId: event.id!,
           userId: user.userId,
           status: status,
-          userName: `${givenName} ${familyName}`.trim(),
+          userName: fullName,
           userEmail: userEmail,
           userAvatar: avatarUrl,
           qrCodeToken: qrToken,

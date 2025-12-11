@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
+import { useUserData, getFullName } from '@/hooks/useUserData';
 import { Loader2, Lightbulb, Users, Clock, Wrench, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
@@ -20,7 +21,8 @@ const client = generateClient<Schema>();
  */
 export default function ProposeTalkPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading, userAttributes } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { userData, isLoading: userDataLoading } = useUserData();
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,9 +42,8 @@ export default function ProposeTalkPage() {
 
   // Verificar que el usuario sea SPEAKER
   useEffect(() => {
-    if (!authLoading && isAuthenticated && user && userAttributes) {
-      const role = userAttributes['custom:role'] as string | undefined;
-      const hasRightRole = role === 'SPEAKER' || role === 'ADMIN';
+    if (!authLoading && isAuthenticated && user && userData) {
+      const hasRightRole = userData.role === 'SPEAKER' || userData.role === 'ADMIN';
       
       if (hasRightRole && !isSpeaker) {
         setIsSpeaker(true);
@@ -50,7 +51,7 @@ export default function ProposeTalkPage() {
         setIsSpeaker(false);
       }
     }
-  }, [authLoading, isAuthenticated, user, userAttributes, isSpeaker]);
+  }, [authLoading, isAuthenticated, user, userData, isSpeaker]);
 
   // Redirigir solo después de confirmar que no es speaker
   useEffect(() => {
@@ -103,13 +104,13 @@ export default function ProposeTalkPage() {
     setError(null);
 
     try {
-      const givenName = userAttributes?.['given_name'] as string || 'Usuario';
-      const familyName = userAttributes?.['family_name'] as string || '';
-      const email = userAttributes?.['email'] as string || '';
+      // ✅ Obtener datos de User table (fuente única de verdad)
+      const fullName = getFullName(userData);
+      const email = userData?.email || '';
 
       const { data, errors } = await client.models.TalkProposal.create({
         userId: user.userId,
-        speakerName: `${givenName} ${familyName}`.trim(),
+        speakerName: fullName,
         speakerEmail: email,
         title,
         description,
@@ -141,7 +142,7 @@ export default function ProposeTalkPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             proposalId: data.id,
-            speakerName: `${givenName} ${familyName}`.trim(),
+            speakerName: fullName,
             title: title,
           }),
         });

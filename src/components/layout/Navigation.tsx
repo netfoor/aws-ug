@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useAuth } from '@/context/auth-context';
+import { useUserData, getUserInitials } from '@/hooks/useUserData';
 import { Button } from '@/components/ui/Button';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { cn } from '@/lib/utils';
@@ -15,12 +16,13 @@ interface NavigationProps {
 
 export function Navigation({ className }: NavigationProps) {
   const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated, user, logout, isAdmin, userAttributes } = useAuth();
+  const { isAuthenticated, user, logout, isAdmin } = useAuth();
+  const { userData } = useUserData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  const userRole = userAttributes?.['custom:role'] as string | undefined;
-  const isSpeaker = userRole === 'SPEAKER' || userRole === 'ADMIN';
+  // ✅ Obtener rol desde User table
+  const isSpeaker = userData?.role === 'SPEAKER' || userData?.role === 'ADMIN';
 
   const navItems = [
     { href: '/', label: 'Inicio' },
@@ -102,7 +104,7 @@ export function Navigation({ className }: NavigationProps) {
                 >
                   <div className="h-8 w-8 bg-accent/10 rounded-full flex items-center justify-center">
                     <span className="text-accent font-medium text-sm">
-                      {user?.signInDetails?.loginId?.charAt(0).toUpperCase() || 'U'}
+                      {getUserInitials(userData)}
                     </span>
                   </div>
                 </Button>

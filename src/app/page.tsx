@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/auth-context';
+import { useUserData, getFullName, getUserInitials } from '@/hooks/useUserData';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -8,6 +9,7 @@ import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
 
 export default function Home() {
   const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
+  const { userData } = useUserData();
 
   return (
     <div className="min-h-screen theme-transition">
@@ -83,12 +85,12 @@ export default function Home() {
                 <div className="flex items-center space-x-4">
                   <div className="h-16 w-16 bg-gradient-to-br from-accent to-accent/70 rounded-full flex items-center justify-center shadow-talavera">
                     <span className="text-white font-bold text-2xl">
-                      {user.signInDetails?.loginId?.charAt(0).toUpperCase() || 'U'}
+                      {getUserInitials(userData)}
                     </span>
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-text-primary">
-                      ¡Bienvenido, {user.signInDetails?.loginId?.split('@')[0] || 'Usuario'}!
+                      ¡Bienvenido, {getFullName(userData)}!
                     </h2>
                     <p className="text-sm text-text-secondary flex items-center gap-2">
                       {isAdmin && (
