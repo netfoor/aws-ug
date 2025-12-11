@@ -16,7 +16,6 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
   const [formData, setFormData] = useState<Partial<UserProfile>>({
     givenName: '',
     familyName: '',
-    email: '',
     phoneNumber: '',
     company: '',
     bio: '',
@@ -36,7 +35,6 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
       setFormData({
         givenName: profile.givenName || '',
         familyName: profile.familyName || '',
-        email: profile.email || '',
         phoneNumber: profile.phoneNumber || '',
         company: profile.company || '',
         bio: profile.bio || '',
@@ -58,12 +56,6 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
     
     if (!formData.familyName?.trim()) {
       errors.familyName = 'El apellido es requerido';
-    }
-    
-    if (!formData.email?.trim()) {
-      errors.email = 'El email es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'El email no es válido';
     }
     
     // Validar social links (URLs)
@@ -206,18 +198,13 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Email *</label>
-            <Input
-              type="email"
-              value={formData.email || ''}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              required
-              placeholder="tu@email.com"
-              className={validationErrors.email ? 'border-red-500' : ''}
-            />
-            {validationErrors.email && (
-              <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>
-            )}
+            <label className="block text-sm font-medium mb-2">Email</label>
+            <div className="px-3 py-2 bg-secondary/30 border border-border rounded-md text-text-secondary">
+              {profile?.email || 'Cargando...'}
+            </div>
+            <p className="text-xs text-text-secondary mt-1">
+              ℹ️ El email viene de tu cuenta de autenticación y no puede editarse aquí
+            </p>
           </div>
 
           <div>

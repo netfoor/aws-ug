@@ -8,14 +8,18 @@ const schema = a.schema({
     email: a.string().required(),
     phoneNumber: a.string(),
     company: a.string(),
+    jobTitle: a.string(), // 🆕 Rol o Carrera (ej: "Ingeniero de Software", "Estudiante de TI")
     bio: a.string(),
     interests: a.string().array(),
+    awsExperienceLevel: a.enum(['PROFESSIONAL', 'PERSONAL', 'NONE', 'LEARNING']), // 🆕 Experiencia con AWS
     role: a.enum(['MEMBER', 'SPEAKER', 'ADMIN']),
     meetupId: a.string(),
     newsletterOptIn: a.boolean().default(false),
     avatarUrl: a.string(),
     socialLinks: a.json(),
     privacyConsentDate: a.datetime(),
+    profileCompleted: a.boolean().default(false), // 🆕 Para detectar primer login
+    onboardingCompletedAt: a.datetime(), // 🆕 Timestamp de cuando completó onboarding
     createdAt: a.datetime(),
     updatedAt: a.datetime(),
   })

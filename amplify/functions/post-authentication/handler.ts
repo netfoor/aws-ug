@@ -3,9 +3,16 @@ import {
   CognitoIdentityProviderClient, 
   AdminAddUserToGroupCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
-// Cliente de Cognito (se reutiliza entre invocaciones)
+// Clientes AWS (se reutilizan entre invocaciones)
 const cognitoClient = new CognitoIdentityProviderClient({});
+const ddbClient = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(ddbClient);
+
+// Nombre de la tabla User (se obtiene de variables de entorno)
+const USER_TABLE_NAME = process.env.USER_TABLE_NAME || '';
 
 /**
  * 🔐 Lambda PreTokenGeneration Handler
@@ -16,14 +23,15 @@ const cognitoClient = new CognitoIdentityProviderClient({});
  * - En cada login, incluido refresh tokens
  * 
  * QUÉ HACE:
- * - Verifica si el usuario tiene grupos personalizados (MEMBERS, SPEAKERS, ADMINS)
- * - Si NO tiene ninguno de esos → Lo agrega a "MEMBERS"
- * - Si YA tiene alguno → No hace nada
+ * 1. Verifica si el usuario tiene grupos personalizados (MEMBERS, SPEAKERS, ADMINS)
+ *    - Si NO tiene ninguno → Lo agrega a "MEMBERS"
+ * 2. Verifica si el usuario existe en la tabla User de DynamoDB
+ *    - Si NO existe → Lo crea con profileCompleted=false (forzar onboarding)
  * 
  * IMPORTANTE:
  * - Se ejecuta CADA login (no solo el primero)
  * - AdminAddUserToGroup es idempotente (seguro llamar múltiples veces)
- * - Los grupos automáticos de OAuth (us-east-1_xxx_Google) no cuentan
+ * - Crear usuario en DynamoDB solo ocurre una vez (primer login)
  */
 export const handler: PreTokenGenerationTriggerHandler = async (event) => {
   console.log('🔐 PreTokenGeneration trigger iniciado');
@@ -32,12 +40,12 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
   console.log('🔑 Trigger Source:', event.triggerSource);
   
   try {
-    // Obtener los grupos del usuario desde el evento
+    // ========================================
+    // PARTE 1: ASIGNACIÓN DE GRUPO MEMBERS
+    // ========================================
     const groupsInToken = event.request.groupConfiguration?.groupsToOverride || [];
-    
     console.log('👥 Grupos actuales:', groupsInToken.length > 0 ? groupsInToken : 'Ninguno');
     
-    // Verificar si el usuario tiene alguno de nuestros grupos personalizados
     const customGroups = ['MEMBERS', 'SPEAKERS', 'ADMINS'];
     const hasCustomGroup = groupsInToken.some(g => customGroups.includes(g));
     
@@ -51,9 +59,51 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
       }));
       
       console.log('✅ Usuario agregado a MEMBERS');
-      console.log('⚠️ Cambios visibles en el PRÓXIMO token (siguiente login o refresh)');
     } else {
       console.log('✅ Usuario ya tiene grupo personalizado:', groupsInToken.filter(g => customGroups.includes(g)));
+    }
+
+    // ========================================
+    // PARTE 2: CREACIÓN DE USUARIO EN DYNAMODB
+    // ========================================
+    const userId = event.request.userAttributes.sub;
+    const email = event.request.userAttributes.email;
+    const givenName = event.request.userAttributes.given_name || '';
+    const familyName = event.request.userAttributes.family_name || '';
+    
+    console.log('📊 Verificando si usuario existe en DynamoDB...');
+    
+    // Verificar si el usuario ya existe
+    const existingUser = await docClient.send(new GetCommand({
+      TableName: USER_TABLE_NAME,
+      Key: { id: userId },
+    }));
+    
+    if (!existingUser.Item) {
+      console.log('🆕 Usuario no existe, creando registro en DynamoDB...');
+      
+      const now = new Date().toISOString();
+      
+      await docClient.send(new PutCommand({
+        TableName: USER_TABLE_NAME,
+        Item: {
+          id: userId,
+          email: email,
+          givenName: givenName,
+          familyName: familyName,
+          role: 'MEMBER', // Default role
+          profileCompleted: false, // 🚨 FORZAR ONBOARDING
+          newsletterOptIn: false,
+          createdAt: now,
+          updatedAt: now,
+          __typename: 'User',
+        },
+      }));
+      
+      console.log('✅ Usuario creado en DynamoDB con profileCompleted=false');
+      console.log('🎯 Usuario será redirigido a onboarding en siguiente carga');
+    } else {
+      console.log('✅ Usuario ya existe en DynamoDB:', existingUser.Item.email);
     }
     
   } catch (error) {
@@ -63,6 +113,5 @@ export const handler: PreTokenGenerationTriggerHandler = async (event) => {
   }
   
   // IMPORTANTE: Siempre retornar el evento
-  // PreTokenGeneration puede modificar el token, pero no lo hacemos aquí
   return event;
 };

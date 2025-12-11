@@ -2,6 +2,7 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
+import { postAuthentication } from './functions/post-authentication/resource';
 import { processSpeakerApplication } from './functions/process-speaker-application/resource';
 import { approveSpeakerApplication } from './functions/approve-speaker-application/resource';
 import { manualApproveSpeaker } from './functions/manual-approve-speaker/resource';
@@ -18,6 +19,7 @@ const backend = defineBackend({
   auth,
   data,
   storage,
+  postAuthentication,
   processSpeakerApplication,
   approveSpeakerApplication,
   manualApproveSpeaker,
@@ -40,6 +42,26 @@ const backend = defineBackend({
 //   scripts/cleanup-orphaned-resources-fixed.ps1 (sección 4)
 
 console.log('⚠️  Log retention: Usar cleanup-orphaned-resources-fixed.ps1 para aplicar 7 días');
+
+// 🔐 POST-AUTHENTICATION LAMBDA: Crear usuarios en DynamoDB
+// Necesita acceso a la tabla User para crear registros en primer login
+backend.postAuthentication.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'dynamodb:GetItem',
+      'dynamodb:PutItem',
+    ],
+    resources: [
+      `arn:aws:dynamodb:${backend.auth.resources.userPool.stack.region}:${backend.auth.resources.userPool.stack.account}:table/User-*`
+    ],
+  })
+);
+
+// Pasar nombre de tabla como variable de entorno
+backend.postAuthentication.addEnvironment(
+  'USER_TABLE_NAME',
+  `User-${backend.data.resources.cfnResources.amplifyDynamoDbTables.User.ref}`
+);
 
 // 🎤 SPEAKER APPLICATION WORKFLOW: Configuración de permisos
 
@@ -469,6 +491,7 @@ backend.notifyAdminsNewProposal.addEnvironment(
 
 // Esto ELIMINA la necesidad del script de limpieza manual
 const lambdaFunctions = [
+  { lambda: backend.postAuthentication.resources.lambda, name: 'PostAuthentication' },
   { lambda: backend.processSpeakerApplication.resources.lambda, name: 'ProcessSpeakerApplication' },
   { lambda: backend.approveSpeakerApplication.resources.lambda, name: 'ApproveSpeakerApplication' },
   { lambda: backend.manualApproveSpeaker.resources.lambda, name: 'ManualApproveSpeaker' },

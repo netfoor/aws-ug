@@ -5,6 +5,7 @@ import AmplifyClientProvider from "@/components/AmplifyClientProvider";
 import { AuthProvider } from "../context/auth-context";
 import { ThemeProvider } from "../providers/ThemeProvider";
 import { Navigation } from "../components/layout/Navigation";
+import { OnboardingGuard } from "../components/OnboardingGuard";
 
 export const metadata: Metadata = {
   title: "AWS UG Puebla - User Group Oficial",
@@ -25,12 +26,14 @@ export default async function RootLayout({
         <ThemeProvider>
           <AmplifyClientProvider>
             <AuthProvider>
-              <div className="flex flex-col min-h-screen">
-                <Navigation />
-                <main className="flex-1">
-                  {children}
-                </main>
-              </div>
+              <OnboardingGuard>
+                <div className="flex flex-col min-h-screen">
+                  <Navigation />
+                  <main className="flex-1">
+                    {children}
+                  </main>
+                </div>
+              </OnboardingGuard>
             </AuthProvider>
           </AmplifyClientProvider>
         </ThemeProvider>
