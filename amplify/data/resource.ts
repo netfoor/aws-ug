@@ -87,6 +87,10 @@ const schema = a.schema({
     requiredEquipment: a.string().array(), // Proyector, micrófono, etc.
     additionalNotes: a.string(), // Notas adicionales para el admin
     
+    // 📅 Fecha y hora propuesta (nuevo - último jueves del mes)
+    proposedDate: a.datetime().required(), // Fecha seleccionada (último jueves)
+    proposedTimeSlot: a.string().default('18:30-19:30'), // Horario fijo: 6:30-7:30 PM
+    
     // Estado de la propuesta
     status: a.enum(['PENDING', 'APPROVED', 'REJECTED', 'EVENT_CREATED']),
     

@@ -6,10 +6,12 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { useUserData, getFullName } from '@/hooks/useUserData';
-import { Loader2, Lightbulb, Users, Clock, Wrench, FileText } from 'lucide-react';
+import { Loader2, Lightbulb, Users, Clock, Wrench, FileText, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
+import LastThursdaySelector from '@/components/speaker/LastThursdaySelector';
+import { dateToISO } from '@/lib/date-utils';
 
 const client = generateClient<Schema>();
 
@@ -39,6 +41,7 @@ export default function ProposeTalkPage() {
   const [requiredEquipment, setRequiredEquipment] = useState<string[]>([]);
   const [equipmentInput, setEquipmentInput] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
+  const [proposedDate, setProposedDate] = useState<Date | null>(null);
 
   // Verificar que el usuario sea SPEAKER
   useEffect(() => {
@@ -100,6 +103,11 @@ export default function ProposeTalkPage() {
       return;
     }
 
+    if (!proposedDate) {
+      setError('Debes seleccionar una fecha para la charla');
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
@@ -119,6 +127,8 @@ export default function ProposeTalkPage() {
         targetAudience,
         requiredEquipment: requiredEquipment.length > 0 ? requiredEquipment : undefined,
         additionalNotes: additionalNotes.trim() || undefined,
+        proposedDate: dateToISO(proposedDate), // 📅 Nueva fecha
+        proposedTimeSlot: '18:30-19:30', // Horario fijo
         status: 'PENDING',
         submittedAt: new Date().toISOString(),
       });
@@ -366,6 +376,20 @@ export default function ProposeTalkPage() {
                 </select>
               </div>
             </div>
+          </div>
+
+          {/* 📅 Selector de Fecha */}
+          <div className="bg-surface rounded-lg p-6 shadow theme-transition">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-5 h-5 text-accent" />
+              <h2 className="text-xl font-semibold text-text-primary">Fecha Propuesta</h2>
+            </div>
+            
+            <LastThursdaySelector
+              selectedDate={proposedDate}
+              onDateSelect={setProposedDate}
+              disabled={isSubmitting}
+            />
           </div>
 
           {/* Equipo Requerido */}
