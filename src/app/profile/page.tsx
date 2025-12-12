@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
+import { Linkedin, Twitter, Github, Globe } from 'lucide-react';
 import { EditProfileForm, SpeakerApplicationForm, SpeakerApplicationStatus } from '@/components/profile';
 import ProfessionalProfileForm from '@/components/profile/ProfessionalProfileForm';
 import { calculateProfileCompleteness, getCompletenessMessage } from '@/lib/profile-utils';
@@ -142,7 +143,9 @@ export default function ProfilePage() {
                   </Badge>
                 )}
                 {profile?.newsletterOptIn && (
-                  <Badge variant="primary">Newsletter Suscrito</Badge>
+                  <Badge variant="primary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 border border-blue-200 dark:border-blue-800">
+                    Newsletter Suscrito
+                  </Badge>
                 )}
               </div>
             </CardHeader>
@@ -202,22 +205,38 @@ export default function ProfilePage() {
               {profile?.socialLinks && Object.keys(profile.socialLinks).some(key => profile.socialLinks?.[key as keyof typeof profile.socialLinks]) && (
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Redes Sociales</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(profile.socialLinks).map(([platform, url]) => 
-                      url ? (
-                        <div key={platform}>
-                          <label className="block text-sm font-medium text-text-secondary mb-1 capitalize">{platform}</label>
-                          <a 
-                            href={url as string} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-accent hover:underline break-all"
-                          >
-                            {url as string}
-                          </a>
-                        </div>
-                      ) : null
-                    )}
+                  <div className="flex flex-wrap gap-3">
+                    {Object.entries(profile.socialLinks).map(([platform, url]) => {
+                      if (!url) return null;
+                      
+                      const getIcon = () => {
+                        switch(platform) {
+                          case 'linkedin': return <Linkedin className="w-5 h-5" />;
+                          case 'twitter': return <Twitter className="w-5 h-5" />;
+                          case 'github': return <Github className="w-5 h-5" />;
+                          case 'website': return <Globe className="w-5 h-5" />;
+                          default: return <Globe className="w-5 h-5" />;
+                        }
+                      };
+                      
+                      return (
+                        <a
+                          key={platform}
+                          href={url as string}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface-hover border border-border rounded-lg transition-colors group"
+                          title={`Ver ${platform}`}
+                        >
+                          <span className="text-text-secondary group-hover:text-accent transition-colors">
+                            {getIcon()}
+                          </span>
+                          <span className="text-sm font-medium text-text-primary capitalize">
+                            {platform}
+                          </span>
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -383,38 +402,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            <Card variant="elevated">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                </div>
-                <h3 className="font-semibold mb-2">Recursos</h3>
-                <p className="text-sm text-text-secondary mb-4">Accede a materiales y grabaciones</p>
-                <Button variant="outline" size="sm" disabled>
-                  Próximamente
-                </Button>
-              </CardContent>
-            </Card>
-
-            {isAdmin && (
-              <Card variant="elevated">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold mb-2">Administración</h3>
-                  <p className="text-sm text-text-secondary mb-4">Panel de administrador</p>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/admin">Ir al Panel</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            {/* Cards de Recursos y Admin movidos al menú hamburguesa para mantener perfil limpio */}
           </div>
         </div>
       </div>

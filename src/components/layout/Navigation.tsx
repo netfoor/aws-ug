@@ -95,89 +95,17 @@ export function Navigation({ className }: NavigationProps) {
             <NotificationBell />
 
             {isAuthenticated ? (
-              <div className="relative hidden sm:block">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2"
+              <>
+                {/* Avatar clickeable - lleva directo a perfil */}
+                <Link
+                  href="/profile"
+                  className="h-9 w-9 bg-gradient-to-br from-accent to-accent/70 rounded-full items-center justify-center hover:scale-110 transition-transform shadow-sm hidden sm:flex"
                 >
-                  <div className="h-8 w-8 bg-accent/10 rounded-full flex items-center justify-center">
-                    <span className="text-accent font-medium text-sm">
-                      {getUserInitials(userData)}
-                    </span>
-                  </div>
-                </Button>
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-surface border border-border rounded-lg shadow-talavera-lg animate-slide-down">
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50 rounded-t-lg"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      Perfil
-                    </Link>
-                    {isSpeaker && (
-                      <>
-                        <div className="border-t border-border" />
-                        <Link
-                          href="/speaker/propose-talk"
-                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Proponer Charla
-                        </Link>
-                        <Link
-                          href="/speaker/my-proposals"
-                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Mis Propuestas
-                        </Link>
-                      </>
-                    )}
-                    {isAdmin && (
-                      <>
-                        <div className="border-t border-border" />
-                        <Link
-                          href="/admin/speakers"
-                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Panel Admin
-                        </Link>
-                        <Link
-                          href="/admin/talk-proposals"
-                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Gestionar Propuestas
-                        </Link>
-                        <Link
-                          href="/admin/events"
-                          className="block px-4 py-2 text-sm text-text-primary hover:bg-secondary/50"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Gestión de Eventos
-                        </Link>
-                      </>
-                    )}
-                    <button
-                      onClick={() => { logout(); setIsUserMenuOpen(false); }}
-                      className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-secondary/50 rounded-b-lg"
-                    >
-                      Cerrar Sesión
-                    </button>
-                  </div>
-                )}
-              </div>
+                  <span className="text-white font-semibold text-sm">
+                    {getUserInitials(userData)}
+                  </span>
+                </Link>
+              </>
             ) : (
               <Button variant="accent" size="sm" className="hidden sm:inline-flex" asChild>
                 <Link href="/login">Iniciar Sesión</Link>
