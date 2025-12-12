@@ -523,16 +523,14 @@ export const handler: DynamoDBStreamHandler = async (event) => {
       const hasAttachedProposal = newImage.hasAttachedProposal?.BOOL || false;
       let attachedProposal = null;
       
-      if (hasAttachedProposal && newImage.attachedProposal?.M) {
-        const proposalMap = newImage.attachedProposal.M;
-        attachedProposal = {
-          talkTitle: proposalMap.talkTitle?.S || '',
-          talkDescription: proposalMap.talkDescription?.S || '',
-          duration: parseInt(proposalMap.duration?.N || '45'),
-          targetAudience: proposalMap.targetAudience?.S || 'ALL',
-          proposedDate: proposalMap.proposedDate?.S || '',
-        };
-        console.log('📎 Propuesta adjunta detectada:', attachedProposal.talkTitle);
+      if (hasAttachedProposal && newImage.attachedProposal?.S) {
+        try {
+          // Parse JSON string from DynamoDB
+          attachedProposal = JSON.parse(newImage.attachedProposal.S);
+          console.log('📎 Propuesta adjunta detectada:', attachedProposal.talkTitle);
+        } catch (error) {
+          console.error('❌ Error parsing attachedProposal JSON:', error);
+        }
       }
 
       if (!applicationId || !userId || !email) {

@@ -7,12 +7,14 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/../../amplify/data/resource';
 import UnifiedSpeakerProposalForm from '@/components/speaker/UnifiedSpeakerProposalForm';
 import { useAuth } from '@/context/auth-context';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const client = generateClient<Schema>();
 
 export default function ApplyWithTalkPage() {
   const router = useRouter();
-  const { user, profile, isLoading: authLoading } = useAuth();
+  const { user, userAttributes, isLoading: authLoading } = useAuth();
+  const { profile, loading: profileLoading } = useUserProfile();
   
   const [isCheckingAccess, setIsCheckingAccess] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
@@ -22,17 +24,20 @@ export default function ApplyWithTalkPage() {
   // Check if user has access
   useEffect(() => {
     async function checkAccess() {
-      if (authLoading) return;
+      if (authLoading || profileLoading) return;
 
       if (!user) {
         router.push('/auth/signin?redirect=/speaker/apply-with-talk');
         return;
       }
 
+      const userEmail = (userAttributes?.email as string) || '';
+      if (!userEmail) return;
+
       try {
         // Check if user already applied
         const { data: applications } = await client.models.SpeakerApplication.list({
-          filter: { email: { eq: user.email } }
+          filter: { email: { eq: userEmail } }
         });
 
         if (applications && applications.length > 0) {
@@ -48,12 +53,10 @@ export default function ApplyWithTalkPage() {
           }
         }
 
-        // Check if user is already a speaker
-        const groups = user.signInDetails?.loginId ? 
-          await user.getSignInUserSession?.()?.getAccessToken?.().payload?.['cognito:groups'] || [] : 
-          [];
+        // Check if user is already a speaker (from profile role)
+        const userRole = profile?.role;
         
-        if (groups.includes('SPEAKERS')) {
+        if (userRole === 'SPEAKER' || userRole === 'ADMIN') {
           // Already a speaker, redirect to propose-talk
           router.push('/speaker/propose-talk');
           return;
@@ -69,32 +72,37 @@ export default function ApplyWithTalkPage() {
     }
 
     checkAccess();
-  }, [user, authLoading, router]);
+  }, [user, userAttributes, authLoading, profileLoading, profile?.role, router]);
 
   async function handleSubmit(formData: any) {
     if (!user) return;
+
+    const userEmail = (userAttributes?.email as string) || '';
+    if (!userEmail) {
+      throw new Error('No se pudo obtener el email del usuario');
+    }
 
     try {
       // Create SpeakerApplication with attached proposal
       const applicationData = {
         userId: user.userId,
-        email: user.email,
+        email: userEmail,
         motivation: formData.motivation,
         experience: formData.experience,
         topics: formData.topics,
-        status: 'PENDING',
+        status: 'PENDING' as const,
         submittedAt: new Date().toISOString(),
         hasAttachedProposal: true, // Important flag!
-        // Attached proposal data
-        attachedProposal: {
+        // Attached proposal data (JSON as string)
+        attachedProposal: JSON.stringify({
           talkTitle: formData.talkTitle,
           talkDescription: formData.talkDescription,
           duration: formData.duration,
           targetAudience: formData.targetAudience,
           proposedDate: formData.proposedDate?.toISOString(),
-        },
-        // Professional profile data
-        professionalProfile: {
+        }),
+        // Professional profile data (JSON as string)
+        professionalProfile: JSON.stringify({
           photoKey: formData.photoKey,
           cvKey: formData.cvKey,
           linkedInUrl: formData.linkedInUrl,
@@ -104,7 +112,7 @@ export default function ApplyWithTalkPage() {
           phoneNumber: formData.phoneNumber,
           givenName: formData.givenName,
           familyName: formData.familyName,
-        }
+        })
       };
 
       const { data: application, errors } = await client.models.SpeakerApplication.create(applicationData);
@@ -136,7 +144,7 @@ export default function ApplyWithTalkPage() {
   }
 
   // Loading state
-  if (authLoading || isCheckingAccess) {
+  if (authLoading || profileLoading || isCheckingAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -262,8 +270,8 @@ export default function ApplyWithTalkPage() {
         {/* Form */}
         <UnifiedSpeakerProposalForm
           userId={user?.userId || ''}
-          userEmail={user?.email || ''}
-          userName={profile?.name || ''}
+          userEmail={(userAttributes?.email as string) || ''}
+          userName={profile ? `${profile.givenName} ${profile.familyName}`.trim() : ''}
           onSubmit={handleSubmit}
           onCancel={() => router.push('/')}
         />

@@ -35,9 +35,10 @@ export const storage = defineStorage({
       allow.authenticated.to(['read']),
       allow.entity('identity').to(['read', 'write', 'delete'])
     ],
-    // 🎤 Speaker professional files (CV y fotos) - speakers/admins full access
+    // 🎤 Speaker professional files (CV y fotos) 
+    // Usuarios autenticados pueden escribir durante aplicación, speakers/admins full access
     'speakers/*': [
-      allow.authenticated.to(['read']),
+      allow.authenticated.to(['read', 'write']), // ← Permite upload durante aplicación
       allow.groups(['SPEAKERS', 'ADMINS']).to(['read', 'write', 'delete'])
     ]
   })
