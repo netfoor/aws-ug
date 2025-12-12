@@ -161,9 +161,9 @@ export default function ProfessionalProfileForm({
   const canSubmit = (cvKey || linkedInUrl) && !photoUploading && !cvUploading && !isSaving;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mb-2">
         <div className="p-3 bg-accent/10 rounded-lg">
           <Briefcase className="w-6 h-6 text-accent" />
         </div>
@@ -182,8 +182,8 @@ export default function ProfessionalProfileForm({
       )}
 
       {/* Foto Profesional */}
-      <div className="bg-surface rounded-lg p-6 shadow theme-transition">
-        <Label className="text-base font-semibold mb-4 block">
+      <div className="bg-surface rounded-lg p-4 sm:p-6 shadow theme-transition">
+        <Label className="text-base font-semibold mb-3 sm:mb-4 block">
           📸 Foto Personal <span className="text-red-500">*</span>
         </Label>
         <p className="text-sm text-text-secondary mb-4">
@@ -195,9 +195,9 @@ export default function ProfessionalProfileForm({
           📢 Tu foto se utilizará en nuestras redes sociales, página web y materiales promocionales del evento.
         </p>
 
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
           {/* Preview */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 mx-auto sm:mx-0">
             {photoPreview ? (
               <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-accent">
                 <img
@@ -212,7 +212,7 @@ export default function ProfessionalProfileForm({
                 )}
               </div>
             ) : (
-              <div className="w-32 h-32 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-secondary/20">
+              <div className="w-32 h-32 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-secondary/20 mx-auto sm:mx-0">
                 <Upload className="w-8 h-8 text-text-secondary" />
               </div>
             )}
@@ -264,8 +264,8 @@ export default function ProfessionalProfileForm({
       </div>
 
       {/* CV */}
-      <div className="bg-surface rounded-lg p-6 shadow theme-transition">
-        <Label className="text-base font-semibold mb-4 block">
+      <div className="bg-surface rounded-lg p-4 sm:p-6 shadow theme-transition">
+        <Label className="text-base font-semibold mb-3 sm:mb-4 block">
           💼 Trayectoria Profesional <span className="text-red-500">*</span>
         </Label>
         <p className="text-sm text-text-secondary mb-4">
@@ -342,8 +342,8 @@ export default function ProfessionalProfileForm({
       </div>
 
       {/* Área de Especialización */}
-      <div className="bg-surface rounded-lg p-6 shadow theme-transition">
-        <Label htmlFor="expertiseArea" className="text-base font-semibold mb-4 block">
+      <div className="bg-surface rounded-lg p-4 sm:p-6 shadow theme-transition">
+        <Label htmlFor="expertiseArea" className="text-base font-semibold mb-3 sm:mb-4 block">
           🎯 Área de Especialización <span className="text-red-500">*</span>
         </Label>
         <p className="text-sm text-text-secondary mb-4">
@@ -367,11 +367,11 @@ export default function ProfessionalProfileForm({
       </div>
 
       {/* Botones */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
         <Button
           type="submit"
           disabled={!canSubmit}
-          className="flex-1"
+          className="w-full sm:flex-1"
         >
           {isSaving ? (
             <>
@@ -389,6 +389,7 @@ export default function ProfessionalProfileForm({
             variant="outline"
             onClick={onSkip}
             disabled={isSaving}
+            className="w-full sm:w-auto"
           >
             Omitir por ahora
           </Button>

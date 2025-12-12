@@ -276,38 +276,36 @@ export default function ProfilePage() {
             <div className="mb-8">
               <Card variant="elevated">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
+                  <div className="space-y-3">
                     <CardTitle className="flex items-center gap-2">
                       💼 Perfil Profesional de Speaker
                     </CardTitle>
                     {(() => {
                       const completeness = calculateProfileCompleteness(profile);
                       return (
-                        <div className="flex items-center gap-2">
-                          <div className="text-right">
-                            <p className="text-xs text-text-secondary">
-                              {getCompletenessMessage(completeness)}
-                            </p>
-                          </div>
+                        <div className="flex items-center gap-3">
                           <div className={`
-                            px-3 py-1 rounded-full text-sm font-semibold
+                            px-3 py-1 rounded-full text-sm font-semibold flex-shrink-0 border-2
                             ${completeness.percentage === 100 
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
+                              ? 'border-green-500 text-green-600 dark:text-green-400' 
                               : completeness.percentage >= 75
-                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                               : completeness.percentage >= 50
-                              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                              ? 'border-amber-500 text-amber-600 dark:text-amber-400'
+                              : 'border-red-500 text-red-600 dark:text-red-400'
                             }
                           `}>
                             {completeness.percentage}%
                           </div>
+                          <p className="text-sm text-text-secondary">
+                            {getCompletenessMessage(completeness)}
+                          </p>
                         </div>
                       );
                     })()}
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   {!showProfessionalForm ? (
                     <div className="space-y-4">
                       {/* Status actual */}

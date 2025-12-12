@@ -96,10 +96,10 @@ export function Navigation({ className }: NavigationProps) {
 
             {isAuthenticated ? (
               <>
-                {/* Avatar clickeable - lleva directo a perfil */}
+                {/* Avatar clickeable - lleva directo a perfil (visible en mobile y desktop) */}
                 <Link
                   href="/profile"
-                  className="h-9 w-9 bg-gradient-to-br from-accent to-accent/70 rounded-full items-center justify-center hover:scale-110 transition-transform shadow-sm hidden sm:flex"
+                  className="h-6.5 w-6.5 bg-gradient-to-br from-accent to-accent/70 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-sm"
                 >
                   <span className="text-white font-semibold text-sm">
                     {getUserInitials(userData)}
@@ -141,19 +141,13 @@ export function Navigation({ className }: NavigationProps) {
               {isAuthenticated ? (
                 <>
                   <Link
-                    href="/dashboard"
+                    href="/profile"
                     className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
-                  <Link
-                    href="/profile"
-                    className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Perfil
-                  </Link>
+                  {/* Perfil removido - ahora se accede con el avatar */}
                   {isSpeaker && (
                     <>
                       <Link
