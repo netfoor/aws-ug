@@ -13,6 +13,7 @@ export interface UserProfile {
   email: string;
   phoneNumber?: string;
   company?: string;
+  jobTitle?: string;
   bio?: string;
   interests?: string[];
   role?: 'MEMBER' | 'SPEAKER' | 'ADMIN';
@@ -75,6 +76,7 @@ export function useUserProfile() {
           email: (userData.email as string) || '',
           phoneNumber: userData.phoneNumber ?? undefined,
           company: userData.company ?? undefined,
+          jobTitle: userData.jobTitle ?? undefined,
           bio: userData.bio ?? undefined,
           interests: (userData.interests ?? []).filter((interest): interest is string => interest !== null),
           role: roleFromCognito, // ← CAMBIO: Ahora viene de Cognito, no de DynamoDB

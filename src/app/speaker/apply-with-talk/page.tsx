@@ -272,6 +272,9 @@ export default function ApplyWithTalkPage() {
           userId={user?.userId || ''}
           userEmail={(userAttributes?.email as string) || ''}
           userName={profile ? `${profile.givenName} ${profile.familyName}`.trim() : ''}
+          userPhone={profile?.phoneNumber}
+          userCompany={profile?.company}
+          userJobTitle={profile?.jobTitle}
           onSubmit={handleSubmit}
           onCancel={() => router.push('/')}
         />

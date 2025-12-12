@@ -23,12 +23,12 @@ const client = generateClient<Schema>();
  */
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, userAttributes, isLoading: authLoading } = useAuth();
 
   // Form state
   const [givenName, setGivenName] = useState('');
   const [familyName, setFamilyName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('+52 ');
   const [company, setCompany] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [awsExperienceLevel, setAwsExperienceLevel] = useState<'PROFESSIONAL' | 'PERSONAL' | 'NONE' | 'LEARNING'>('NONE');
@@ -47,6 +47,25 @@ export default function OnboardingPage() {
     { value: 'SPEAKER', label: '🎤 Quiero ser speaker' },
     { value: 'CONTENT', label: '💡 Contenido técnico interesante' },
   ];
+
+  // Pre-llenar con datos de Cognito
+  useEffect(() => {
+    if (userAttributes) {
+      // Pre-llenar nombre si viene de Cognito
+      if (userAttributes.given_name && !givenName) {
+        setGivenName(userAttributes.given_name as string);
+      }
+      if (userAttributes.family_name && !familyName) {
+        setFamilyName(userAttributes.family_name as string);
+      }
+      // Pre-llenar teléfono si viene de Cognito
+      if (userAttributes.phone_number && phoneNumber === '+52 ') {
+        const phone = userAttributes.phone_number as string;
+        // Si ya tiene el +52, úsalo; si no, agrégalo
+        setPhoneNumber(phone.startsWith('+52') ? phone : `+52 ${phone}`);
+      }
+    }
+  }, [userAttributes, givenName, familyName, phoneNumber]);
 
   useEffect(() => {
     // Si el usuario ya completó onboarding, redirigir
@@ -74,6 +93,29 @@ export default function OnboardingPage() {
         ? prev.filter(i => i !== value)
         : [...prev, value]
     );
+  };
+
+  // Handler para teléfono con auto-formato +52
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    // Si el usuario borra todo, mantener el +52
+    if (value === '' || value === '+') {
+      setPhoneNumber('+52 ');
+      return;
+    }
+    
+    // Si no empieza con +52, agregarlo
+    if (!value.startsWith('+52')) {
+      value = '+52 ' + value.replace(/^\+?52?\s?/, '');
+    }
+    
+    // Asegurar que haya un espacio después del +52
+    if (value.startsWith('+52') && value[3] !== ' ') {
+      value = '+52 ' + value.substring(3);
+    }
+    
+    setPhoneNumber(value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -205,7 +247,7 @@ export default function OnboardingPage() {
                   <Input
                     id="givenName"
                     type="text"
-                    placeholder="Fortino"
+                    placeholder={userAttributes?.given_name ? String(userAttributes.given_name) : "Juan"}
                     value={givenName}
                     onChange={(e) => setGivenName(e.target.value)}
                     required
@@ -217,7 +259,7 @@ export default function OnboardingPage() {
                   <Input
                     id="familyName"
                     type="text"
-                    placeholder="Romero Mantilla"
+                    placeholder={userAttributes?.family_name ? String(userAttributes.family_name) : "Pérez García"}
                     value={familyName}
                     onChange={(e) => setFamilyName(e.target.value)}
                     required
@@ -234,7 +276,7 @@ export default function OnboardingPage() {
                   type="tel"
                   placeholder="+52 222 123 4567"
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={handlePhoneChange}
                   required
                 />
                 <p className="text-xs text-text-secondary mt-1">
@@ -248,12 +290,14 @@ export default function OnboardingPage() {
                 <Input
                   id="company"
                   type="text"
-                  placeholder="Universidad Tecnológica de Puebla"
+                  placeholder="Empresa, Universidad, Freelance, etc."
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   required
                 />
-                <p className="text-xs text-text-secondary mt-1">¿A qué organización representas?</p>
+                <p className="text-xs text-text-secondary mt-1">
+                  ¿A qué organización representas? 
+                </p>
               </div>
 
               {/* Rol o Carrera */}
@@ -262,13 +306,13 @@ export default function OnboardingPage() {
                 <Input
                   id="jobTitle"
                   type="text"
-                  placeholder="Ingeniero de Software / Estudiante de TI"
+                  placeholder="Solutions Architect, DevOps Engineer, Estudiante de TI, etc."
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
                   required
                 />
                 <p className="text-xs text-text-secondary mt-1">
-                  Tu puesto actual o carrera que estudias
+                  Tu puesto de trabajo o carrera que estudias
                 </p>
               </div>
 

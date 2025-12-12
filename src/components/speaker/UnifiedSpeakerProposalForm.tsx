@@ -45,6 +45,9 @@ interface UnifiedSpeakerProposalFormProps {
   userId: string;
   userEmail: string;
   userName: string;
+  userPhone?: string;
+  userCompany?: string;
+  userJobTitle?: string;
   onSubmit: (data: UnifiedFormData) => Promise<void>;
   onCancel: () => void;
 }
@@ -53,6 +56,9 @@ export default function UnifiedSpeakerProposalForm({
   userId,
   userEmail,
   userName,
+  userPhone,
+  userCompany,
+  userJobTitle,
   onSubmit,
   onCancel,
 }: UnifiedSpeakerProposalFormProps) {
@@ -60,14 +66,14 @@ export default function UnifiedSpeakerProposalForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form data
+  // Form data - pre-fill from User table
   const [formData, setFormData] = useState<UnifiedFormData>({
     givenName: userName.split(' ')[0] || '',
     familyName: userName.split(' ').slice(1).join(' ') || '',
     email: userEmail,
-    phoneNumber: '',
-    company: '',
-    jobTitle: '',
+    phoneNumber: userPhone || '+52 ',
+    company: userCompany || '',
+    jobTitle: userJobTitle || '',
     expertiseArea: '',
     photoFile: null,
     photoKey: null,
@@ -146,6 +152,29 @@ export default function UnifiedSpeakerProposalForm({
     } else {
       setError(result.error || 'Error al subir el CV');
     }
+  }
+
+  // Handle phone change with +52 auto-format
+  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let value = e.target.value;
+    
+    // Si está vacío o solo tiene +, resetear a +52
+    if (value === '' || value === '+') {
+      setFormData({ ...formData, phoneNumber: '+52 ' });
+      return;
+    }
+    
+    // Asegurar que siempre empiece con +52
+    if (!value.startsWith('+52')) {
+      value = '+52 ' + value.replace(/^\+?52?\s?/, '');
+    }
+    
+    // Asegurar espacio después de +52
+    if (value.startsWith('+52') && value[3] !== ' ') {
+      value = '+52 ' + value.substring(3);
+    }
+    
+    setFormData({ ...formData, phoneNumber: value });
   }
 
   // Add topic
@@ -344,7 +373,7 @@ export default function UnifiedSpeakerProposalForm({
               id="phoneNumber"
               type="tel"
               value={formData.phoneNumber}
-              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+              onChange={handlePhoneChange}
               placeholder="+52 222 123 4567"
             />
           </div>
@@ -538,8 +567,9 @@ export default function UnifiedSpeakerProposalForm({
                 id="company"
                 value={formData.company}
                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                placeholder="AWS, Microsoft, etc."
+                placeholder="AWS, Google, BUAP, Freelance, etc."
               />
+              <p className="text-xs text-text-secondary mt-1">(empresa, universidad, independiente)</p>
             </div>
             <div>
               <Label htmlFor="jobTitle">Puesto de trabajo *</Label>
@@ -547,7 +577,7 @@ export default function UnifiedSpeakerProposalForm({
                 id="jobTitle"
                 value={formData.jobTitle}
                 onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
-                placeholder="Solutions Architect, DevOps Engineer, etc."
+                placeholder="Solutions Architect, DevOps Engineer, Estudiante de TI, etc."
               />
             </div>
           </div>
