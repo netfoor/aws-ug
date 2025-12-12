@@ -38,7 +38,7 @@ export function NotificationBell() {
           userId: { eq: user.userId },
         },
         limit: 20,
-        selectionSet: ['id', 'userId', 'type', 'title', 'message', 'read', 'link', 'icon', 'createdAt', 'readAt', 'owner'],
+        selectionSet: ['id', 'userId', 'type', 'title', 'message', 'read', 'link', 'icon', 'createdAt', 'updatedAt', 'readAt', 'owner'],
       });
 
       if (errors && errors.length > 0) {
