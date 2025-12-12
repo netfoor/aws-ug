@@ -7,11 +7,14 @@ import { defineStorage } from '@aws-amplify/backend';
  * - Cover images de eventos
  * - Avatares de usuarios
  * - Attachments de propuestas
+ * - Speaker professional files (CV, photos)
  * 
  * Estructura:
  * - events/{eventId}/cover-{timestamp}.webp
  * - avatars/{userId}/avatar-{timestamp}.webp
  * - proposals/{proposalId}/attachment-{timestamp}.{ext}
+ * - speakers/{userId}/photo/{timestamp}-{filename}
+ * - speakers/{userId}/cv/{timestamp}-{filename}
  */
 export const storage = defineStorage({
   name: 'awsugStorage',
@@ -31,6 +34,11 @@ export const storage = defineStorage({
     'proposals/{identity}/*': [
       allow.authenticated.to(['read']),
       allow.entity('identity').to(['read', 'write', 'delete'])
+    ],
+    // 🎤 Speaker professional files (CV y fotos) - speakers/admins full access
+    'speakers/*': [
+      allow.authenticated.to(['read']),
+      allow.groups(['SPEAKERS', 'ADMINS']).to(['read', 'write', 'delete'])
     ]
   })
 });

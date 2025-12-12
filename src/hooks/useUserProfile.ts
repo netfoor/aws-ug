@@ -24,6 +24,11 @@ export interface UserProfile {
     github?: string;
     website?: string;
   };
+  // 🎤 PROFESSIONAL SPEAKER FIELDS (Fase 3)
+  speakerPhotoKey?: string;
+  speakerCvKey?: string;
+  linkedInUrl?: string;
+  expertiseArea?: string;
 }
 
 export function useUserProfile() {
@@ -76,6 +81,11 @@ export function useUserProfile() {
           newsletterOptIn: userData.newsletterOptIn ?? false,
           avatarUrl: userData.avatarUrl ?? undefined,
           socialLinks: parsedSocialLinks,
+          // 🎤 PROFESSIONAL SPEAKER FIELDS
+          speakerPhotoKey: userData.speakerPhotoKey ?? undefined,
+          speakerCvKey: userData.speakerCvKey ?? undefined,
+          linkedInUrl: userData.linkedInUrl ?? undefined,
+          expertiseArea: userData.expertiseArea ?? undefined,
         });
       } else {
         // Crear perfil inicial desde atributos de Cognito

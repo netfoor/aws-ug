@@ -6,7 +6,9 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { useUserData, getFullName } from '@/hooks/useUserData';
-import { Loader2, Lightbulb, Users, Clock, Wrench, FileText, Calendar } from 'lucide-react';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { canProposeTalk } from '@/lib/profile-utils';
+import { Loader2, Lightbulb, Users, Clock, Wrench, FileText, Calendar, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
@@ -25,11 +27,13 @@ export default function ProposeTalkPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { userData, isLoading: userDataLoading } = useUserData();
+  const { profile, loading: profileLoading } = useUserProfile();
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSpeaker, setIsSpeaker] = useState<boolean | null>(null);
+  const [showProfileWarning, setShowProfileWarning] = useState(false);
 
   // Form state
   const [title, setTitle] = useState('');
@@ -63,6 +67,20 @@ export default function ProposeTalkPage() {
     }
   }, [authLoading, isAuthenticated, isSpeaker, router]);
 
+  // Verificar completitud del perfil profesional
+  useEffect(() => {
+    if (profile && !profileLoading) {
+      const check = canProposeTalk(profile);
+      if (!check.allowed) {
+        setShowProfileWarning(true);
+        setError(check.reason || 'Perfil incompleto');
+      } else {
+        setShowProfileWarning(false);
+        setError(null);
+      }
+    }
+  }, [profile, profileLoading]);
+
   // Agregar topic
   const handleAddTopic = () => {
     if (topicInput.trim() && !topics.includes(topicInput.trim())) {
@@ -92,6 +110,13 @@ export default function ProposeTalkPage() {
   // Submit propuesta
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar perfil completo PRIMERO
+    if (showProfileWarning) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setError('Por favor completa tu perfil profesional antes de proponer una charla');
+      return;
+    }
     
     if (!user) {
       setError('Debes estar autenticado');
@@ -241,8 +266,36 @@ export default function ProposeTalkPage() {
           </p>
         </div>
 
+        {/* Warning de perfil incompleto */}
+        {showProfileWarning && (
+          <div className="mb-6 p-6 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded-lg">
+            <div className="flex items-start gap-4">
+              <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">
+                  ¡Completa tu Perfil Profesional!
+                </h3>
+                <p className="text-amber-800 dark:text-amber-200 mb-3">
+                  {error}
+                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
+                  Necesitamos esta información para promocionar tu participación en nuestros eventos y redes sociales.
+                </p>
+                <Button
+                  type="button"
+                  variant="accent"
+                  onClick={() => router.push('/profile#professional-profile')}
+                  className="bg-amber-600 hover:bg-amber-700 text-white"
+                >
+                  Completar Perfil Ahora
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Error message */}
-        {error && (
+        {error && !showProfileWarning && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <p className="text-red-800 dark:text-red-200">{error}</p>
           </div>

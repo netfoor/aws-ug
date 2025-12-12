@@ -190,6 +190,7 @@ export default function LastThursdaySelector({
 
           return (
             <button
+              type="button"
               key={index}
               onClick={() => handleDateClick(dateOption)}
               disabled={disabled || !dateOption.isAvailable}

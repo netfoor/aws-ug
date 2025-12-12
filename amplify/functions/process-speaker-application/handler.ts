@@ -149,11 +149,18 @@ async function sendApprovalEmail(email: string, name: string) {
                   </ul>
                   <p><strong>Próximos pasos:</strong></p>
                   <ol>
-                    <li>Inicia sesión en AWS Puebla Connect</li>
-                    <li>Completa tu perfil de speaker</li>
-                    <li>Propón tu primera charla</li>
+                    <li><strong>Completa tu perfil profesional</strong> (foto, CV/LinkedIn, área de especialización)</li>
+                    <li>Propón tu primera charla para la comunidad</li>
+                    <li>Comparte tu conocimiento con AWS User Group Puebla</li>
                   </ol>
-                  <a href="https://awspuebla.com/speaker/propose-talk" class="button">Proponer Charla</a>
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://awspuebla.com/profile#professional-profile" class="button" style="margin-right: 10px;">Completar Perfil</a>
+                    <a href="https://awspuebla.com/speaker/propose-talk" class="button">Proponer Charla</a>
+                  </div>
+                  <p style="margin-top: 20px; padding: 15px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+                    💡 <strong>Tip:</strong> Completa tu perfil profesional antes de proponer tu primera charla. 
+                    Esto nos ayudará a promocionar mejor tu participación en nuestros eventos.
+                  </p>
                   <p style="margin-top: 30px;">¡Estamos emocionados de tenerte en el equipo!</p>
                 </div>
               </div>
@@ -192,9 +199,9 @@ async function createApprovalNotification(userId: string, userName: string) {
         userId,
         type: 'SPEAKER_APPROVED',
         title: '🎉 ¡Tu postulación fue aprobada!',
-        message: 'Felicitaciones, ahora eres parte del equipo de speakers de AWS User Group Puebla. Ya puedes proponer charlas para nuestros eventos.',
+        message: 'Felicitaciones, ahora eres speaker. Completa tu perfil profesional y propón tu primera charla.',
         read: false,
-        link: '/speaker/propose-talk',
+        link: '/profile#professional-profile',
         icon: '🎤',
         createdAt: now,
         updatedAt: now,
@@ -431,13 +438,11 @@ export const handler: DynamoDBStreamHandler = async (event) => {
 
       console.log(`👤 Procesando aplicación de: ${email} (${applicationId})`);
 
-      // 1️⃣ Enviar email de confirmación "Solicitud Recibida"
-      await sendApplicationReceivedEmail(email, userName);
-
-      // 2️⃣ Notificar a todos los admins
+      // 1️⃣ Notificar a todos los admins
       await notifyAdmins(applicationId, email);
 
-      // 3️⃣ ⚡ APROBAR INMEDIATAMENTE (sin esperar 5 minutos)
+      // 2️⃣ ⚡ APROBAR INMEDIATAMENTE (sin esperar)
+      // Esto enviará el email de aprobación directamente
       await approveApplicationImmediately(applicationId, userId, email);
 
       console.log(`✅ Aplicación procesada y aprobada correctamente: ${applicationId}`);

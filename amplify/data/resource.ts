@@ -20,6 +20,13 @@ const schema = a.schema({
     privacyConsentDate: a.datetime(),
     profileCompleted: a.boolean().default(false), // 🆕 Para detectar primer login
     onboardingCompletedAt: a.datetime(), // 🆕 Timestamp de cuando completó onboarding
+    
+    // 🎤 SPEAKER PROFESSIONAL FIELDS (Fase 3)
+    speakerPhotoKey: a.string(), // S3 key para foto profesional del speaker
+    speakerCvKey: a.string(), // S3 key para CV (PDF)
+    linkedInUrl: a.url(), // URL de LinkedIn
+    expertiseArea: a.string(), // Área de especialización (ej: "Cloud Architecture", "DevOps", "AI/ML")
+    
     createdAt: a.datetime(),
     updatedAt: a.datetime(),
   })

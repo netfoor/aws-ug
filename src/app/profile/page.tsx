@@ -10,12 +10,41 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
 import { EditProfileForm, SpeakerApplicationForm, SpeakerApplicationStatus } from '@/components/profile';
+import ProfessionalProfileForm from '@/components/profile/ProfessionalProfileForm';
+import { calculateProfileCompleteness, getCompletenessMessage } from '@/lib/profile-utils';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../../amplify/data/resource';
+
+const client = generateClient<Schema>();
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
   const { profile, loading: profileLoading, refetch } = useUserProfile();
   const { userData } = useUserData();
   const [isEditing, setIsEditing] = useState(false);
+  const [showProfessionalForm, setShowProfessionalForm] = useState(false);
+
+  // Handler para guardar perfil profesional
+  async function handleSaveProfessionalProfile(data: any) {
+    if (!user) return;
+
+    try {
+      await client.models.User.update({
+        id: user.userId,
+        speakerPhotoKey: data.speakerPhotoKey,
+        speakerCvKey: data.speakerCvKey,
+        linkedInUrl: data.linkedInUrl,
+        expertiseArea: data.expertiseArea,
+        updatedAt: new Date().toISOString(),
+      });
+
+      await refetch();
+      setShowProfessionalForm(false);
+    } catch (error) {
+      console.error('Error updating professional profile:', error);
+      throw error;
+    }
+  }
 
   if (isLoading || profileLoading) {
     return (
@@ -220,6 +249,120 @@ export default function ProfilePage() {
                   }}
                 />
               </div>
+            </div>
+          )}
+
+          {/* Professional Profile Section (For Speakers) */}
+          {(profile?.role === 'SPEAKER' || profile?.role === 'ADMIN') && (
+            <div className="mb-8">
+              <Card variant="elevated">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      💼 Perfil Profesional de Speaker
+                    </CardTitle>
+                    {(() => {
+                      const completeness = calculateProfileCompleteness(profile);
+                      return (
+                        <div className="flex items-center gap-2">
+                          <div className="text-right">
+                            <p className="text-xs text-text-secondary">
+                              {getCompletenessMessage(completeness)}
+                            </p>
+                          </div>
+                          <div className={`
+                            px-3 py-1 rounded-full text-sm font-semibold
+                            ${completeness.percentage === 100 
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
+                              : completeness.percentage >= 75
+                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                              : completeness.percentage >= 50
+                              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                            }
+                          `}>
+                            {completeness.percentage}%
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {!showProfessionalForm ? (
+                    <div className="space-y-4">
+                      {/* Status actual */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-semibold text-text-secondary mb-1">Foto Profesional</p>
+                          <p className="text-text-primary">
+                            {profile?.speakerPhotoKey ? '✅ Cargada' : '⚠️ No cargada'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-text-secondary mb-1">CV</p>
+                          <p className="text-text-primary">
+                            {profile?.speakerCvKey ? '✅ Cargado' : '⚠️ No cargado'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-text-secondary mb-1">LinkedIn</p>
+                          <p className="text-text-primary">
+                            {profile?.linkedInUrl ? (
+                              <a 
+                                href={profile.linkedInUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-accent hover:underline"
+                              >
+                                Ver perfil
+                              </a>
+                            ) : (
+                              '⚠️ No agregado'
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-text-secondary mb-1">Área de Especialización</p>
+                          <p className="text-text-primary">
+                            {profile?.expertiseArea || '⚠️ No especificada'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Botón para editar */}
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowProfessionalForm(true)}
+                        className="w-full md:w-auto"
+                      >
+                        {profile?.speakerCvKey || profile?.linkedInUrl 
+                          ? 'Actualizar Perfil Profesional' 
+                          : 'Completar Perfil Profesional'}
+                      </Button>
+
+                      {!profile?.speakerCvKey && !profile?.linkedInUrl && (
+                        <p className="text-sm text-amber-600">
+                          💡 Completa tu perfil profesional para mejorar tu visibilidad como speaker
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <ProfessionalProfileForm
+                      userId={user.userId}
+                      initialData={{
+                        speakerPhotoKey: profile?.speakerPhotoKey || undefined,
+                        speakerCvKey: profile?.speakerCvKey || undefined,
+                        linkedInUrl: profile?.linkedInUrl || undefined,
+                        expertiseArea: profile?.expertiseArea || undefined,
+                      }}
+                      onSave={handleSaveProfessionalProfile}
+                      onSkip={() => setShowProfessionalForm(false)}
+                      showSkipButton={true}
+                    />
+                  )}
+                </CardContent>
+              </Card>
             </div>
           )}
 

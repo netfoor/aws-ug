@@ -104,10 +104,14 @@ backend.processSpeakerApplication.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     actions: [
       'dynamodb:PutItem',
+      'dynamodb:UpdateItem',
+      'dynamodb:GetItem',
       'dynamodb:ListTables',
     ],
     resources: [
       `arn:aws:dynamodb:*:*:table/Notification-*`,
+      `arn:aws:dynamodb:*:*:table/SpeakerApplication-*`,
+      `arn:aws:dynamodb:*:*:table/User-*`,
       '*', // ListTables requiere acceso global
     ],
   })
