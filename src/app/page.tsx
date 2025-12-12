@@ -181,6 +181,134 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Become a Speaker Section - DUAL FLOW OPTIONS */}
+      <section className="py-20 px-4 bg-gradient-to-br from-accent/5 via-surface to-background relative overflow-hidden">
+        <TalaveraPattern variant="background" />
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary">
+              🎤 ¿Quieres ser Speaker?
+            </h2>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Comparte tu conocimiento con la comunidad. Elige la opción que mejor se adapte a ti:
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Opción 1: Flujo Tradicional (Hybrid) */}
+            <Card className="hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-border hover:border-accent/50">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🚶‍♂️</span>
+                </div>
+                <CardTitle className="text-2xl mb-2">Flujo Tradicional</CardTitle>
+                <CardDescription className="text-base">
+                  Aplica primero, propón después
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-secondary/20 rounded-lg p-4 text-sm text-text-secondary">
+                  <p className="mb-3"><strong className="text-text-primary">Perfecto si:</strong></p>
+                  <ul className="space-y-2 list-disc list-inside">
+                    <li>Aún no tienes una charla específica en mente</li>
+                    <li>Quieres explorar la comunidad primero</li>
+                    <li>Prefieres tomarte tu tiempo para decidir</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5">✓</span>
+                    <span>Proceso gradual en 2 pasos</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5">✓</span>
+                    <span>Completa tu perfil profesional</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5">✓</span>
+                    <span>Propón tu charla cuando estés listo</span>
+                  </div>
+                </div>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4 border-2 hover:border-accent hover:bg-accent/10"
+                  asChild
+                >
+                  <Link href={isAuthenticated ? "/profile#speaker-section" : "/auth/signin?redirect=/profile#speaker-section"}>
+                    Aplicar como Speaker →
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Opción 2: Flujo Unificado (All-in-one) */}
+            <Card className="hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-accent relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-accent text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                RÁPIDO ⚡
+              </div>
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🚀</span>
+                </div>
+                <CardTitle className="text-2xl mb-2">Flujo Unificado</CardTitle>
+                <CardDescription className="text-base">
+                  Aplica + Propón en un solo paso
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-accent/10 rounded-lg p-4 text-sm text-text-secondary border border-accent/20">
+                  <p className="mb-3"><strong className="text-text-primary">Perfecto si:</strong></p>
+                  <ul className="space-y-2 list-disc list-inside">
+                    <li>Ya tienes una charla preparada</li>
+                    <li>Quieres agilizar el proceso</li>
+                    <li>Estás listo para compartir ahora</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <span className="text-accent mt-0.5">✓</span>
+                    <span>Todo en un solo formulario</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-accent mt-0.5">✓</span>
+                    <span>Perfil + Propuesta juntos</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-accent mt-0.5">✓</span>
+                    <span>Aprobación automática como speaker</span>
+                  </div>
+                </div>
+
+                <Button 
+                  variant="accent" 
+                  className="w-full mt-4 shadow-lg hover:shadow-xl"
+                  asChild
+                >
+                  <Link href={isAuthenticated ? "/speaker/apply-with-talk" : "/auth/signin?redirect=/speaker/apply-with-talk"}>
+                    Aplicar + Proponer Charla ✨
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Info adicional */}
+          <div className="mt-12 max-w-3xl mx-auto">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 text-center">
+              <p className="text-sm text-text-secondary">
+                <strong className="text-text-primary">💡 ¿No estás seguro cuál elegir?</strong>
+                <br />
+                Ambos caminos son válidos. Si tienes dudas, empieza con el flujo tradicional 
+                y propón tu charla cuando te sientas listo.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-16 px-4 bg-gradient-to-r from-primary to-primary/90 text-secondary relative overflow-hidden">
         <TalaveraPattern variant="background" />

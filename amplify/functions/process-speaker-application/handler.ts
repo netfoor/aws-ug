@@ -20,6 +20,7 @@ const USER_POOL_ID = process.env.USER_POOL_ID;
 const NOTIFICATION_TABLE_PREFIX = 'Notification';
 const SPEAKER_APPLICATION_TABLE_PREFIX = 'SpeakerApplication';
 const USER_TABLE_PREFIX = 'User';
+const TALK_PROPOSAL_TABLE_PREFIX = 'TalkProposal';
 
 /**
  * 🔍 Obtiene el nombre real de la tabla con el prefijo dado
@@ -405,6 +406,93 @@ async function approveApplicationImmediately(applicationId: string, userId: stri
 }
 
 /**
+ * 🎯 Crea automáticamente una TalkProposal si viene en la aplicación
+ */
+async function createAttachedTalkProposal(
+  applicationId: string,
+  userId: string,
+  userEmail: string,
+  attachedProposal: any
+) {
+  console.log('🎯 Creando propuesta de charla adjunta automáticamente...');
+  
+  const talkProposalTableName = await getTableName(TALK_PROPOSAL_TABLE_PREFIX);
+  const { randomUUID } = await import('crypto');
+  const now = new Date().toISOString();
+
+  const talkProposalData = {
+    id: randomUUID(),
+    userId,
+    userEmail,
+    applicationId, // Vinculado a la aplicación
+    title: attachedProposal.talkTitle,
+    description: attachedProposal.talkDescription,
+    duration: attachedProposal.duration || 45,
+    targetAudience: attachedProposal.targetAudience || 'ALL',
+    proposedDate: attachedProposal.proposedDate,
+    status: 'SUBMITTED', // Aún debe ser revisada por admins
+    submittedAt: now,
+    createdAt: now,
+    updatedAt: now,
+    owner: userId,
+  };
+
+  try {
+    await docClient.send(new PutCommand({
+      TableName: talkProposalTableName,
+      Item: talkProposalData,
+    }));
+    
+    console.log(`✅ Propuesta de charla creada automáticamente: ${talkProposalData.id}`);
+    
+    // Notificar admins sobre la nueva propuesta
+    await notifyAdminsNewProposal(talkProposalData.id, userEmail, attachedProposal.talkTitle);
+    
+    return talkProposalData.id;
+  } catch (error) {
+    console.error('❌ Error creando propuesta adjunta:', error);
+    throw error;
+  }
+}
+
+/**
+ * 🔔 Notifica a admins sobre nueva propuesta de charla
+ */
+async function notifyAdminsNewProposal(proposalId: string, speakerEmail: string, talkTitle: string) {
+  console.log('🔔 Notificando a admins sobre nueva propuesta...');
+  
+  const notificationTableName = await getTableName(NOTIFICATION_TABLE_PREFIX);
+  const admins = await getAdminUsers();
+  const now = new Date().toISOString();
+  const { randomUUID } = await import('crypto');
+
+  for (const admin of admins) {
+    try {
+      await docClient.send(new PutCommand({
+        TableName: notificationTableName,
+        Item: {
+          id: randomUUID(),
+          userId: admin.userId,
+          type: 'NEW_TALK_PROPOSAL',
+          title: '💡 Nueva propuesta de charla',
+          message: `${speakerEmail} propuso: "${talkTitle}". Revisa los detalles en el panel de administración.`,
+          read: false,
+          link: `/admin/proposals?status=SUBMITTED`,
+          icon: '💡',
+          createdAt: now,
+          updatedAt: now,
+          owner: admin.username,
+        },
+      }));
+      
+      console.log(`✅ Notificación de propuesta creada para admin: ${admin.username}`);
+    } catch (error) {
+      console.error(`❌ Error creando notificación para ${admin.username}:`, error);
+    }
+  }
+}
+
+/**
  * 🎯 Handler principal - Se ejecuta cuando se crea una SpeakerApplication
  */
 export const handler: DynamoDBStreamHandler = async (event) => {
@@ -430,6 +518,22 @@ export const handler: DynamoDBStreamHandler = async (event) => {
       const userId = newImage.userId?.S;
       const email = newImage.email?.S;
       const userName = email?.split('@')[0] || 'Usuario'; // Fallback si no hay nombre
+      
+      // Extraer propuesta adjunta si existe
+      const hasAttachedProposal = newImage.hasAttachedProposal?.BOOL || false;
+      let attachedProposal = null;
+      
+      if (hasAttachedProposal && newImage.attachedProposal?.M) {
+        const proposalMap = newImage.attachedProposal.M;
+        attachedProposal = {
+          talkTitle: proposalMap.talkTitle?.S || '',
+          talkDescription: proposalMap.talkDescription?.S || '',
+          duration: parseInt(proposalMap.duration?.N || '45'),
+          targetAudience: proposalMap.targetAudience?.S || 'ALL',
+          proposedDate: proposalMap.proposedDate?.S || '',
+        };
+        console.log('📎 Propuesta adjunta detectada:', attachedProposal.talkTitle);
+      }
 
       if (!applicationId || !userId || !email) {
         console.error('❌ Datos incompletos en la aplicación:', { applicationId, userId, email });
@@ -444,6 +548,17 @@ export const handler: DynamoDBStreamHandler = async (event) => {
       // 2️⃣ ⚡ APROBAR INMEDIATAMENTE (sin esperar)
       // Esto enviará el email de aprobación directamente
       await approveApplicationImmediately(applicationId, userId, email);
+      
+      // 3️⃣ Si viene propuesta adjunta, crearla automáticamente
+      if (hasAttachedProposal && attachedProposal) {
+        console.log('🎯 Creando propuesta adjunta automáticamente...');
+        try {
+          await createAttachedTalkProposal(applicationId, userId, email, attachedProposal);
+        } catch (error) {
+          console.error('❌ Error creando propuesta adjunta (no crítico):', error);
+          // No detenemos el flujo si falla la propuesta
+        }
+      }
 
       console.log(`✅ Aplicación procesada y aprobada correctamente: ${applicationId}`);
     } catch (error) {

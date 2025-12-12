@@ -63,6 +63,11 @@ const schema = a.schema({
     schedulerArn: a.string(), // ARN del EventBridge Schedule
     rejectionReason: a.string(), // Solo si status = REJECTED
     
+    // 🆕 UNIFIED FLOW: Propuesta adjunta opcional
+    hasAttachedProposal: a.boolean().default(false), // Indica si viene con propuesta
+    attachedProposal: a.json(), // Datos de la propuesta (title, description, etc.)
+    professionalProfile: a.json(), // Datos del perfil profesional (photoKey, cvKey, etc.)
+    
     // Owner field para authorization
     owner: a.string(),
   })
