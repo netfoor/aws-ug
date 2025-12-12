@@ -213,8 +213,8 @@ export default function AdminEventsPage() {
           <p className="text-text-secondary mb-6">
             No tienes permisos para acceder a esta página.
           </p>
-          <Button variant="accent" onClick={() => window.location.href = '/dashboard'}>
-            Volver al Dashboard
+          <Button variant="accent" onClick={() => window.location.href = '/'}>
+            Volver al Inicio
           </Button>
         </div>
       </div>

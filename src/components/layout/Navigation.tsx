@@ -142,13 +142,6 @@ export function Navigation({ className }: NavigationProps) {
               ))}
               {isAuthenticated ? (
                 <>
-                  <Link
-                    href="/profile"
-                    className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
                   {/* Perfil removido - ahora se accede con el avatar */}
                   {isSpeaker && (
                     <>

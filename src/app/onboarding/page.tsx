@@ -174,8 +174,8 @@ export default function OnboardingPage() {
         updatedAt: now,
       });
 
-      // Redirigir al dashboard
-      router.push('/dashboard');
+      // Redirigir al inicio
+      router.push('/');
 
     } catch (err) {
       console.error('Error completando onboarding:', err);

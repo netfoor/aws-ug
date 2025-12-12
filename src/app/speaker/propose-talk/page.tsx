@@ -229,7 +229,7 @@ export default function ProposeTalkPage() {
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/')}
               className="flex-1 text-sm"
             >
               Volver

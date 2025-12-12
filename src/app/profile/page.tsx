@@ -395,7 +395,7 @@ export default function ProfilePage() {
                 <h3 className="font-semibold mb-2">Próximos Eventos</h3>
                 <p className="text-sm text-text-secondary mb-4">Ve los eventos a los que te has registrado</p>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/dashboard">Ver Eventos</Link>
+                  <Link href="/">Ver Eventos</Link>
                 </Button>
               </CardContent>
             </Card>
