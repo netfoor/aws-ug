@@ -90,6 +90,9 @@ const schema = a.schema({
     speakerName: a.string().required(),
     speakerEmail: a.string().required(),
     
+    // 🔗 Vinculación con aplicación de speaker (si vino del flujo unificado)
+    applicationId: a.string(), // ID de SpeakerApplication si fue creada automáticamente
+    
     // Datos de la propuesta de charla
     title: a.string().required(), // Título de la charla
     description: a.string().required(), // Descripción detallada

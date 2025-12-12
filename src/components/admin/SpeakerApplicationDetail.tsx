@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Mail,
@@ -13,11 +13,23 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  Briefcase,
+  Phone,
+  Building,
+  ExternalLink,
+  FileText,
+  Lightbulb,
+  Clock,
+  Users,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Textarea';
 import { Label } from '../ui/Label';
+import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
+import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../amplify/data/resource';
+
+const client = generateClient<Schema>();
 
 type SpeakerApplication = Schema['SpeakerApplication']['type'];
 
@@ -46,6 +58,64 @@ export function SpeakerApplicationDetail({
   const [isRejecting, setIsRejecting] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [linkedProposal, setLinkedProposal] = useState<Schema['TalkProposal']['type'] | null>(null);
+  const [loadingProposal, setLoadingProposal] = useState(false);
+
+  // Parse JSON fields
+  const professionalProfile = application?.professionalProfile 
+    ? (() => {
+        try {
+          return JSON.parse(application.professionalProfile as string);
+        } catch (e) {
+          console.error('Error parsing professionalProfile:', e);
+          return null;
+        }
+      })()
+    : null;
+
+  const attachedProposal = application?.attachedProposal
+    ? (() => {
+        try {
+          return JSON.parse(application.attachedProposal as string);
+        } catch (e) {
+          console.error('Error parsing attachedProposal:', e);
+          return null;
+        }
+      })()
+    : null;
+
+  // Load linked TalkProposal if exists
+  useEffect(() => {
+    async function loadLinkedProposal() {
+      if (!application?.hasAttachedProposal || !application?.id) return;
+
+      setLoadingProposal(true);
+      try {
+        const { data: proposals } = await client.models.TalkProposal.list({
+          filter: {
+            userId: { eq: application.userId }
+          }
+        });
+
+        // Find proposal created around the same time
+        const linked = proposals.find(p => {
+          const appTime = new Date(application.submittedAt || '').getTime();
+          const propTime = new Date(p.submittedAt || '').getTime();
+          return Math.abs(appTime - propTime) < 60000; // Within 1 minute
+        });
+
+        setLinkedProposal(linked || null);
+      } catch (error) {
+        console.error('Error loading linked proposal:', error);
+      } finally {
+        setLoadingProposal(false);
+      }
+    }
+
+    if (isOpen) {
+      loadLinkedProposal();
+    }
+  }, [application?.hasAttachedProposal, application?.id, application?.userId, application?.submittedAt, isOpen]);
 
   if (!isOpen || !application) return null;
 
@@ -188,6 +258,149 @@ export function SpeakerApplicationDetail({
               </div>
             )}
           </div>
+
+          {/* 🆕 PERFIL PROFESIONAL */}
+          {professionalProfile && (
+            <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Briefcase className="w-5 h-5 text-blue-600" />
+                <h3 className="font-semibold text-text-primary text-lg">Perfil Profesional</h3>
+              </div>
+
+              <div className="flex gap-6">
+                {/* Photo */}
+                <div className="flex-shrink-0">
+                  <SpeakerPhotoPreview 
+                    photoKey={professionalProfile.photoKey}
+                    speakerName={`${professionalProfile.givenName || ''} ${professionalProfile.familyName || ''}`.trim()}
+                    size="lg"
+                  />
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <p className="text-lg font-bold text-text-primary">
+                      {professionalProfile.givenName} {professionalProfile.familyName}
+                    </p>
+                    <p className="text-sm text-text-secondary">
+                      {professionalProfile.jobTitle || 'N/A'} @ {professionalProfile.company || 'N/A'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    {professionalProfile.phoneNumber && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-blue-600" />
+                        <span className="text-text-primary">{professionalProfile.phoneNumber}</span>
+                      </div>
+                    )}
+
+                    {professionalProfile.expertiseArea && (
+                      <div className="flex items-center gap-2">
+                        <Award className="w-4 h-4 text-blue-600" />
+                        <span className="text-text-primary">{professionalProfile.expertiseArea}</span>
+                      </div>
+                    )}
+
+                    {professionalProfile.linkedInUrl && (
+                      <div className="flex items-center gap-2 md:col-span-2">
+                        <LinkIcon className="w-4 h-4 text-blue-600" />
+                        <a 
+                          href={professionalProfile.linkedInUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline flex items-center gap-1"
+                        >
+                          Ver perfil de LinkedIn
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+
+                    {professionalProfile.cvKey && (
+                      <div className="flex items-center gap-2 md:col-span-2">
+                        <FileText className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm text-text-secondary">
+                          CV disponible (Key: {professionalProfile.cvKey.split('/').pop()})
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 🆕 PROPUESTA ADJUNTA */}
+          {application.hasAttachedProposal && attachedProposal && (
+            <div className="mb-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-amber-600" />
+                  <h3 className="font-semibold text-text-primary text-lg">Propuesta de Charla Adjunta</h3>
+                </div>
+                <div className="px-3 py-1 bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 text-xs font-bold rounded-full">
+                  CON PROPUESTA
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-lg font-bold text-text-primary mb-1">
+                    {attachedProposal.talkTitle}
+                  </p>
+                  <p className="text-sm text-text-secondary">
+                    {attachedProposal.talkDescription}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-600" />
+                    <span className="text-text-primary">{attachedProposal.duration} minutos</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-amber-600" />
+                    <span className="text-text-primary capitalize">{attachedProposal.targetAudience?.toLowerCase()}</span>
+                  </div>
+
+                  {attachedProposal.proposedDate && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-amber-600" />
+                      <span className="text-text-primary">
+                        {new Date(attachedProposal.proposedDate).toLocaleDateString('es-MX', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {linkedProposal && (
+                  <div className="mt-4 pt-4 border-t border-amber-200 dark:border-amber-800">
+                    <a
+                      href={`/admin/talk-proposals?id=${linkedProposal.id}`}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Ver Propuesta Completa
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                )}
+
+                {loadingProposal && (
+                  <div className="flex items-center gap-2 text-sm text-text-secondary">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Buscando propuesta vinculada...</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Motivación */}
           <div className="mb-6">

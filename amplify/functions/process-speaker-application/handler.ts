@@ -424,12 +424,15 @@ async function createAttachedTalkProposal(
     id: randomUUID(),
     userId,
     userEmail,
-    applicationId, // Vinculado a la aplicación
+    speakerName: userEmail.split('@')[0], // Temporal, se actualiza después
+    speakerEmail: userEmail,
+    applicationId, // ← Vinculación con SpeakerApplication
     title: attachedProposal.talkTitle,
     description: attachedProposal.talkDescription,
     duration: attachedProposal.duration || 45,
     targetAudience: attachedProposal.targetAudience || 'ALL',
     proposedDate: attachedProposal.proposedDate,
+    topics: [], // Se puede extraer de la aplicación si es necesario
     status: 'SUBMITTED', // Aún debe ser revisada por admins
     submittedAt: now,
     createdAt: now,

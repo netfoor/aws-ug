@@ -186,7 +186,14 @@ export function SpeakerApplicationsList({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(application.status || 'PENDING')}
+                    <div className="flex flex-col gap-2">
+                      {getStatusBadge(application.status || 'PENDING')}
+                      {application.hasAttachedProposal && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 text-xs font-bold rounded-full w-fit">
+                          🚀 PROPUESTA
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-text-primary flex items-center gap-1">
