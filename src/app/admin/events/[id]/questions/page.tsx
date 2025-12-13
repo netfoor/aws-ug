@@ -68,8 +68,15 @@ export default function RegistrationQuestionsPage() {
 
       // Cargar preguntas desde el campo JSON o usar preguntas por defecto
       if (eventData.registrationQuestions) {
-        const loadedQuestions = eventData.registrationQuestions as RegistrationQuestion[];
-        setQuestions(loadedQuestions);
+        try {
+          const loadedQuestions = typeof eventData.registrationQuestions === 'string' 
+            ? JSON.parse(eventData.registrationQuestions) 
+            : eventData.registrationQuestions;
+          setQuestions(loadedQuestions as RegistrationQuestion[]);
+        } catch (parseError) {
+          console.error('Error parsing questions:', parseError);
+          setQuestions([]);
+        }
       } else {
         // Preguntas por defecto si no hay ninguna guardada
         const defaultQuestions: RegistrationQuestion[] = [
@@ -177,7 +184,7 @@ export default function RegistrationQuestionsPage() {
       // Guardar las preguntas en el campo JSON del evento
       const { data: updatedEvent, errors: updateErrors } = await client.models.Event.update({
         id: eventId,
-        registrationQuestions: questions as any,
+        registrationQuestions: JSON.stringify(questions),
       });
 
       if (updateErrors) {

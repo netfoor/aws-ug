@@ -71,8 +71,17 @@ export default function EventRegistrationPage() {
 
       // Cargar preguntas de registro
       if (eventData.registrationQuestions) {
-        const loadedQuestions = eventData.registrationQuestions as RegistrationQuestion[];
-        setQuestions(loadedQuestions.sort((a, b) => a.order - b.order));
+        try {
+          const loadedQuestions = typeof eventData.registrationQuestions === 'string'
+            ? JSON.parse(eventData.registrationQuestions)
+            : eventData.registrationQuestions;
+          setQuestions((loadedQuestions as RegistrationQuestion[]).sort((a, b) => a.order - b.order));
+        } catch (parseError) {
+          console.error('Error parsing questions:', parseError);
+          setQuestions([]);
+        }
+      } else {
+        setQuestions([]);
       }
     } catch (err) {
       console.error('Error loading event:', err);
@@ -175,7 +184,7 @@ export default function EventRegistrationPage() {
         registeredAt: new Date().toISOString(),
         userName: user.signInDetails?.loginId || user.username || 'Usuario',
         userEmail: user.signInDetails?.loginId || '',
-        registrationAnswers: answers as any,
+        registrationAnswers: JSON.stringify(answers),
         checkedIn: false,
       });
 
@@ -324,9 +333,14 @@ export default function EventRegistrationPage() {
             </h2>
 
             {questions.length === 0 ? (
-              <p className="text-text-secondary text-center py-8">
-                No hay preguntas de registro configuradas para este evento.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-text-secondary mb-4">
+                  Este evento no requiere información adicional para el registro.
+                </p>
+                <p className="text-sm text-text-secondary">
+                  Puedes confirmar tu asistencia directamente.
+                </p>
+              </div>
             ) : (
               <div className="space-y-6">
                 {questions.map((question, index) => (
@@ -394,7 +408,7 @@ export default function EventRegistrationPage() {
             <Button
               type="submit"
               variant="accent"
-              disabled={isSubmitting || questions.length === 0}
+              disabled={isSubmitting}
               className="flex-1"
             >
               {isSubmitting ? (
