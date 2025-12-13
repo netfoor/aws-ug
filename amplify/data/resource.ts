@@ -212,6 +212,9 @@ const schema = a.schema({
     // Media
     coverImageUrl: a.string(), // S3 URL
     
+    // 📋 Registration Questions (JSON array de preguntas personalizadas)
+    registrationQuestions: a.json(), // Array de { id, type, label, placeholder, required, options, order }
+    
     // Metadata
     createdBy: a.string().required(), // userId del admin que creó
     createdAt: a.datetime().required(),
@@ -264,6 +267,9 @@ const schema = a.schema({
     userName: a.string().required(),
     userEmail: a.string().required(),
     userAvatar: a.string(),
+    
+    // 📋 Registration Answers (JSON con respuestas a las preguntas personalizadas)
+    registrationAnswers: a.json(), // Object con { questionId: answer }
     
     // Owner field
     owner: a.string(),

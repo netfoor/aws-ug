@@ -90,10 +90,9 @@ export default function EventDetailsPage() {
 
   const handleRegister = () => {
     if (!isAuthenticated) {
-      router.push(`/login?returnUrl=/events/${slug}`);
+      router.push(`/login?returnUrl=/events/${slug}/register`);
     } else {
-      // TODO: Implementar registro
-      console.log('Registrar a evento');
+      router.push(`/events/${slug}/register`);
     }
   };
 
