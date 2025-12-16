@@ -5,9 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
-import { ArrowLeft, Users, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Users, Clock, CheckCircle, AlertTriangle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { QRScanner, ManualCheckIn } from '@/components/admin';
+import { QRScanner, ManualCheckIn, SecurityIncidents } from '@/components/admin';
 import { Badge } from '@/components/ui/Badge';
 
 const client = generateClient<Schema>();
@@ -38,6 +38,7 @@ export default function EventCheckInPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showManualCheckIn, setShowManualCheckIn] = useState(false);
+  const [showSecurityIncidents, setShowSecurityIncidents] = useState(false);
   const [recentCheckIns, setRecentCheckIns] = useState<string[]>([]);
 
   useEffect(() => {
@@ -194,15 +195,27 @@ export default function EventCheckInPage() {
               </p>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push(`/admin/events/${eventId}/attendees`)}
-              className="flex items-center gap-2"
-            >
-              <Users className="w-4 h-4" />
-              Ver Lista
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSecurityIncidents(true)}
+                className="flex items-center gap-2"
+              >
+                <Shield className="w-4 h-4" />
+                Seguridad
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/admin/events/${eventId}/attendees`)}
+                className="flex items-center gap-2"
+              >
+                <Users className="w-4 h-4" />
+                Ver Lista
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -358,6 +371,13 @@ export default function EventCheckInPage() {
         isOpen={showManualCheckIn}
         onClose={() => setShowManualCheckIn(false)}
         onCheckInSuccess={handleCheckInSuccess}
+      />
+
+      {/* Modal de Incidentes de Seguridad */}
+      <SecurityIncidents
+        eventId={eventId}
+        isOpen={showSecurityIncidents}
+        onClose={() => setShowSecurityIncidents(false)}
       />
     </div>
   );

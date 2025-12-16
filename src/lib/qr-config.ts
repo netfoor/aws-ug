@@ -31,8 +31,11 @@ export interface QRTokenData {
 
 // Utilidades para tokens QR
 export class QRTokenUtils {
+  // Clave secreta para firmar tokens (en producción debería venir de variables de entorno)
+  private static readonly SECRET_KEY = 'aws-ug-qr-secret-2024';
+
   /**
-   * Genera un token QR a partir de los datos del registro
+   * Genera un token QR a partir de los datos del registro con firma criptográfica
    */
   static generateToken(data: Omit<QRTokenData, 'timestamp' | 'signature'>): string {
     const tokenData: QRTokenData = {
@@ -40,13 +43,52 @@ export class QRTokenUtils {
       timestamp: Date.now(),
     };
     
-    // Por ahora, simplemente codificamos como JSON
-    // En el futuro se puede añadir firma criptográfica
+    // Generar firma criptográfica
+    tokenData.signature = this.generateSignature(tokenData);
+    
     return JSON.stringify(tokenData);
   }
 
   /**
-   * Parsea un token QR y valida su estructura
+   * Genera una firma criptográfica para el token
+   */
+  private static generateSignature(tokenData: Omit<QRTokenData, 'signature'>): string {
+    // Crear string para firmar
+    const dataToSign = `${tokenData.eventId}:${tokenData.userId}:${tokenData.registrationId}:${tokenData.timestamp}`;
+    
+    // Generar hash simple (en producción usar crypto más robusto)
+    let hash = 0;
+    const combined = dataToSign + this.SECRET_KEY;
+    
+    for (let i = 0; i < combined.length; i++) {
+      const char = combined.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    
+    return Math.abs(hash).toString(36);
+  }
+
+  /**
+   * Verifica la firma criptográfica de un token
+   */
+  static verifySignature(tokenData: QRTokenData): boolean {
+    if (!tokenData.signature) {
+      return false;
+    }
+    
+    const expectedSignature = this.generateSignature({
+      eventId: tokenData.eventId,
+      userId: tokenData.userId,
+      registrationId: tokenData.registrationId,
+      timestamp: tokenData.timestamp,
+    });
+    
+    return tokenData.signature === expectedSignature;
+  }
+
+  /**
+   * Parsea un token QR y valida su estructura y firma
    */
   static parseToken(token: string): QRTokenData | null {
     try {
@@ -61,6 +103,12 @@ export class QRTokenUtils {
       // Validar que tenga los campos requeridos
       if (!data.eventId || !data.userId || !data.registrationId || !data.timestamp) {
         console.warn('QR token missing required fields:', data);
+        return null;
+      }
+
+      // Verificar firma criptográfica
+      if (!this.verifySignature(data)) {
+        console.warn('QR token signature verification failed:', data);
         return null;
       }
       

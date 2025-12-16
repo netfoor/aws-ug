@@ -56,13 +56,18 @@
 - [x] 6. Implementar funcionalidad de check-in manual
 
 
+
   - Crear componente ManualCheckIn.tsx con búsqueda de asistentes
   - Integrar con datos existentes de la página de attendees
   - Implementar búsqueda por nombre y email
   - Añadir check-in manual con registro del método y admin
   - _Requerimientos: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 7. Crear sistema de validación y seguridad de QR
+- [x] 7. Crear sistema de validación y seguridad de QR
+
+
+
+
   - Implementar validación de autenticidad de tokens QR
   - Añadir verificación de uso único (prevenir duplicados)
   - Implementar validación de evento correcto

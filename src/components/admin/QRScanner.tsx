@@ -5,8 +5,11 @@ import { Camera, CameraOff, CheckCircle, XCircle, AlertTriangle, Loader2, Users,
 import { Button } from '@/components/ui/Button';
 import { useQRScanner } from '@/hooks/useQRScanner';
 import { ScannerState, QRTokenData } from '@/lib/qr-config';
+import { QRValidator } from '@/lib/qr-validation';
+// import { SecurityLogger } from '@/lib/security-logger';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../amplify/data/resource';
+import { useAuth } from '@/context/auth-context';
 
 const client = generateClient<Schema>();
 
@@ -32,6 +35,7 @@ export default function QRScanner({
   onCheckInSuccess,
   onManualCheckIn 
 }: QRScannerProps) {
+  const { user } = useAuth();
   const [scanResults, setScanResults] = useState<ScanResult[]>([]);
   const [checkInCount, setCheckInCount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -77,50 +81,52 @@ export default function QRScanner({
     setIsProcessing(true);
     
     try {
-      // Buscar el registro del usuario
-      const { data: registrations } = await client.models.EventRegistration.registrationsByEvent({
-        eventId: eventId,
-      });
-
-      if (!registrations) {
-        throw new Error('No se pudieron cargar los registros');
-      }
-
-      const registration = registrations.find(reg => 
-        reg.userId === token.userId && reg.id === token.registrationId
+      // Usar el validador mejorado con seguridad
+      const validationResult = await QRValidator.validateToken(
+        JSON.stringify(token), 
+        eventId, 
+        user?.userId
       );
 
-      if (!registration) {
-        throw new Error('Registro no encontrado');
-      }
-
-      if (registration.checkedIn) {
-        addScanResult({
-          type: 'warning',
-          message: `${registration.userName || 'Usuario'} ya había hecho check-in`,
-          attendeeName: registration.userName || 'Usuario',
-          timestamp: new Date(),
-        });
+      if (!validationResult.isValid) {
+        // Manejar incidentes de seguridad
+        if (validationResult.securityIncident) {
+          addScanResult({
+            type: 'error',
+            message: `🚨 ${validationResult.error}`,
+            timestamp: new Date(),
+          });
+        } else {
+          addScanResult({
+            type: 'warning',
+            message: validationResult.error || 'Token inválido',
+            timestamp: new Date(),
+          });
+        }
         return;
       }
 
-      // Realizar check-in
-      const { errors } = await client.models.EventRegistration.update({
-        id: registration.id || '',
-        checkedIn: true,
-        checkedInAt: new Date().toISOString(),
-        checkInMethod: 'QR_SCAN',
-      });
+      const { registration } = validationResult;
+      if (!registration) {
+        throw new Error('Registro no encontrado después de validación');
+      }
 
-      if (errors) {
-        throw new Error('Error al actualizar el registro');
+      // Realizar check-in usando el validador
+      const checkInResult = await QRValidator.performCheckIn(
+        registration,
+        user?.userId || 'unknown',
+        'QR_SCAN'
+      );
+
+      if (!checkInResult.success) {
+        throw new Error(checkInResult.error || 'Error al realizar check-in');
       }
 
       // Éxito
       const attendeeName = registration.userName || 'Usuario';
       addScanResult({
         type: 'success',
-        message: `¡Check-in exitoso para ${attendeeName}!`,
+        message: `✅ Check-in exitoso para ${attendeeName}!`,
         attendeeName,
         timestamp: new Date(),
       });
@@ -131,7 +137,7 @@ export default function QRScanner({
         onCheckInSuccess(attendeeName);
       }
 
-      // Reproducir sonido de éxito (si está disponible)
+      // Reproducir sonido de éxito
       playSuccessSound();
 
     } catch (error) {

@@ -1,10 +1,11 @@
 /**
- * Utilidades para validación avanzada de tokens QR
+ * Utilidades para validación avanzada de tokens QR con seguridad mejorada
  */
 
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
-import { QRTokenData, QRTokenUtils } from './qr-config';
+import { QRTokenUtils } from './qr-config';
+import { SecurityLogger, SecurityIncidentType } from './security-logger';
 
 const client = generateClient<Schema>();
 
@@ -13,28 +14,57 @@ export interface QRValidationResult {
     error?: string;
     registration?: Schema['EventRegistration']['type'];
     event?: Schema['Event']['type'];
+    securityIncident?: boolean;
+    incidentType?: SecurityIncidentType;
 }
 
 export class QRValidator {
     /**
-     * Valida completamente un token QR incluyendo verificaciones de base de datos
+     * Valida completamente un token QR incluyendo verificaciones de seguridad y base de datos
      */
-    static async validateToken(tokenString: string, expectedEventId: string): Promise<QRValidationResult> {
+    static async validateToken(
+        tokenString: string, 
+        expectedEventId: string, 
+        adminId?: string
+    ): Promise<QRValidationResult> {
         try {
-            // 1. Parsear el token
+            // 1. Parsear el token y verificar firma criptográfica
             const tokenData = QRTokenUtils.parseToken(tokenString);
             if (!tokenData) {
+                // Log incidente de seguridad
+                await SecurityLogger.logIncident({
+                    type: SecurityIncidentType.INVALID_SIGNATURE,
+                    eventId: expectedEventId,
+                    adminId,
+                    tokenData: tokenString.substring(0, 50) + '...', // Solo primeros 50 chars
+                    details: 'Token QR con formato inválido o firma criptográfica incorrecta',
+                    severity: 'MEDIUM',
+                });
+
                 return {
                     isValid: false,
-                    error: 'Token QR inválido o corrupto'
+                    error: 'Código QR inválido o con firma incorrecta',
+                    securityIncident: true,
+                    incidentType: SecurityIncidentType.INVALID_SIGNATURE,
                 };
             }
 
             // 2. Verificar que sea para el evento correcto
             if (!QRTokenUtils.isTokenForEvent(tokenData, expectedEventId)) {
+                // Log incidente de seguridad
+                await SecurityLogger.logIncident({
+                    type: SecurityIncidentType.WRONG_EVENT,
+                    eventId: expectedEventId,
+                    adminId,
+                    details: `Token QR del evento ${tokenData.eventId} escaneado en evento ${expectedEventId}`,
+                    severity: 'LOW',
+                });
+
                 return {
                     isValid: false,
-                    error: 'Este código QR pertenece a otro evento'
+                    error: `Este código QR pertenece al evento ${tokenData.eventId}`,
+                    securityIncident: true,
+                    incidentType: SecurityIncidentType.WRONG_EVENT,
                 };
             }
 
@@ -50,19 +80,42 @@ export class QRValidator {
                 };
             }
 
-            // 4. Verificar que el token coincida
+            // 4. Verificar que el token coincida (prevenir tokens alterados)
             if (registration.qrCodeToken !== tokenString) {
+                // Log incidente crítico de seguridad
+                await SecurityLogger.logIncident({
+                    type: SecurityIncidentType.TAMPERED_TOKEN,
+                    eventId: expectedEventId,
+                    adminId,
+                    details: `Token QR no coincide con el registro ${tokenData.registrationId}`,
+                    severity: 'HIGH',
+                });
+
                 return {
                     isValid: false,
-                    error: 'Token QR no coincide con el registro'
+                    error: 'Token QR posiblemente alterado o inválido',
+                    securityIncident: true,
+                    incidentType: SecurityIncidentType.TAMPERED_TOKEN,
                 };
             }
 
-            // 5. Verificar que no haya hecho check-in previamente
+            // 5. Verificar que no haya hecho check-in previamente (prevenir uso duplicado)
             if (registration.checkedIn) {
+                // Log intento de uso duplicado
+                await SecurityLogger.logIncident({
+                    type: SecurityIncidentType.DUPLICATE_SCAN,
+                    eventId: expectedEventId,
+                    adminId,
+                    details: `Intento de check-in duplicado para registro ${tokenData.registrationId}. Check-in original: ${registration.checkedInAt}`,
+                    severity: 'MEDIUM',
+                });
+
+                const checkedInDate = new Date(registration.checkedInAt || '').toLocaleString('es-MX');
                 return {
                     isValid: false,
-                    error: `Ya se realizó check-in el ${new Date(registration.checkedInAt || '').toLocaleString('es-MX')}`
+                    error: `Ya se realizó check-in el ${checkedInDate}`,
+                    securityIncident: true,
+                    incidentType: SecurityIncidentType.DUPLICATE_SCAN,
                 };
             }
 
@@ -89,9 +142,20 @@ export class QRValidator {
             // 8. Verificar expiración del token
             const eventEndDate = new Date(event.endDate);
             if (QRTokenUtils.isTokenExpired(tokenData, eventEndDate)) {
+                // Log token expirado
+                await SecurityLogger.logIncident({
+                    type: SecurityIncidentType.EXPIRED_TOKEN,
+                    eventId: expectedEventId,
+                    adminId,
+                    details: `Token QR expirado escaneado. Evento terminó: ${eventEndDate.toLocaleString('es-MX')}`,
+                    severity: 'LOW',
+                });
+
                 return {
                     isValid: false,
-                    error: 'El código QR ha expirado'
+                    error: `El código QR expiró el ${new Date(eventEndDate.getTime() + 24 * 60 * 60 * 1000).toLocaleString('es-MX')}`,
+                    securityIncident: true,
+                    incidentType: SecurityIncidentType.EXPIRED_TOKEN,
                 };
             }
 
@@ -103,11 +167,17 @@ export class QRValidator {
                 };
             }
 
+            // 10. Detectar actividad sospechosa
+            if (adminId) {
+                SecurityLogger.detectSuspiciousActivity(expectedEventId, adminId);
+            }
+
             // Todo válido
             return {
                 isValid: true,
                 registration,
-                event
+                event,
+                securityIncident: false,
             };
 
         } catch (error) {
@@ -137,7 +207,7 @@ export class QRValidator {
                 checkedInAt: now,
                 checkedInBy: adminId,
                 checkInMethod: method,
-            } as any; // Temporal fix para tipos de Amplify
+            };
 
             const { data: updatedRegistration, errors } = await client.models.EventRegistration.update(updateData);
 
@@ -158,7 +228,7 @@ export class QRValidator {
                     const eventUpdateData = {
                         id: registration.eventId,
                         checkedInCount: (event.checkedInCount || 0) + 1,
-                    } as any; // Temporal fix para tipos de Amplify
+                    };
 
                     await client.models.Event.update(eventUpdateData);
                 }
@@ -210,7 +280,7 @@ export class QRValidator {
             const updateData = {
                 id: registrationId,
                 qrCodeToken: newToken,
-            } as any; // Temporal fix para tipos de Amplify
+            };
 
             const { data: updatedRegistration, errors } = await client.models.EventRegistration.update(updateData);
 
