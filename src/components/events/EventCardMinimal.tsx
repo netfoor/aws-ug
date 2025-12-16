@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Clock, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { getUrl } from 'aws-amplify/storage';
 
 interface EventCardMinimalProps {
   id: string;
@@ -35,6 +36,8 @@ export default function EventCardMinimal({
   maxAttendees,
   isUnlimited,
 }: EventCardMinimalProps) {
+  const [fullCoverImageUrl, setFullCoverImageUrl] = useState<string | null>(null);
+
   // Format date
   const eventDate = new Date(startDate);
   const formattedDate = format(eventDate, "d MMM • h:mm a", { locale: es });
@@ -43,6 +46,30 @@ export default function EventCardMinimal({
   const spotsLeft = maxAttendees && !isUnlimited ? maxAttendees - goingCount : null;
   const isFull = spotsLeft !== null && spotsLeft <= 0;
   const isAlmostFull = spotsLeft !== null && spotsLeft > 0 && spotsLeft <= 10;
+
+  // Load cover image URL
+  useEffect(() => {
+    if (coverImageUrl) {
+      loadCoverImageUrl();
+    }
+  }, [coverImageUrl]);
+
+  const loadCoverImageUrl = async () => {
+    if (!coverImageUrl) return;
+    
+    try {
+      const urlResult = await getUrl({
+        path: coverImageUrl,
+        options: {
+          expiresIn: 3600 // 1 hora
+        }
+      });
+      setFullCoverImageUrl(urlResult.url.toString());
+    } catch (err) {
+      console.warn('Error loading cover image URL:', err);
+      setFullCoverImageUrl(null);
+    }
+  };
 
   return (
     <Link 
@@ -107,9 +134,9 @@ export default function EventCardMinimal({
         <div className="relative flex-shrink-0">
           {/* Image aligned with title */}
           <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-accent/20 to-accent/5 mt-6">
-            {coverImageUrl ? (
+            {fullCoverImageUrl ? (
               <img 
-                src={coverImageUrl} 
+                src={fullCoverImageUrl} 
                 alt={title}
                 className="w-full h-full object-cover"
               />

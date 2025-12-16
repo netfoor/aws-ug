@@ -3,13 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
+import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Calendar, Clock, MapPin, Share2, Plus, Mail, Loader2, Users, Tag, ClipboardList, MessageSquare, Edit, UserPlus } from 'lucide-react';
+import { Calendar, Clock, MapPin, Share2, Plus, Mail, Loader2, Users, Tag, ClipboardList, MessageSquare, Edit, UserPlus, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { QRTicketModal, TicketStatus } from '@/components/events';
+import { useQRTicket } from '@/hooks';
 
 const client = generateClient<Schema>();
 
@@ -19,7 +22,7 @@ type UserType = Schema['User']['type'];
 export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, isAdmin } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, isAdmin, user } = useAuth();
   const slug = params?.slug as string;
 
   const [event, setEvent] = useState<EventType | null>(null);
@@ -27,6 +30,22 @@ export default function EventDetailsPage() {
   const [admins, setAdmins] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+
+  // Hook para manejar el ticket QR del usuario
+  const {
+    registration,
+    isLoading: ticketLoading,
+    error: ticketError,
+    hasTicket,
+    hasValidToken,
+    refetch: refetchTicket,
+    regenerateToken,
+  } = useQRTicket({
+    eventId: event?.id || '',
+    userId: user?.userId || '',
+  });
 
   useEffect(() => {
     if (slug) {
@@ -59,6 +78,11 @@ export default function EventDetailsPage() {
       const eventData = events[0];
       setEvent(eventData);
 
+      // Cargar cover image URL
+      if (eventData.coverImageUrl) {
+        loadCoverImage(eventData.coverImageUrl);
+      }
+
       // Cargar datos del speaker
       if (eventData.speakerId) {
         const { data: speakerData } = await client.models.User.get({ id: eventData.speakerId });
@@ -71,6 +95,21 @@ export default function EventDetailsPage() {
       setError('Error al cargar el evento');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function loadCoverImage(imagePath: string) {
+    try {
+      const urlResult = await getUrl({
+        path: imagePath,
+        options: {
+          expiresIn: 3600 // 1 hora
+        }
+      });
+      setCoverImageUrl(urlResult.url.toString());
+    } catch (err) {
+      console.warn('Error loading cover image URL:', err);
+      setCoverImageUrl(null);
     }
   }
 
@@ -99,6 +138,18 @@ export default function EventDetailsPage() {
   const handleContact = () => {
     if (event?.speakerEmail) {
       window.location.href = `mailto:${event.speakerEmail}`;
+    }
+  };
+
+  const handleShowTicket = () => {
+    setShowTicketModal(true);
+  };
+
+  const handleRegenerateTicket = async () => {
+    try {
+      await regenerateToken();
+    } catch (error) {
+      console.error('Error regenerating ticket:', error);
     }
   };
 
@@ -201,9 +252,9 @@ export default function EventDetailsPage() {
       {/* Cover Image */}
       <div className="max-w-2xl mx-auto px-4 mb-6">
         <div className="relative w-full h-[45vh] bg-surface rounded-3xl overflow-hidden">
-        {event.coverImageUrl ? (
+        {coverImageUrl ? (
           <Image
-            src={event.coverImageUrl}
+            src={coverImageUrl}
             alt={event.title}
             fill
             className="object-cover rounded-b-3xl"
@@ -292,13 +343,19 @@ export default function EventDetailsPage() {
             /* Member Buttons */
             <div className="grid grid-cols-4 gap-3">
             <button
-              onClick={handleRegister}
+              onClick={hasTicket ? handleShowTicket : handleRegister}
               className="flex flex-col items-center gap-2 p-3 rounded-xl bg-accent/10 hover:bg-accent/20 transition-colors"
             >
               <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                <Users className="w-5 h-5 text-accent" />
+                {hasTicket ? (
+                  <Ticket className="w-5 h-5 text-accent" />
+                ) : (
+                  <Users className="w-5 h-5 text-accent" />
+                )}
               </div>
-              <span className="text-xs font-medium text-text-primary">Registro</span>
+              <span className="text-xs font-medium text-text-primary">
+                {hasTicket ? 'Mi Ticket' : 'Registro'}
+              </span>
             </button>
 
             <button
@@ -542,7 +599,54 @@ export default function EventDetailsPage() {
             {event.description}
           </p>
         </div>
+
+        {/* Ticket Status for authenticated users */}
+        {isAuthenticated && !isAdmin && (
+          <div className="bg-transparent p-6 mb-8">
+            <h2 className="text-lg font-semibold text-text-primary mb-4">
+              Estado de tu registro
+            </h2>
+            <TicketStatus
+              status={
+                ticketLoading
+                  ? 'loading'
+                  : ticketError
+                  ? 'error'
+                  : registration?.checkedIn
+                  ? 'checked_in'
+                  : registration && !hasValidToken
+                  ? 'error'
+                  : hasTicket
+                  ? 'has_ticket'
+                  : 'not_registered'
+              }
+              message={
+                ticketError || 
+                (registration && !hasValidToken ? 'Tu código QR es inválido y necesita ser regenerado' : undefined)
+              }
+              onRegister={handleRegister}
+              onShowTicket={handleShowTicket}
+              onRegenerate={handleRegenerateTicket}
+            />
+          </div>
+        )}
       </div>
+
+      {/* QR Ticket Modal */}
+      {hasTicket && hasValidToken && registration && event && (
+        <QRTicketModal
+          isOpen={showTicketModal}
+          onClose={() => setShowTicketModal(false)}
+          eventId={event.id || ''}
+          userId={user?.userId || ''}
+          registrationId={registration.id || ''}
+          qrToken={registration.qrCodeToken || ''}
+          eventTitle={event.title}
+          eventDate={event.startDate}
+          eventLocation={event.location || ''}
+          userName={registration.userName || 'Usuario'}
+        />
+      )}
     </div>
   );
 }

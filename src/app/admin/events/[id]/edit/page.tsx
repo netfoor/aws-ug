@@ -101,7 +101,7 @@ export default function EditEventPage() {
         description: eventData.description || '',
         slug: eventData.slug || '',
         eventType: eventData.eventType || 'TALK',
-        topics: eventData.topics || [],
+        topics: (eventData.topics || []).filter((topic): topic is string => topic !== null),
         startDate: eventData.startDate ? new Date(eventData.startDate).toISOString().slice(0, 16) : '',
         endDate: eventData.endDate ? new Date(eventData.endDate).toISOString().slice(0, 16) : '',
         timezone: eventData.timezone || 'America/Mexico_City',

@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
+import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { QRTokenUtils } from '@/lib/qr-config';
 import Image from 'next/image';
 
 const client = generateClient<Schema>();
@@ -37,6 +39,7 @@ export default function EventRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -69,6 +72,11 @@ export default function EventRegistrationPage() {
       const eventData = events[0];
       setEvent(eventData);
 
+      // Cargar cover image URL
+      if (eventData.coverImageUrl) {
+        loadCoverImage(eventData.coverImageUrl);
+      }
+
       // Cargar preguntas de registro
       if (eventData.registrationQuestions) {
         try {
@@ -88,6 +96,21 @@ export default function EventRegistrationPage() {
       setError('Error al cargar el evento');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function loadCoverImage(imagePath: string) {
+    try {
+      const urlResult = await getUrl({
+        path: imagePath,
+        options: {
+          expiresIn: 3600 // 1 hora
+        }
+      });
+      setCoverImageUrl(urlResult.url.toString());
+    } catch (err) {
+      console.warn('Error loading cover image URL:', err);
+      setCoverImageUrl(null);
     }
   }
 
@@ -137,7 +160,7 @@ export default function EventRegistrationPage() {
     for (const question of questions) {
       if (question.required) {
         const answer = answers[question.id];
-        
+
         if (!answer) {
           setError(`Por favor completa el campo: ${question.label}`);
           return false;
@@ -160,7 +183,7 @@ export default function EventRegistrationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!event || !event.id || !user?.userId) return;
 
     setError(null);
@@ -172,10 +195,17 @@ export default function EventRegistrationPage() {
     try {
       setIsSubmitting(true);
 
-      // Generar QR token único
-      const qrToken = `${event.id}-${user.userId}-${Date.now()}`;
+      // Generar un ID temporal para el QR token
+      const tempRegistrationId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      // Crear registro
+      // Generar QR token con ID temporal
+      const qrToken = QRTokenUtils.generateToken({
+        eventId: event.id,
+        userId: user.userId,
+        registrationId: tempRegistrationId,
+      });
+
+      // Crear registro con QR token
       const { data: registration, errors: regErrors } = await client.models.EventRegistration.create({
         eventId: event.id,
         userId: user.userId,
@@ -188,11 +218,25 @@ export default function EventRegistrationPage() {
         checkedIn: false,
       });
 
-      if (regErrors) {
+      if (regErrors || !registration) {
         console.error('Registration errors:', regErrors);
+        console.error('Registration data attempted:', {
+          eventId: event.id,
+          userId: user.userId,
+          status: 'GOING',
+          qrCodeToken: qrToken,
+          registeredAt: new Date().toISOString(),
+          userName: user.signInDetails?.loginId || user.username || 'Usuario',
+          userEmail: user.signInDetails?.loginId || '',
+          registrationAnswers: JSON.stringify(answers),
+          checkedIn: false,
+        });
         setError('Error al registrar. Por favor intenta de nuevo.');
         return;
       }
+
+      // El QR token con ID temporal es suficiente y único
+      // No necesitamos actualizarlo ya que funciona correctamente
 
       // Actualizar contador de registros en el evento
       const newGoingCount = (event.goingCount || 0) + 1;
@@ -253,7 +297,7 @@ export default function EventRegistrationPage() {
           <p className="text-text-secondary mb-8">
             Te has registrado correctamente para <strong>{event?.title}</strong>
           </p>
-          
+
           <div className="bg-surface rounded-xl p-6 mb-8 text-left">
             <h3 className="font-semibold text-text-primary mb-4">¿Qué sigue?</h3>
             <ul className="space-y-3 text-sm text-text-secondary">
@@ -305,12 +349,12 @@ export default function EventRegistrationPage() {
         </div>
 
         {/* Event Info Card */}
-        {event?.coverImageUrl && (
+        {coverImageUrl && (
           <div className="bg-surface rounded-xl overflow-hidden mb-8 border border-border">
             <div className="relative h-48 w-full">
               <Image
-                src={event.coverImageUrl}
-                alt={event.title}
+                src={coverImageUrl}
+                alt={event?.title || 'Event'}
                 fill
                 className="object-cover"
               />

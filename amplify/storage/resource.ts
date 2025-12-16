@@ -39,7 +39,7 @@ export const storage = defineStorage({
     // Usuarios autenticados pueden escribir durante aplicación, speakers/admins full access
     'speakers/*': [
       allow.authenticated.to(['read', 'write']), // ← Permite upload durante aplicación
-      allow.groups(['SPEAKERS', 'ADMINS']).to(['read', 'write', 'delete'])
+      allow.groups(['MEMBERS', 'SPEAKERS', 'ADMINS']).to(['read', 'write', 'delete'])
     ]
   })
 });
