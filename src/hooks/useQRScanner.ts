@@ -3,13 +3,13 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ScannerState, ScannerError, QRTokenData, QRTokenUtils } from '@/lib/qr-config';
+import { ScannerState, QRTokenData, QRTokenUtils } from '@/lib/qr-config';
 
 interface UseQRScannerOptions {
   eventId?: string;
   onCheckIn?: (token: QRTokenData) => Promise<void>;
   onError: (error: string) => void;
-  onScanSuccess?: (qrData: string) => void;
+  onScanSuccess?: (qrData: QRTokenData) => void;
 }
 
 interface UseQRScannerReturn {
@@ -45,6 +45,7 @@ export function useQRScanner({
         scannerRef.current.destroy();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkCameraAvailability = async () => {
@@ -59,7 +60,7 @@ export function useQRScanner({
       console.error('Error checking camera availability:', error);
       setHasCamera(false);
       setScannerState(ScannerState.ERROR);
-      onError(ScannerError.NO_CAMERA_FOUND, 'No se pudo verificar la disponibilidad de la cámara');
+      onError('No se pudo verificar la disponibilidad de la cámara');
     }
   };
 
@@ -78,14 +79,14 @@ export function useQRScanner({
       // Parsear el token
       const token = QRTokenUtils.parseToken(tokenString);
       if (!token) {
-        onError(ScannerError.INVALID_TOKEN, 'El código QR no tiene un formato válido');
+        onError('El código QR no tiene un formato válido');
         setScannerState(ScannerState.SCANNING);
         return;
       }
 
       // Validar que sea para el evento correcto
-      if (!QRTokenUtils.isTokenForEvent(token, eventId)) {
-        onError(ScannerError.WRONG_EVENT, 'Este código QR pertenece a otro evento');
+      if (eventId && !QRTokenUtils.isTokenForEvent(token, eventId)) {
+        onError('Este código QR pertenece a otro evento');
         setScannerState(ScannerState.SCANNING);
         return;
       }
@@ -96,7 +97,9 @@ export function useQRScanner({
       }
 
       // Procesar el check-in
-      await onCheckIn(token);
+      if (onCheckIn) {
+        await onCheckIn(token);
+      }
       
       // Breve pausa antes de continuar escaneando
       setTimeout(() => {
@@ -105,7 +108,7 @@ export function useQRScanner({
       
     } catch (error) {
       console.error('Error processing QR result:', error);
-      onError(ScannerError.NETWORK_ERROR, 'Error al procesar el check-in');
+      onError('Error al procesar el check-in');
       setScannerState(ScannerState.SCANNING);
     }
     
@@ -117,7 +120,7 @@ export function useQRScanner({
 
   const startScanning = useCallback(async () => {
     if (!videoRef.current || !hasCamera) {
-      onError(ScannerError.NO_CAMERA_FOUND, 'No hay cámara disponible');
+      onError('No hay cámara disponible');
       return;
     }
 
@@ -151,11 +154,11 @@ export function useQRScanner({
       // Determinar el tipo de error específico
       if (error instanceof Error) {
         if (error.name === 'NotAllowedError') {
-          onError(ScannerError.NO_CAMERA_PERMISSION, 'Acceso a la cámara denegado');
+          onError('Acceso a la cámara denegado');
         } else if (error.name === 'NotFoundError') {
-          onError(ScannerError.NO_CAMERA_FOUND, 'No se encontró ninguna cámara');
+          onError('No se encontró ninguna cámara');
         } else {
-          onError(ScannerError.NETWORK_ERROR, `Error al iniciar el scanner: ${error.message}`);
+          onError(`Error al iniciar el scanner: ${error.message}`);
         }
       }
     }

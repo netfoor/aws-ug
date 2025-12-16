@@ -11,6 +11,7 @@
   - _Requerimientos: 1.1, 2.1, 5.1_
 
 
+
 - [x] 2. Crear componente QRTicket para visualización de tickets
 
 
@@ -22,12 +23,16 @@
   - Implementar validación de expiración del token QR
 
 
+
   - _Requerimientos: 1.2, 1.3, 1.4, 1.5, 1.6_
 
 - [ ] 3. Modificar página de evento para mostrar "Mi Ticket"
   - Actualizar lógica en `/events/[slug]/page.tsx` para cambiar botón "Registro" a "Mi Ticket"
   - Crear modal o página dedicada para mostrar el QRTicket
   - Integrar con datos existentes de EventRegistration
+
+
+
   - Añadir manejo de estados (no registrado, registrado, ticket disponible)
   - _Requerimientos: 1.2, 1.3_
 
