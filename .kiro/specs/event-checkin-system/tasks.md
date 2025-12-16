@@ -33,6 +33,7 @@
 
 
 
+
   - Añadir manejo de estados (no registrado, registrado, ticket disponible)
   - _Requerimientos: 1.2, 1.3_
 
@@ -43,14 +44,18 @@
   - Añadir feedback visual y sonoro para éxito/error
   - _Requerimientos: 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 5. Crear página de scanner para administradores
+- [x] 5. Crear página de scanner para administradores
+
+
   - Implementar `/admin/events/[id]/checkin/page.tsx`
   - Integrar QRScanner component con diseño móvil optimizado
   - Añadir contador en tiempo real de asistentes
   - Conectar con modelo EventRegistration para actualizar check-ins
   - _Requerimientos: 2.1, 2.3, 4.1_
 
-- [ ] 6. Implementar funcionalidad de check-in manual
+- [x] 6. Implementar funcionalidad de check-in manual
+
+
   - Crear componente ManualCheckIn.tsx con búsqueda de asistentes
   - Integrar con datos existentes de la página de attendees
   - Implementar búsqueda por nombre y email

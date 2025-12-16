@@ -7,7 +7,7 @@ import type { Schema } from '../../../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { ArrowLeft, Users, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { QRScanner } from '@/components/admin';
+import { QRScanner, ManualCheckIn } from '@/components/admin';
 import { Badge } from '@/components/ui/Badge';
 
 const client = generateClient<Schema>();
@@ -352,26 +352,13 @@ export default function EventCheckInPage() {
         </div>
       </div>
 
-      {/* Modal de Check-in Manual (placeholder) */}
-      {showManualCheckIn && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-surface rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-text-primary mb-4">
-              Check-in Manual
-            </h3>
-            <p className="text-text-secondary mb-6">
-              Esta funcionalidad se implementará en la siguiente tarea.
-            </p>
-            <Button
-              variant="accent"
-              onClick={() => setShowManualCheckIn(false)}
-              className="w-full"
-            >
-              Cerrar
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Modal de Check-in Manual */}
+      <ManualCheckIn
+        eventId={eventId}
+        isOpen={showManualCheckIn}
+        onClose={() => setShowManualCheckIn(false)}
+        onCheckInSuccess={handleCheckInSuccess}
+      />
     </div>
   );
 }

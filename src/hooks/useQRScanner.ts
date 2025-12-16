@@ -31,7 +31,7 @@ export function useQRScanner({
   const [scannerState, setScannerState] = useState<ScannerState>(ScannerState.INITIALIZING);
   const [hasCamera, setHasCamera] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerRef = useRef<any>(null); // QrScanner instance
   const processedTokensRef = useRef<Set<string>>(new Set()); // Para evitar duplicados
@@ -45,7 +45,7 @@ export function useQRScanner({
         scannerRef.current.destroy();
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkCameraAvailability = async () => {
@@ -53,7 +53,7 @@ export function useQRScanner({
       // Importación dinámica para evitar errores en SSR
       const QrScanner = (await import('qr-scanner')).default;
       const cameraAvailable = await QrScanner.hasCamera();
-      
+
       setHasCamera(cameraAvailable);
       setScannerState(cameraAvailable ? ScannerState.READY : ScannerState.NO_CAMERA);
     } catch (error) {
@@ -66,15 +66,15 @@ export function useQRScanner({
 
   const processQRResult = useCallback(async (result: { data: string }) => {
     const tokenString = result.data;
-    
+
     // Evitar procesar el mismo token múltiples veces
     if (processedTokensRef.current.has(tokenString)) {
       return;
     }
-    
+
     processedTokensRef.current.add(tokenString);
     setScannerState(ScannerState.PROCESSING);
-    
+
     try {
       // Parsear el token
       const token = QRTokenUtils.parseToken(tokenString);
@@ -100,18 +100,18 @@ export function useQRScanner({
       if (onCheckIn) {
         await onCheckIn(token);
       }
-      
+
       // Breve pausa antes de continuar escaneando
       setTimeout(() => {
         setScannerState(ScannerState.SCANNING);
       }, 1500);
-      
+
     } catch (error) {
       console.error('Error processing QR result:', error);
       onError('Error al procesar el check-in');
       setScannerState(ScannerState.SCANNING);
     }
-    
+
     // Limpiar el token procesado después de un tiempo
     setTimeout(() => {
       processedTokensRef.current.delete(tokenString);
@@ -126,10 +126,10 @@ export function useQRScanner({
 
     try {
       setScannerState(ScannerState.INITIALIZING);
-      
+
       // Importación dinámica
       const QrScanner = (await import('qr-scanner')).default;
-      
+
       // Crear nueva instancia del scanner
       scannerRef.current = new QrScanner(
         videoRef.current,
@@ -145,12 +145,12 @@ export function useQRScanner({
       await scannerRef.current.start();
       setIsScanning(true);
       setScannerState(ScannerState.SCANNING);
-      
+
     } catch (error) {
       console.error('Error starting scanner:', error);
       setIsScanning(false);
       setScannerState(ScannerState.ERROR);
-      
+
       // Determinar el tipo de error específico
       if (error instanceof Error) {
         if (error.name === 'NotAllowedError') {
@@ -177,7 +177,7 @@ export function useQRScanner({
       scannerRef.current.destroy();
       scannerRef.current = null;
     }
-    
+
     setIsScanning(false);
     processedTokensRef.current.clear();
     setScannerState(hasCamera ? ScannerState.READY : ScannerState.NO_CAMERA);
