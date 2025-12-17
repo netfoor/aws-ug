@@ -7,13 +7,26 @@ interface UseScreenBrightnessOptions {
   targetBrightness?: number;
 }
 
+// Type definitions for experimental screen brightness API
+interface ScreenWithBrightness extends Screen {
+  brightness?: number;
+}
+
+interface WakeLockAPI {
+  request: (type: 'screen') => Promise<WakeLockSentinel>;
+}
+
+interface NavigatorWithWakeLock {
+  wakeLock?: WakeLockAPI;
+}
+
 /**
  * Hook para controlar el brillo de pantalla automáticamente
  * Funciona principalmente en dispositivos móviles con soporte nativo
  */
-export function useScreenBrightness({ 
-  enabled, 
-  targetBrightness = 1.0 
+export function useScreenBrightness({
+  enabled,
+  targetBrightness = 1.0
 }: UseScreenBrightnessOptions) {
   const originalBrightnessRef = useRef<number | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
@@ -25,13 +38,13 @@ export function useScreenBrightness({
       try {
         // 1. Intentar controlar brillo (funciona en algunos navegadores móviles)
         if ('screen' in navigator) {
-          const screen = navigator.screen as any;
-          
+          const screen = navigator.screen as ScreenWithBrightness;
+
           // Guardar brillo original
           if (screen.brightness !== undefined && originalBrightnessRef.current === null) {
             originalBrightnessRef.current = screen.brightness;
           }
-          
+
           // Establecer brillo máximo
           if (screen.brightness !== undefined) {
             screen.brightness = targetBrightness;
@@ -41,7 +54,8 @@ export function useScreenBrightness({
         // 2. Mantener pantalla encendida (Wake Lock API)
         if ('wakeLock' in navigator) {
           try {
-            wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+            const navigatorWithWakeLock = navigator as unknown as NavigatorWithWakeLock;
+            wakeLockRef.current = await navigatorWithWakeLock.wakeLock!.request('screen');
             console.log('Wake lock activated');
           } catch (wakeLockError) {
             console.log('Wake lock not supported or denied:', wakeLockError);
@@ -51,7 +65,7 @@ export function useScreenBrightness({
         // 3. Fallback: CSS para maximizar brillo visual
         document.documentElement.style.setProperty('--ticket-brightness', '1.5');
         document.documentElement.style.setProperty('--ticket-contrast', '1.2');
-        
+
       } catch (error) {
         console.log('Brightness control setup failed:', error);
       }
@@ -65,7 +79,7 @@ export function useScreenBrightness({
       if (originalBrightnessRef.current !== null) {
         try {
           if ('screen' in navigator) {
-            const screen = navigator.screen as any;
+            const screen = navigator.screen as ScreenWithBrightness;
             if (screen.brightness !== undefined) {
               screen.brightness = originalBrightnessRef.current;
             }

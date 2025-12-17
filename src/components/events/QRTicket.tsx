@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { QRTicketProps, DEFAULT_QR_OPTIONS } from '@/lib/qr-config';
@@ -26,23 +26,7 @@ export default function QRTicket({
   const [isGenerating, setIsGenerating] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Generar el código QR cuando el componente se monta
-  useEffect(() => {
-    if (!qrToken) {
-      setError('Token QR no disponible');
-      setIsGenerating(false);
-      return;
-    }
-
-    // Esperar un poco más para que el canvas esté completamente listo
-    const timer = setTimeout(() => {
-      generateQRCode();
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [qrToken]);
-
-  const generateQRCode = async () => {
+  const generateQRCode = useCallback(async () => {
     try {
       setIsGenerating(true);
       setError(null);
@@ -200,7 +184,23 @@ export default function QRTicket({
       setError('Error al generar el código QR');
       setIsGenerating(false);
     }
-  };
+  }, [qrToken, isFullscreen]);
+
+  // Generar el código QR cuando el componente se monta
+  useEffect(() => {
+    if (!qrToken) {
+      setError('Token QR no disponible');
+      setIsGenerating(false);
+      return;
+    }
+
+    // Esperar un poco más para que el canvas esté completamente listo
+    const timer = setTimeout(() => {
+      generateQRCode();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [qrToken, generateQRCode]);
 
   const downloadQRCode = () => {
     if (!canvasRef.current || !qrGenerated) return;

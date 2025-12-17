@@ -7,7 +7,7 @@ import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
-import Link from 'next/link';
+// import Link from 'next/link'; // Unused import
 import { Calendar, Clock, MapPin, Share2, Plus, Mail, Loader2, Users, Tag, ClipboardList, MessageSquare, Edit, UserPlus, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -22,7 +22,7 @@ type UserType = Schema['User']['type'];
 export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, isAdmin, user } = useAuth();
+  const { isAuthenticated, isAdmin, user } = useAuth();
   const slug = params?.slug as string;
 
   const [event, setEvent] = useState<EventType | null>(null);
@@ -40,7 +40,6 @@ export default function EventDetailsPage() {
     error: ticketError,
     hasTicket,
     hasValidToken,
-    refetch: refetchTicket,
     regenerateToken,
   } = useQRTicket({
     eventId: event?.id || '',

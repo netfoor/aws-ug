@@ -8,8 +8,8 @@ import {
   getUpcomingLastThursdays, 
   formatEventDate,
   getMonthName,
-  isSameDay,
-  dateToISO
+  isSameDay
+  // dateToISO // Unused import
 } from '@/lib/date-utils';
 
 const client = generateClient<Schema>();
