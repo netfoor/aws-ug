@@ -174,8 +174,51 @@ export default function EventCheckInPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-surface border-b border-border sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          {/* Mobile Layout */}
+          <div className="flex items-center justify-between mb-2 md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.back()}
+              className="flex items-center gap-1 px-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-xs">Atrás</span>
+            </Button>
+            
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSecurityIncidents(true)}
+                className="p-2"
+              >
+                <Shield className="w-4 h-4" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/admin/events/${eventId}/attendees`)}
+                className="p-2"
+              >
+                <Users className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="md:hidden">
+            <h1 className="text-lg font-bold text-text-primary truncate">
+              Check-in: {event.title}
+            </h1>
+            <p className="text-xs text-text-secondary truncate">
+              {formatEventDate(event.startDate)}
+            </p>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden md:flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
@@ -220,21 +263,21 @@ export default function EventCheckInPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-3 gap-6">
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="grid lg:grid-cols-3 gap-4">
           {/* Panel Principal - Scanner */}
           <div className="lg:col-span-2">
             <div className="bg-surface rounded-2xl border border-border overflow-hidden">
-              <div className="p-4 border-b border-border">
-                <h2 className="text-lg font-semibold text-text-primary">
+              <div className="p-3 border-b border-border md:p-4">
+                <h2 className="text-base font-semibold text-text-primary md:text-lg">
                   Scanner QR
                 </h2>
-                <p className="text-sm text-text-secondary">
+                <p className="text-xs text-text-secondary md:text-sm">
                   Escanea los códigos QR de los asistentes para registrar su check-in
                 </p>
               </div>
               
-              <div className="p-4">
+              <div className="p-3 md:p-4">
                 <QRScanner
                   eventId={eventId}
                   onCheckInSuccess={handleCheckInSuccess}
@@ -245,10 +288,10 @@ export default function EventCheckInPage() {
           </div>
 
           {/* Panel Lateral - Estadísticas */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Estadísticas Generales */}
-            <div className="bg-surface rounded-2xl border border-border p-6">
-              <h3 className="text-lg font-semibold text-text-primary mb-4">
+            <div className="bg-surface rounded-2xl border border-border p-4">
+              <h3 className="text-base font-semibold text-text-primary mb-3 md:text-lg md:mb-4">
                 Estadísticas
               </h3>
               
@@ -270,9 +313,9 @@ export default function EventCheckInPage() {
                 </div>
 
                 {/* Números */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600 mb-1">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <div className="text-xl font-bold text-green-600 mb-1 md:text-2xl">
                       {stats.checkedIn}
                     </div>
                     <div className="text-xs text-green-700 dark:text-green-300">
@@ -280,8 +323,8 @@ export default function EventCheckInPage() {
                     </div>
                   </div>
                   
-                  <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600 mb-1">
+                  <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <div className="text-xl font-bold text-blue-600 mb-1 md:text-2xl">
                       {stats.pending}
                     </div>
                     <div className="text-xs text-blue-700 dark:text-blue-300">
@@ -290,8 +333,8 @@ export default function EventCheckInPage() {
                   </div>
                 </div>
 
-                <div className="text-center p-3 bg-surface-hover rounded-lg">
-                  <div className="text-2xl font-bold text-text-primary mb-1">
+                <div className="text-center p-2 bg-surface-hover rounded-lg">
+                  <div className="text-xl font-bold text-text-primary mb-1 md:text-2xl">
                     {stats.total}
                   </div>
                   <div className="text-xs text-text-secondary">
@@ -303,8 +346,8 @@ export default function EventCheckInPage() {
 
             {/* Check-ins Recientes */}
             {recentCheckIns.length > 0 && (
-              <div className="bg-surface rounded-2xl border border-border p-6">
-                <h3 className="text-lg font-semibold text-text-primary mb-4">
+              <div className="bg-surface rounded-2xl border border-border p-4">
+                <h3 className="text-base font-semibold text-text-primary mb-3 md:text-lg md:mb-4">
                   Check-ins Recientes
                 </h3>
                 
@@ -329,8 +372,8 @@ export default function EventCheckInPage() {
             )}
 
             {/* Información del Evento */}
-            <div className="bg-surface rounded-2xl border border-border p-6">
-              <h3 className="text-lg font-semibold text-text-primary mb-4">
+            <div className="bg-surface rounded-2xl border border-border p-4">
+              <h3 className="text-base font-semibold text-text-primary mb-3 md:text-lg md:mb-4">
                 Información del Evento
               </h3>
               

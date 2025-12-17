@@ -166,6 +166,22 @@ export function useQRScanner({
       // Importación dinámica
       const QrScanner = (await import('qr-scanner')).default;
 
+      // Convertir currentCamera al formato esperado por QrScanner
+      const getPreferredCamera = (): "front" | "back" | undefined => {
+        if (currentCamera === 'user') return 'front';
+        if (currentCamera === 'environment') return 'back';
+
+        // Si es un ID específico, determinar si es frontal o trasera
+        const currentCameraInfo = availableCameras.find(c => c.id === currentCamera);
+        if (currentCameraInfo) {
+          if (CameraUtils.isFrontCamera(currentCameraInfo.label)) return 'front';
+          if (CameraUtils.isBackCamera(currentCameraInfo.label)) return 'back';
+        }
+
+        // Por defecto, usar cámara trasera
+        return 'back';
+      };
+
       // Crear nueva instancia del scanner
       scannerRef.current = new QrScanner(
         videoRef.current,
@@ -174,11 +190,21 @@ export function useQRScanner({
           highlightScanRegion: true,
           highlightCodeOutline: true,
           maxScansPerSecond: 3,
-          preferredCamera: "back", 
+          preferredCamera: getPreferredCamera(),
         }
       ) as QRScannerInstance;
 
       await scannerRef.current.start();
+
+      // Si currentCamera es un ID específico (no 'user' o 'environment'), configurarlo después del start
+      if (currentCamera !== 'user' && currentCamera !== 'environment') {
+        try {
+          await scannerRef.current.setCamera(currentCamera);
+        } catch (cameraError) {
+          console.warn('Could not set specific camera, using default:', cameraError);
+        }
+      }
+
       setIsScanning(true);
       setScannerState(ScannerState.SCANNING);
 
@@ -198,7 +224,7 @@ export function useQRScanner({
         }
       }
     }
-  }, [hasCamera, processQRResult, onError]);
+  }, [hasCamera, processQRResult, onError, currentCamera, availableCameras]);
 
   const stopScanning = useCallback(() => {
     if (scannerRef.current) {

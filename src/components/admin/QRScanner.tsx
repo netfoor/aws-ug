@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Camera, CameraOff, CheckCircle, XCircle, AlertTriangle, Loader2, Users, Zap } from 'lucide-react';
+import { Camera, CameraOff, CheckCircle, XCircle, AlertTriangle, Loader2, Users, Zap, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useQRScanner } from '@/hooks/useQRScanner';
 import { ScannerState, QRTokenData, CameraUtils } from '@/lib/qr-config';
@@ -240,15 +240,15 @@ export default function QRScanner({
   };
 
   return (
-    <div className="max-w-md mx-auto bg-surface rounded-2xl overflow-hidden">
+    <div className="w-full max-w-sm mx-auto bg-surface rounded-2xl overflow-hidden">
       {/* Header con estadísticas */}
-      <div className="bg-accent/10 p-4 border-b border-border">
+      <div className="bg-accent/10 p-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-accent" />
-            <span className="font-semibold text-text-primary">Check-ins</span>
+            <Users className="w-4 h-4 text-accent" />
+            <span className="text-sm font-semibold text-text-primary">Check-ins</span>
           </div>
-          <div className="text-2xl font-bold text-accent">
+          <div className="text-xl font-bold text-accent">
             {checkInCount}
           </div>
         </div>
@@ -256,7 +256,7 @@ export default function QRScanner({
 
       {/* Video Scanner */}
       <div className="relative">
-        <div className="aspect-square bg-black rounded-none overflow-hidden">
+        <div className="aspect-square bg-black overflow-hidden">
           {hasCamera ? (
             <video
               ref={videoRef}
@@ -267,8 +267,8 @@ export default function QRScanner({
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center text-text-secondary">
-                <CameraOff className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>Cámara no disponible</p>
+                <CameraOff className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p className="text-sm">Cámara no disponible</p>
               </div>
             </div>
           )}
@@ -277,22 +277,22 @@ export default function QRScanner({
         {/* Overlay de estado */}
         {isProcessing && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="bg-surface rounded-lg p-4 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-accent" />
-              <p className="text-sm text-text-primary">Procesando...</p>
+            <div className="bg-surface rounded-lg p-3 text-center">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-accent" />
+              <p className="text-xs text-text-primary">Procesando...</p>
             </div>
           </div>
         )}
       </div>
 
       {/* Estado del scanner */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-3">
+      <div className="p-3 border-b border-border">
+        <div className="flex items-center gap-2">
           <div className="text-text-secondary">
             {getScannerStateIcon()}
           </div>
           <div className="flex-1">
-            <p className="text-sm text-text-primary font-medium">
+            <p className="text-xs text-text-primary font-medium">
               {getScannerStateMessage()}
             </p>
           </div>
@@ -300,23 +300,23 @@ export default function QRScanner({
       </div>
 
       {/* Controles */}
-      <div className="p-4 space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="p-3 space-y-2">
+        <div className="grid grid-cols-2 gap-2">
           {!isScanning ? (
             <Button
               variant="accent"
               onClick={startScanning}
               disabled={!hasCamera || scannerState === ScannerState.INITIALIZING}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 text-sm py-2"
             >
               <Camera className="w-4 h-4" />
-              Iniciar Scanner
+              Iniciar
             </Button>
           ) : (
             <Button
               variant="outline"
               onClick={stopScanning}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 text-sm py-2"
             >
               <CameraOff className="w-4 h-4" />
               Detener
@@ -326,91 +326,55 @@ export default function QRScanner({
           <Button
             variant="outline"
             onClick={onManualCheckIn}
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 text-sm py-2"
           >
             <Users className="w-4 h-4" />
             Manual
           </Button>
         </div>
 
-        {scannerState === ScannerState.ERROR && (
-          <Button
-            variant="ghost"
-            onClick={resetScanner}
-            className="w-full text-sm"
-          >
-            Reiniciar Scanner
-          </Button>
-        )}
+        {/* Controles adicionales */}
+        <div className="flex gap-2">
+          {scannerState === ScannerState.ERROR && (
+            <Button
+              variant="ghost"
+              onClick={resetScanner}
+              className="flex-1 text-xs py-1"
+            >
+              Reiniciar
+            </Button>
+          )}
 
-        {/* Camera switching controls */}
-        {availableCameras.length > 1 && (
-          <div className="pt-2 border-t border-border">
-            <p className="text-xs text-text-secondary mb-2">Cambiar cámara:</p>
-            <div className="grid grid-cols-2 gap-2">
-              {availableCameras.map((camera) => (
-                <Button
-                  key={camera.id}
-                  variant={currentCamera === camera.id ? "accent" : "outline"}
-                  onClick={() => switchCamera(camera.id)}
-                  disabled={scannerState === ScannerState.INITIALIZING}
-                  className="text-xs py-1 px-2 h-8"
-                >
-                  {CameraUtils.getFriendlyName(camera.label)}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Quick camera toggle for common case */}
-        {availableCameras.length > 1 && (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              const currentCameraInfo = availableCameras.find(c => c.id === currentCamera);
-              const isCurrentlyBack = currentCamera === 'environment' || 
-                (currentCameraInfo && CameraUtils.isBackCamera(currentCameraInfo.label));
-              
-              if (isCurrentlyBack) {
-                // Switch to front
-                const frontCamera = availableCameras.find(c => CameraUtils.isFrontCamera(c.label));
-                if (frontCamera) switchCamera(frontCamera.id);
-                else switchCamera('user'); // fallback
-              } else {
-                // Switch to back
-                const backCamera = availableCameras.find(c => CameraUtils.isBackCamera(c.label));
-                if (backCamera) switchCamera(backCamera.id);
-                else switchCamera('environment'); // fallback
-              }
-            }}
-            className="w-full text-sm"
-          >
-            🔄 Cambiar a {
-              (() => {
+          {/* Simple camera toggle - only show if multiple cameras available */}
+          {availableCameras.length > 1 && (
+            <Button
+              variant="ghost"
+              onClick={() => {
                 const currentCameraInfo = availableCameras.find(c => c.id === currentCamera);
                 const isCurrentlyBack = currentCamera === 'environment' || 
                   (currentCameraInfo && CameraUtils.isBackCamera(currentCameraInfo.label));
-                return isCurrentlyBack ? 'Cámara Frontal' : 'Cámara Trasera';
-              })()
-            }
-          </Button>
-        )}
+                
+                if (isCurrentlyBack) {
+                  // Switch to front
+                  const frontCamera = availableCameras.find(c => CameraUtils.isFrontCamera(c.label));
+                  if (frontCamera) switchCamera(frontCamera.id);
+                  else switchCamera('user'); // fallback
+                } else {
+                  // Switch to back
+                  const backCamera = availableCameras.find(c => CameraUtils.isBackCamera(c.label));
+                  if (backCamera) switchCamera(backCamera.id);
+                  else switchCamera('environment'); // fallback
+                }
+              }}
+              className="flex-1 text-xs py-1 flex items-center justify-center gap-1"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Cambiar</span>
+            </Button>
+          )}
+        </div>
 
-        {/* Debug: Fix registrations button */}
-        {process.env.NODE_ENV === 'development' && (
-          <Button
-            variant="ghost"
-            onClick={async () => {
-              const { RegistrationFixer } = await import('@/lib/fix-registrations');
-              const result = await RegistrationFixer.fixEventRegistrations(eventId);
-              alert(`Fixed ${result.fixed} registrations, ${result.errors} errors`);
-            }}
-            className="w-full text-xs text-amber-600"
-          >
-            🔧 Fix Event Registrations (Dev)
-          </Button>
-        )}
+
       </div>
 
       {/* Resultados recientes */}

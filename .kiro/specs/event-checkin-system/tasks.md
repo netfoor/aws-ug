@@ -82,14 +82,14 @@
   - Añadir UI para mostrar estado de sincronización y errores
   - _Requerimientos: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-- [ ] 9. Integrar con página de asistentes existente
+- [x] 9. Integrar con página de asistentes existente
   - Conectar actualizaciones de check-in con `/admin/events/[id]/attendees`
   - Añadir navegación entre scanner y lista de asistentes
   - Actualizar indicadores visuales de check-in en tiempo real
   - Sincronizar contadores y estadísticas entre ambas páginas
   - _Requerimientos: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 10. Optimizar experiencia móvil y añadir polish
+- [x] 10. Optimizar experiencia móvil y añadir polish
   - Optimizar rendimiento del scanner en dispositivos móviles
   - Añadir animaciones y micro-interacciones para feedback
   - Implementar manejo robusto de errores de cámara
