@@ -70,6 +70,16 @@ export function Navigation({ className }: NavigationProps) {
                 {item.label}
               </Link>
             ))}
+            
+            {/* Apply as Speaker for non-speakers */}
+            {isAuthenticated && !isSpeaker && (
+              <Link
+                href="/speaker/apply"
+                className="text-sm font-medium text-accent hover:text-accent-dark transition-colors px-3 py-1.5 border border-accent/20 rounded-md hover:bg-accent/10"
+              >
+                🎤 Aplicar como Speaker
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center space-x-3">
@@ -143,7 +153,7 @@ export function Navigation({ className }: NavigationProps) {
               {isAuthenticated ? (
                 <>
                   {/* Perfil removido - ahora se accede con el avatar */}
-                  {isSpeaker && (
+                  {isSpeaker ? (
                     <>
                       <Link
                         href="/speaker/propose-talk"
@@ -160,6 +170,14 @@ export function Navigation({ className }: NavigationProps) {
                         Mis Propuestas
                       </Link>
                     </>
+                  ) : (
+                    <Link
+                      href="/speaker/apply"
+                      className="block px-3 py-2 text-base font-medium text-accent hover:text-accent-dark hover:bg-accent/10 rounded-md transition-colors border border-accent/20"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      🎤 Aplicar como Speaker
+                    </Link>
                   )}
                   {isAdmin && (
                     <>

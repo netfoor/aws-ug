@@ -187,9 +187,7 @@ export default function ProfessionalProfileForm({
           📸 Foto Personal <span className="text-red-500">*</span>
         </Label>
         <p className="text-sm text-text-secondary mb-4">
-          Sube una foto tuya que podamos utilizar para la <strong>promoción de tu participación en nuestros eventos</strong>. 
-          Esta imagen será parte de los materiales de publicidad y difusión en nuestras redes sociales y plataformas. 
-          Te recomendamos que sea una foto profesional y de alta calidad, que refleje tu mejor presentación.
+        Sube una foto tuya que podamos utilizar para la promoción de tu participación en nuestros eventos. Esta imagen será parte de los <strong>materiales de publicidad y difusión en nuestras redes sociales y plataformas</strong>. Te recomendamos que sea una foto profesional y de alta calidad, que refleje tu mejor presentación.
         </p>
         <p className="text-xs text-amber-600 mb-3">
           📢 Tu foto se utilizará en nuestras redes sociales, página web y materiales promocionales del evento.

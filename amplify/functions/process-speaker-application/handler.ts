@@ -536,15 +536,26 @@ export const handler: DynamoDBStreamHandler = async (event) => {
         }
       }
 
+      // 🔐 Verificar si es aplicación de admin para evitar notificaciones inapropiadas
+      const isAdminApplication = newImage.isAdminApplication?.BOOL || false;
+
       if (!applicationId || !userId || !email) {
         console.error('❌ Datos incompletos en la aplicación:', { applicationId, userId, email });
         continue;
       }
 
       console.log(`👤 Procesando aplicación de: ${email} (${applicationId})`);
+      
+      if (isAdminApplication) {
+        console.log('🔐 Aplicación de administrador detectada - suprimiendo notificaciones');
+      }
 
-      // 1️⃣ Notificar a todos los admins
-      await notifyAdmins(applicationId, email);
+      // 1️⃣ Notificar a todos los admins (solo si NO es aplicación de admin)
+      if (!isAdminApplication) {
+        await notifyAdmins(applicationId, email);
+      } else {
+        console.log('🔐 Notificaciones suprimidas para aplicación de administrador');
+      }
 
       // 2️⃣ ⚡ APROBAR INMEDIATAMENTE (sin esperar)
       // Esto enviará el email de aprobación directamente

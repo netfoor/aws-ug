@@ -699,8 +699,8 @@ async function sendApprovalEmail(email: string, name: string) {
 
 ### **Frontend - React Components**
 
-#### 9. `src/components/profile/SpeakerApplicationForm.tsx`
-**Propósito:** Formulario para enviar postulación
+#### 9. `src/components/speaker/UnifiedSpeakerProposalForm.tsx`
+**Propósito:** Formulario unificado para aplicación de speaker con propuesta de charla
 
 **Funcionalidad:**
 ```typescript
@@ -712,12 +712,12 @@ import type { Schema } from '../../../amplify/data/resource';
 
 const client = generateClient<Schema>();
 
-export default function SpeakerApplicationForm({ userId, userEmail }: Props) {
-  const [motivation, setMotivation] = useState('');
-  const [topics, setTopics] = useState(['']);
-  const [experience, setExperience] = useState('');
-  const [previousTalksLinks, setPreviousTalksLinks] = useState(['']);
-  const [loading, setLoading] = useState(false);
+export default function UnifiedSpeakerProposalForm({ userId, userEmail, userName }: Props) {
+  // Email de contacto editable (puede diferir del email principal del usuario)
+  const [formData, setFormData] = useState({
+    email: userEmail, // Pre-filled but editable for contact preferences
+    // ... otros campos
+  });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -1373,7 +1373,7 @@ aws lambda list-event-source-mappings --function-name process-speaker-applicatio
 | `amplify/data/resource.ts` | Schema | Modelo GraphQL/DynamoDB | ~50 |
 | `amplify/functions/process-speaker-application/handler.ts` | Lambda | Procesar nueva postulación | ~150 |
 | `amplify/functions/approve-speaker-application/handler.ts` | Lambda | Aprobar automáticamente | ~180 |
-| `src/components/profile/SpeakerApplicationForm.tsx` | React | Formulario de postulación | ~300 |
+| `src/components/speaker/UnifiedSpeakerProposalForm.tsx` | React | Formulario unificado de aplicación | ~800 |
 | `src/components/profile/SpeakerApplicationStatus.tsx` | React | Mostrar estado | ~200 |
 | `src/app/profile/page.tsx` | Next.js | Página de perfil | ~250 |
 | `scripts/post-deploy-setup.ps1` | Script | Conectar Stream trigger | ~100 |
@@ -1388,6 +1388,7 @@ aws lambda list-event-source-mappings --function-name process-speaker-applicatio
 2. **Auto-limpieza:** EventBridge Schedules se eliminan automáticamente después de ejecutar
 3. **Emails:** Se envían 2 emails automáticos (confirmación inmediata, aprobación a los 5 min)
 4. **Seguridad:** Permisos IAM específicos por Lambda, autenticación via Cognito
+5. **Email de contacto:** El formulario permite editar el email para notificaciones de speaker (independiente del email principal del usuario)
 5. **Escalable:** Soporta múltiples postulaciones simultáneas sin conflictos
 6. **Monitoreable:** CloudWatch Logs detallados con emojis para debugging fácil
 7. **Testing:** Frontend y backend funcionan independientemente

@@ -68,6 +68,9 @@ const schema = a.schema({
     attachedProposal: a.json(), // Datos de la propuesta (title, description, etc.)
     professionalProfile: a.json(), // Datos del perfil profesional (photoKey, cvKey, etc.)
     
+    // 🔐 ADMIN MANAGEMENT: Prevenir notificaciones inapropiadas
+    isAdminApplication: a.boolean().default(false), // Indica si la aplicación es de un admin
+    
     // Owner field para authorization
     owner: a.string(),
   })

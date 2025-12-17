@@ -1,13 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Loader2, User, Briefcase, Lightbulb, Calendar, FileText, Upload, LinkIcon, Check } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { User, Briefcase, Lightbulb, Calendar, FileText, Upload, LinkIcon, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import LastThursdaySelector from './LastThursdaySelector';
-import { uploadSpeakerPhoto, uploadSpeakerCV, validateLinkedInUrl, EXPERTISE_AREAS, formatFileSize } from '@/lib/speaker-uploads';
+import { uploadSpeakerPhoto, uploadSpeakerCV, EXPERTISE_AREAS, formatFileSize } from '@/lib/speaker-uploads';
+import {
+  validateFormSection,
+  validateCompleteForm,
+  validateProfessionalProfileCompletion,
+  validateMandatoryTalkProposal,
+  type UnifiedFormData as ValidationFormData
+} from '@/lib/form-validation';
 
 interface UnifiedFormData {
   // Datos personales (ya en User table, solo para display)
@@ -15,24 +22,24 @@ interface UnifiedFormData {
   familyName: string;
   email: string;
   phoneNumber: string;
-  
+
   // Perfil profesional
   company: string;
   jobTitle: string;
   expertiseArea: string;
-  
+
   // Archivos
   photoFile: File | null;
   photoKey: string | null;
   cvFile: File | null;
   cvKey: string | null;
   linkedInUrl: string;
-  
+
   // Speaker Application
   motivation: string;
   experience: string;
   topics: string[];
-  
+
   // Talk Proposal
   talkTitle: string;
   talkDescription: string;
@@ -65,6 +72,7 @@ export default function UnifiedSpeakerProposalForm({
   const [currentSection, setCurrentSection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
 
   // Form data - pre-fill from User table
   const [formData, setFormData] = useState<UnifiedFormData>({
@@ -106,7 +114,7 @@ export default function UnifiedSpeakerProposalForm({
     if (!file) return;
 
     setError(null);
-    
+
     // Preview
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -125,7 +133,7 @@ export default function UnifiedSpeakerProposalForm({
     setPhotoUploading(false);
 
     if (result.success && result.key) {
-      setFormData({ ...formData, photoFile: file, photoKey: result.key });
+      setFormData(prev => ({ ...prev, photoFile: file, photoKey: result.key || null }));
     } else {
       setError(result.error || 'Error al subir la foto');
       setPhotoPreview(null);
@@ -148,126 +156,84 @@ export default function UnifiedSpeakerProposalForm({
     setCvUploading(false);
 
     if (result.success && result.key) {
-      setFormData({ ...formData, cvFile: file, cvKey: result.key });
+      setFormData(prev => ({ ...prev, cvFile: file, cvKey: result.key || null }));
     } else {
       setError(result.error || 'Error al subir el CV');
     }
   }
 
   // Handle phone change with +52 auto-format
-  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    
+
     // Si está vacío o solo tiene +, resetear a +52
     if (value === '' || value === '+') {
-      setFormData({ ...formData, phoneNumber: '+52 ' });
+      setFormData(prev => ({ ...prev, phoneNumber: '+52 ' }));
       return;
     }
-    
+
     // Asegurar que siempre empiece con +52
     if (!value.startsWith('+52')) {
       value = '+52 ' + value.replace(/^\+?52?\s?/, '');
     }
-    
+
     // Asegurar espacio después de +52
     if (value.startsWith('+52') && value[3] !== ' ') {
       value = '+52 ' + value.substring(3);
     }
-    
-    setFormData({ ...formData, phoneNumber: value });
-  }
+
+    setFormData(prev => ({ ...prev, phoneNumber: value }));
+  }, []);
 
   // Add topic
-  function handleAddTopic() {
+  const handleAddTopic = useCallback(() => {
     if (topicInput.trim() && !formData.topics.includes(topicInput.trim())) {
-      setFormData({ ...formData, topics: [...formData.topics, topicInput.trim()] });
+      setFormData(prev => ({ ...prev, topics: [...prev.topics, topicInput.trim()] }));
       setTopicInput('');
     }
-  }
+  }, [topicInput, formData.topics]);
 
   // Remove topic
-  function handleRemoveTopic(topic: string) {
-    setFormData({ ...formData, topics: formData.topics.filter((t) => t !== topic) });
-  }
+  const handleRemoveTopic = useCallback((topic: string) => {
+    setFormData(prev => ({ ...prev, topics: prev.topics.filter((t) => t !== topic) }));
+  }, []);
 
-  // Validate section
+  // Enhanced validation using the comprehensive validation system
   function validateSection(section: number): boolean {
     setError(null);
+    setValidationWarnings([]);
 
-    switch (section) {
-      case 1: // Datos personales
-        if (!formData.phoneNumber) {
-          setError('El teléfono es requerido');
-          return false;
-        }
-        if (!formData.photoKey) {
-          setError('Debes subir tu foto profesional');
-          return false;
-        }
-        return true;
+    const validation = validateFormSection(formData as ValidationFormData, section);
 
-      case 2: // Trayectoria profesional
-        if (!formData.cvKey && !formData.linkedInUrl) {
-          setError('Debes proporcionar tu CV o tu perfil de LinkedIn');
-          return false;
-        }
-        if (formData.linkedInUrl) {
-          const validation = validateLinkedInUrl(formData.linkedInUrl);
-          if (!validation.valid) {
-            setError(validation.error || 'URL de LinkedIn inválida');
-            return false;
-          }
-        }
-        return true;
-
-      case 3: // Datos de trabajo
-        if (!formData.company) {
-          setError('La empresa es requerida');
-          return false;
-        }
-        if (!formData.jobTitle) {
-          setError('El puesto es requerido');
-          return false;
-        }
-        if (!formData.expertiseArea) {
-          setError('El área de especialización es requerida');
-          return false;
-        }
-        if (!formData.motivation) {
-          setError('La motivación es requerida');
-          return false;
-        }
-        if (!formData.experience) {
-          setError('La experiencia es requerida');
-          return false;
-        }
-        if (formData.topics.length === 0) {
-          setError('Debes agregar al menos un tema de interés');
-          return false;
-        }
-        return true;
-
-      case 4: // Propuesta de charla
-        if (!formData.talkTitle) {
-          setError('El título de la charla es requerido');
-          return false;
-        }
-        if (!formData.talkDescription) {
-          setError('La descripción es requerida');
-          return false;
-        }
-        return true;
-
-      case 5: // Fecha
-        if (!formData.proposedDate) {
-          setError('Debes seleccionar una fecha');
-          return false;
-        }
-        return true;
-
-      default:
-        return true;
+    if (!validation.valid) {
+      setError(validation.errors[0]); // Show first error
+      return false;
     }
+
+    // Set warnings if any
+    if (validation.warnings && validation.warnings.length > 0) {
+      setValidationWarnings(validation.warnings);
+    }
+
+    // Additional validation for professional profile completion before talk proposal
+    if (section === 3) {
+      const profileValidation = validateProfessionalProfileCompletion(formData as ValidationFormData);
+      if (!profileValidation.valid) {
+        setError('Debes completar tu perfil profesional antes de continuar con la aplicación como speaker');
+        return false;
+      }
+    }
+
+    // Ensure talk proposal cannot be skipped (section 4 is mandatory)
+    if (section === 4) {
+      const talkValidation = validateMandatoryTalkProposal(formData as ValidationFormData);
+      if (!talkValidation.valid) {
+        setError(talkValidation.errors[0]);
+        return false;
+      }
+    }
+
+    return true;
   }
 
   // Next section
@@ -286,7 +252,15 @@ export default function UnifiedSpeakerProposalForm({
 
   // Submit
   async function handleSubmit() {
+    // Validate current section first
     if (!validateSection(currentSection)) return;
+
+    // Validate complete form before submission
+    const completeValidation = validateCompleteForm(formData as ValidationFormData);
+    if (!completeValidation.valid) {
+      setError(completeValidation.errors[0]);
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
@@ -302,7 +276,7 @@ export default function UnifiedSpeakerProposalForm({
   }
 
   // Progress indicator
-  const progress = (currentSection / 5) * 100;
+  const progress = (currentSection / 6) * 100;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -310,7 +284,7 @@ export default function UnifiedSpeakerProposalForm({
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium text-text-secondary">
-            Sección {currentSection} de 5
+            Sección {currentSection} de 6
           </span>
           <span className="text-sm font-medium text-accent">
             {Math.round(progress)}% completado
@@ -322,12 +296,80 @@ export default function UnifiedSpeakerProposalForm({
             style={{ width: `${progress}%` }}
           />
         </div>
+
+        {/* Section validation indicators */}
+        <div className="overflow-x-auto mt-3 scrollbar-hide">
+          <div className="flex justify-between items-center text-xs min-w-max px-2" style={{ minWidth: '480px' }}>
+            {[1, 2, 3, 4, 5, 6].map((sectionNum) => {
+              const sectionValidation = validateFormSection(formData as ValidationFormData, sectionNum);
+              const isComplete = sectionValidation.valid;
+              const isCurrent = sectionNum === currentSection;
+
+              return (
+                <div
+                  key={sectionNum}
+                  className={`flex items-center gap-1 px-2 py-1 rounded ${isCurrent
+                    ? 'bg-accent/20 text-accent font-medium'
+                    : isComplete
+                      ? 'text-green-600'
+                      : 'text-gray-400'
+                    }`}
+                >
+                  {isComplete ? (
+                    <Check className="w-3 h-3" />
+                  ) : (
+                    <div className={`w-3 h-3 rounded-full border-2 ${isCurrent ? 'border-accent' : 'border-gray-300'
+                      }`} />
+                  )}
+                  <span>
+                    {sectionNum === 1 && 'Personal'}
+                    {sectionNum === 2 && 'Perfil'}
+                    {sectionNum === 3 && 'Trabajo'}
+                    {sectionNum === 4 && 'Charla*'}
+                    {sectionNum === 5 && 'Fecha'}
+                    {sectionNum === 6 && 'Opcional'}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
+
+
 
       {/* Error message */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-800 dark:text-red-200">{error}</p>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 text-red-600">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-red-800 dark:text-red-200 font-medium">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Validation warnings */}
+      {validationWarnings.length > 0 && (
+        <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div className="flex items-start gap-2">
+            <div className="w-5 h-5 text-amber-600 mt-0.5">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-amber-800 dark:text-amber-200 font-medium mb-1">Sugerencias:</p>
+              <ul className="text-amber-700 dark:text-amber-300 text-sm space-y-1">
+                {validationWarnings.map((warning, index) => (
+                  <li key={index}>• {warning}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 
@@ -341,7 +383,8 @@ export default function UnifiedSpeakerProposalForm({
             <div>
               <h2 className="text-2xl font-bold text-text-primary">Datos Personales</h2>
               <p className="text-sm text-text-secondary">
-                En esta sección, te pedimos que ingreses tu información personal básica.
+                En esta sección, te pedimos que ingreses tu información personal básica. Estos datos nos ayudarán a conocerte mejor y poder contactarte para coordinar tu participación.
+                <br></br>Toda la información será tratada con confidencialidad.
               </p>
             </div>
           </div>
@@ -352,7 +395,7 @@ export default function UnifiedSpeakerProposalForm({
               <Input
                 id="givenName"
                 value={formData.givenName}
-                onChange={(e) => setFormData({ ...formData, givenName: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, givenName: e.target.value }))}
                 placeholder="Juan"
               />
             </div>
@@ -361,7 +404,7 @@ export default function UnifiedSpeakerProposalForm({
               <Input
                 id="familyName"
                 value={formData.familyName}
-                onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, familyName: e.target.value }))}
                 placeholder="Pérez García"
               />
             </div>
@@ -379,14 +422,18 @@ export default function UnifiedSpeakerProposalForm({
           </div>
 
           <div>
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email">Email de contacto para esta aplicación *</Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
-              disabled
-              className="bg-gray-100 dark:bg-gray-800"
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              placeholder={userEmail}
             />
+            <p className="text-xs text-text-secondary mt-1">
+              Este email se usará para notificaciones relacionadas con tu aplicación como speaker.
+              Puedes usar tu email principal o uno alternativo donde prefieras recibir estas comunicaciones.
+            </p>
           </div>
 
           {/* Foto Personal */}
@@ -395,8 +442,7 @@ export default function UnifiedSpeakerProposalForm({
               📸 Foto Personal <span className="text-red-500">*</span>
             </Label>
             <p className="text-sm text-text-secondary mb-4">
-              Sube una foto tuya que podamos utilizar para la <strong>promoción de tu participación en nuestros eventos</strong>. 
-              Esta imagen será parte de los materiales de publicidad y difusión en nuestras redes sociales y plataformas.
+              Sube una foto tuya que podamos utilizar para la promoción de tu participación en nuestros eventos. Esta imagen será parte de los <strong>materiales de publicidad y difusión en nuestras redes sociales y plataformas</strong>. Te recomendamos que sea una foto profesional y de alta calidad, que refleje tu mejor presentación.
             </p>
 
             <div className="flex items-start gap-4">
@@ -453,6 +499,11 @@ export default function UnifiedSpeakerProposalForm({
                 <p className="text-xs text-text-secondary mt-2">
                   JPG, PNG o WebP. Máximo 10MB
                 </p>
+                {formData.photoFile && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ {formData.photoFile.name} ({formatFileSize(formData.photoFile.size)})
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -470,6 +521,7 @@ export default function UnifiedSpeakerProposalForm({
               <h2 className="text-2xl font-bold text-text-primary">Trayectoria Profesional</h2>
               <p className="text-sm text-text-secondary">
                 Elige cómo compartir tu trayectoria profesional con nosotros.
+                <br />Esta información será utilizada para presentarte adecuadamente durante el evento, destacando tus logros y experiencia
               </p>
             </div>
           </div>
@@ -532,15 +584,20 @@ export default function UnifiedSpeakerProposalForm({
                   id="linkedin"
                   type="url"
                   value={formData.linkedInUrl}
-                  onChange={(e) => setFormData({ ...formData, linkedInUrl: e.target.value })}
+                  onChange={(e) => setFormData(prev => ({ ...prev, linkedInUrl: e.target.value }))}
                   placeholder="https://linkedin.com/in/tu-perfil"
                   className="pl-10"
                 />
               </div>
             </div>
-            <p className="text-xs text-amber-600 mt-2">
-              ⚠️ Debes proporcionar al menos uno: CV o LinkedIn
-            </p>
+            <div className="mt-2">
+              <p className="text-xs text-amber-600">
+                ⚠️ Debes proporcionar al menos uno: CV o LinkedIn
+              </p>
+              <p className="text-xs text-text-secondary mt-1">
+                PDF únicamente. Máximo 5MB
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -555,42 +612,42 @@ export default function UnifiedSpeakerProposalForm({
             <div>
               <h2 className="text-2xl font-bold text-text-primary">Datos de Trabajo</h2>
               <p className="text-sm text-text-secondary">
-                Cuéntanos más sobre tu experiencia laboral y motivación.
+                Cuéntanos más sobre tu experiencia laboral y el rol que desempeñas en tu empresa o proyecto. Queremos conocer tu perfil profesional y cómo te vinculas con la tecnología de AWS.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="company">Empresa *</Label>
+              <Label htmlFor="company">Empresa</Label>
               <Input
                 id="company"
                 value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
                 placeholder="AWS, Google, BUAP, Freelance, etc."
               />
               <p className="text-xs text-text-secondary mt-1">(empresa, universidad, independiente)</p>
             </div>
             <div>
-              <Label htmlFor="jobTitle">Puesto de trabajo *</Label>
+              <Label htmlFor="jobTitle">Puesto de trabajo</Label>
               <Input
                 id="jobTitle"
                 value={formData.jobTitle}
-                onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
                 placeholder="Solutions Architect, DevOps Engineer, Estudiante de TI, etc."
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="expertiseArea">Área de especialización *</Label>
+            <Label htmlFor="expertiseArea">Área de especialización</Label>
             <select
               id="expertiseArea"
               value={formData.expertiseArea}
-              onChange={(e) => setFormData({ ...formData, expertiseArea: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, expertiseArea: e.target.value }))}
               className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
             >
-              <option value="">Selecciona un área</option>
+              <option value="">Selecciona un área (opcional)</option>
               {EXPERTISE_AREAS.map((area) => (
                 <option key={area} value={area}>
                   {area}
@@ -599,61 +656,7 @@ export default function UnifiedSpeakerProposalForm({
             </select>
           </div>
 
-          <div>
-            <Label htmlFor="motivation">Motivación *</Label>
-            <Textarea
-              id="motivation"
-              value={formData.motivation}
-              onChange={(e) => setFormData({ ...formData, motivation: e.target.value })}
-              placeholder="¿Por qué quieres ser speaker en AWS User Group Puebla?"
-              rows={4}
-            />
-          </div>
 
-          <div>
-            <Label htmlFor="experience">Experiencia previa *</Label>
-            <Textarea
-              id="experience"
-              value={formData.experience}
-              onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-              placeholder="Cuéntanos sobre tu experiencia dando charlas, webinars, o compartiendo conocimiento"
-              rows={4}
-            />
-          </div>
-
-          <div>
-            <Label>Temas de interés (tecnologías AWS) *</Label>
-            <div className="flex gap-2 mt-2">
-              <Input
-                value={topicInput}
-                onChange={(e) => setTopicInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTopic())}
-                placeholder="Ej: Lambda, ECS, S3..."
-              />
-              <Button type="button" variant="outline" onClick={handleAddTopic}>
-                Agregar
-              </Button>
-            </div>
-            {formData.topics.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {formData.topics.map((topic) => (
-                  <span
-                    key={topic}
-                    className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm flex items-center gap-2"
-                  >
-                    {topic}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTopic(topic)}
-                      className="hover:text-red-600"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       )}
 
@@ -665,19 +668,23 @@ export default function UnifiedSpeakerProposalForm({
               <Lightbulb className="w-6 h-6 text-accent" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-text-primary">Propuesta de Tema</h2>
+              <h2 className="text-2xl font-bold text-text-primary">
+                Propuesta de Tema <span className="text-red-500">*</span>
+              </h2>
               <p className="text-sm text-text-secondary">
-                ¡Este es el momento para compartir tu idea!
+                <strong>¡Este es el momento para compartir tu idea!</strong> <br />
+                En esta sección, te invitamos a detallar el tema que te gustaría presentar en nuestros eventos.
+                Queremos conocer la propuesta de tu charla, su enfoque y cómo beneficiará a la comunidad.
+                No olvides incluir una breve descripción del tema, su relevancia para AWS y los puntos clave que cubrirás.
               </p>
             </div>
           </div>
-
           <div>
             <Label htmlFor="talkTitle">Título de la Plática *</Label>
             <Input
               id="talkTitle"
               value={formData.talkTitle}
-              onChange={(e) => setFormData({ ...formData, talkTitle: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, talkTitle: e.target.value }))}
               placeholder="Ej: Arquitecturas Serverless con AWS Lambda"
             />
           </div>
@@ -687,7 +694,7 @@ export default function UnifiedSpeakerProposalForm({
             <Textarea
               id="talkDescription"
               value={formData.talkDescription}
-              onChange={(e) => setFormData({ ...formData, talkDescription: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, talkDescription: e.target.value }))}
               placeholder="Describe de qué tratará tu charla, qué aprenderán los asistentes, y por qué es relevante..."
               rows={6}
             />
@@ -699,7 +706,7 @@ export default function UnifiedSpeakerProposalForm({
               <select
                 id="duration"
                 value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
+                onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
                 className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
               >
                 <option value={30}>30 minutos</option>
@@ -713,7 +720,7 @@ export default function UnifiedSpeakerProposalForm({
               <select
                 id="targetAudience"
                 value={formData.targetAudience}
-                onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value as 'ALL' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' })}
+                onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value as 'ALL' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' }))}
                 className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
               >
                 <option value="ALL">Todos los niveles</option>
@@ -743,21 +750,125 @@ export default function UnifiedSpeakerProposalForm({
 
           <LastThursdaySelector
             selectedDate={formData.proposedDate}
-            onDateSelect={(date) => setFormData({ ...formData, proposedDate: date })}
+            onDateSelect={(date) => setFormData(prev => ({ ...prev, proposedDate: date }))}
             disabled={false}
           />
         </div>
       )}
 
+      {/* Section 6: Preguntas Opcionales */}
+      {currentSection === 6 && (
+        <div className="bg-surface rounded-lg p-6 shadow theme-transition space-y-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-accent/10 rounded-lg">
+              <User className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-text-primary">Cuéntanos más sobre ti</h2>
+              <p className="text-sm text-text-secondary">
+                Estas preguntas son completamente opcionales, pero nos ayudan a conocerte mejor y personalizar tu experiencia como speaker.
+              </p>
+            </div>
+          </div>
+
+          {/* Mensaje de invitación */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-start gap-2">
+              <div className="w-5 h-5 text-blue-600 mt-0.5">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-blue-800 dark:text-blue-200 font-medium mb-1">
+                  💬 Paso Opcional
+                </p>
+                <p className="text-blue-700 dark:text-blue-300 text-sm">
+                  Puedes responder estas preguntas o simplemente continuar para finalizar tu aplicación.
+                  Cualquier información que compartas nos ayudará a brindarte una mejor experiencia.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <Label htmlFor="motivation">¿Por qué quieres ser speaker?</Label>
+              <Textarea
+                id="motivation"
+                value={formData.motivation}
+                onChange={(e) => setFormData(prev => ({ ...prev, motivation: e.target.value }))}
+                placeholder="Comparte tu motivación para ser parte de AWS User Group Puebla como speaker..."
+                rows={4}
+              />
+              <p className="text-xs text-text-secondary mt-1">
+                Opcional - Nos ayuda a entender tus objetivos y cómo podemos apoyarte
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="experience">Experiencia previa</Label>
+              <Textarea
+                id="experience"
+                value={formData.experience}
+                onChange={(e) => setFormData(prev => ({ ...prev, experience: e.target.value }))}
+                placeholder="Cuéntanos sobre tu experiencia dando charlas, webinars, workshops, o compartiendo conocimiento..."
+                rows={4}
+              />
+              <p className="text-xs text-text-secondary mt-1">
+                Opcional - Incluye tanto experiencia formal como informal (meetups, equipos de trabajo, etc.)
+              </p>
+            </div>
+
+            <div>
+              <Label>Temas de interés en AWS</Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  value={topicInput}
+                  onChange={(e) => setTopicInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTopic())}
+                  placeholder="Ej: Lambda, ECS, S3, IA, ML, DevOps..."
+                />
+                <Button type="button" variant="outline" onClick={handleAddTopic}>
+                  Agregar
+                </Button>
+              </div>
+              {formData.topics.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {formData.topics.map((topic) => (
+                    <span
+                      key={topic}
+                      className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm flex items-center gap-2"
+                    >
+                      {topic}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTopic(topic)}
+                        className="hover:text-red-600"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-text-secondary mt-1">
+                Opcional - Nos ayuda a sugerir temas futuros y conectarte con otros speakers
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation buttons */}
-      <div className="flex gap-4 mt-8">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8">
         {currentSection > 1 && (
           <Button
             type="button"
             variant="outline"
             onClick={handlePrevious}
             disabled={isSubmitting}
-            className="flex-1"
+            className="flex-1 w-full sm:w-auto"
           >
             ← Anterior
           </Button>
@@ -769,39 +880,60 @@ export default function UnifiedSpeakerProposalForm({
             variant="outline"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="flex-1"
+            className="flex-1 w-full sm:w-auto"
           >
             Cancelar
           </Button>
         )}
 
-        {currentSection < 5 ? (
+        {currentSection < 6 ? (
           <Button
             type="button"
             variant="accent"
             onClick={handleNext}
             disabled={isSubmitting}
-            className="flex-1"
+            className="flex-1 w-full sm:w-auto"
           >
-            Siguiente →
+            <span className="hidden sm:inline">
+              {currentSection === 5 ? 'Siguiente →' : 'Siguiente →'}
+            </span>
+            <span className="sm:hidden">
+              Siguiente →
+            </span>
           </Button>
         ) : (
-          <Button
-            type="button"
-            variant="accent"
-            onClick={handleSubmit}
-            disabled={isSubmitting || !formData.proposedDate}
-            className="flex-1"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Enviando...
-              </>
-            ) : (
-              '✅ Enviar Propuesta Completa'
-            )}
-          </Button>
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !formData.proposedDate}
+              className="flex-1 w-full sm:w-auto order-2 sm:order-1"
+            >
+              <span className="hidden sm:inline">Omitir y Enviar</span>
+              <span className="sm:hidden">Omitir y Enviar</span>
+            </Button>
+            <Button
+              type="button"
+              variant="accent"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !formData.proposedDate}
+              className="flex-1 w-full sm:w-auto order-1 sm:order-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <span className="hidden sm:inline">Enviando...</span>
+                  <span className="sm:hidden">Enviando...</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden sm:inline">✅ Enviar Propuesta Completa</span>
+                  <span className="sm:hidden">✅ Enviar</span>
+                </>
+              )}
+            </Button>
+          </>
         )}
       </div>
     </div>

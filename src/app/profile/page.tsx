@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserData, getFullName } from '@/hooks/useUserData';
@@ -10,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
 import { Linkedin, Twitter, Github, Globe } from 'lucide-react';
-import { EditProfileForm, SpeakerApplicationForm, SpeakerApplicationStatus } from '@/components/profile';
+import { EditProfileForm } from '@/components/profile';
 import ProfessionalProfileForm from '@/components/profile/ProfessionalProfileForm';
 import { calculateProfileCompleteness, getCompletenessMessage } from '@/lib/profile-utils';
 import { generateClient } from 'aws-amplify/data';
@@ -19,11 +20,31 @@ import type { Schema } from '../../../amplify/data/resource';
 const client = generateClient<Schema>();
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
   const { profile, loading: profileLoading, refetch } = useUserProfile();
   const { userData } = useUserData();
   const [isEditing, setIsEditing] = useState(false);
   const [showProfessionalForm, setShowProfessionalForm] = useState(false);
+
+  // Handle legacy speaker section hash redirect
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Handle hash-based redirect
+      if (window.location.hash === '#speaker-section') {
+        window.history.replaceState(null, '', window.location.pathname);
+        router.push('/speaker/apply');
+        return;
+      }
+      
+      // Handle query parameter redirect (from Next.js config)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('section') === 'speaker') {
+        router.push('/speaker/apply');
+        return;
+      }
+    }
+  }, [router]);
 
   // Handler para guardar perfil profesional
   async function handleSaveProfessionalProfile(data: { speakerPhotoKey?: string; speakerCvKey?: string; linkedInUrl?: string; expertiseArea?: string }) {
@@ -148,6 +169,24 @@ export default function ProfilePage() {
                   </Badge>
                 )}
               </div>
+              
+              {/* Role Hierarchy Display */}
+              <div className="flex justify-center mt-3">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg px-4 py-2 text-sm">
+                  <span className="text-text-secondary">Jerarquía de roles: </span>
+                  <span className={`font-medium ${profile?.role === 'ADMIN' ? 'text-amber-600' : 'text-text-secondary'}`}>
+                    ADMIN
+                  </span>
+                  <span className="text-text-secondary mx-2">&gt;</span>
+                  <span className={`font-medium ${profile?.role === 'SPEAKER' ? 'text-accent' : 'text-text-secondary'}`}>
+                    SPEAKER
+                  </span>
+                  <span className="text-text-secondary mx-2">&gt;</span>
+                  <span className={`font-medium ${profile?.role === 'MEMBER' || !profile?.role ? 'text-text-primary' : 'text-text-secondary'}`}>
+                    MEMBER
+                  </span>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Información de Role */}
@@ -161,9 +200,22 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm mb-1">Sobre tu role</h4>
                     <p className="text-sm text-text-secondary">
-                      Tu role <strong>{profile?.role || 'MEMBER'}</strong> se asigna automáticamente. 
-                      {isAdmin ? ' Como administrador, tienes acceso completo a todas las funciones.' : ' Para cambiar tu role, contacta a un administrador.'}
+                      Tu role <strong>{profile?.role || 'MEMBER'}</strong> se asigna automáticamente desde los grupos de Cognito. 
+                      {profile?.role === 'ADMIN' 
+                        ? ' Como administrador, tienes acceso completo a todas las funciones y puedes gestionar usuarios y contenido.'
+                        : profile?.role === 'SPEAKER'
+                        ? ' Como speaker, puedes proponer charlas y gestionar tu perfil profesional.'
+                        : ' Para convertirte en speaker, puedes aplicar usando el formulario unificado. Para obtener permisos de administrador, contacta a un admin existente.'
+                      }
                     </p>
+                    {profile?.role === 'ADMIN' && (
+                      <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded text-xs">
+                        <p className="text-amber-800 dark:text-amber-200">
+                          <strong>🔐 Privilegios de Admin:</strong> Puedes aplicar como speaker sin generar notificaciones a otros admins, 
+                          gestionar aplicaciones de speakers, aprobar/rechazar propuestas de charlas, y administrar eventos.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -254,21 +306,29 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          {/* Speaker Application Section */}
+          {/* Speaker Application Call-to-Action */}
           {profile?.role !== 'SPEAKER' && profile?.role !== 'ADMIN' && (
-            <div id="speaker-section" className="mb-8 scroll-mt-20">
-              <h2 className="text-2xl font-bold text-text-primary mb-4">🎤 Conviértete en Speaker</h2>
-              <SpeakerApplicationStatus userId={user.userId} />
-              <div className="mt-4">
-                <SpeakerApplicationForm 
-                  userId={user.userId}
-                  userEmail={String(displayEmail)}
-                  onSuccess={async () => {
-                    await refetch();
-                  }}
-                />
-              </div>
-            </div>
+            <Card className="mb-8" variant="elevated">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-text-primary mb-2">🎤 Conviértete en Speaker</h2>
+                <p className="text-text-secondary mb-6 max-w-md mx-auto">
+                  Comparte tu conocimiento con la comunidad AWS de Puebla. Aplica como speaker y propón tu primera charla en un solo proceso.
+                </p>
+                <Button variant="accent" size="lg" asChild>
+                  <Link href="/speaker/apply">
+                    Aplicar como Speaker
+                  </Link>
+                </Button>
+                <p className="text-xs text-text-secondary mt-3">
+                  Proceso unificado: aplicación + propuesta de charla
+                </p>
+              </CardContent>
+            </Card>
           )}
 
           {/* Professional Profile Section (For Speakers) */}
