@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Camera, CameraOff, CheckCircle, XCircle, AlertTriangle, Loader2, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useQRScanner } from '@/hooks/useQRScanner';
-import { ScannerState, QRTokenData } from '@/lib/qr-config';
+import { ScannerState, QRTokenData, CameraUtils } from '@/lib/qr-config';
 import { QRValidator } from '@/lib/qr-validation';
 // import { SecurityLogger } from '@/lib/security-logger';
 import { generateClient } from 'aws-amplify/data';
@@ -45,9 +45,12 @@ export default function QRScanner({
     scannerState,
     isScanning,
     hasCamera,
+    availableCameras,
+    currentCamera,
     startScanning,
     stopScanning,
     resetScanner,
+    switchCamera,
     videoRef,
   } = useQRScanner({
     eventId,
@@ -77,16 +80,21 @@ export default function QRScanner({
     }
   }
 
-  async function handleCheckIn(token: QRTokenData): Promise<void> {
+  async function handleCheckIn(tokenString: string): Promise<void> {
     setIsProcessing(true);
     
     try {
+      console.log('🔍 Processing QR token:', tokenString.substring(0, 100) + '...');
+      console.log('📍 Event ID:', eventId);
+      
       // Usar el validador mejorado con seguridad
       const validationResult = await QRValidator.validateToken(
-        JSON.stringify(token), 
+        tokenString, 
         eventId, 
         user?.userId
       );
+
+      console.log('✅ Validation result:', validationResult);
 
       if (!validationResult.isValid) {
         // Manejar incidentes de seguridad
@@ -173,7 +181,7 @@ export default function QRScanner({
   function playSuccessSound() {
     try {
       // Crear un beep de éxito usando Web Audio API
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass = window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       const audioContext = new AudioContextClass();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -332,6 +340,75 @@ export default function QRScanner({
             className="w-full text-sm"
           >
             Reiniciar Scanner
+          </Button>
+        )}
+
+        {/* Camera switching controls */}
+        {availableCameras.length > 1 && (
+          <div className="pt-2 border-t border-border">
+            <p className="text-xs text-text-secondary mb-2">Cambiar cámara:</p>
+            <div className="grid grid-cols-2 gap-2">
+              {availableCameras.map((camera) => (
+                <Button
+                  key={camera.id}
+                  variant={currentCamera === camera.id ? "accent" : "outline"}
+                  onClick={() => switchCamera(camera.id)}
+                  disabled={scannerState === ScannerState.INITIALIZING}
+                  className="text-xs py-1 px-2 h-8"
+                >
+                  {CameraUtils.getFriendlyName(camera.label)}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Quick camera toggle for common case */}
+        {availableCameras.length > 1 && (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const currentCameraInfo = availableCameras.find(c => c.id === currentCamera);
+              const isCurrentlyBack = currentCamera === 'environment' || 
+                (currentCameraInfo && CameraUtils.isBackCamera(currentCameraInfo.label));
+              
+              if (isCurrentlyBack) {
+                // Switch to front
+                const frontCamera = availableCameras.find(c => CameraUtils.isFrontCamera(c.label));
+                if (frontCamera) switchCamera(frontCamera.id);
+                else switchCamera('user'); // fallback
+              } else {
+                // Switch to back
+                const backCamera = availableCameras.find(c => CameraUtils.isBackCamera(c.label));
+                if (backCamera) switchCamera(backCamera.id);
+                else switchCamera('environment'); // fallback
+              }
+            }}
+            className="w-full text-sm"
+          >
+            🔄 Cambiar a {
+              (() => {
+                const currentCameraInfo = availableCameras.find(c => c.id === currentCamera);
+                const isCurrentlyBack = currentCamera === 'environment' || 
+                  (currentCameraInfo && CameraUtils.isBackCamera(currentCameraInfo.label));
+                return isCurrentlyBack ? 'Cámara Frontal' : 'Cámara Trasera';
+              })()
+            }
+          </Button>
+        )}
+
+        {/* Debug: Fix registrations button */}
+        {process.env.NODE_ENV === 'development' && (
+          <Button
+            variant="ghost"
+            onClick={async () => {
+              const { RegistrationFixer } = await import('@/lib/fix-registrations');
+              const result = await RegistrationFixer.fixEventRegistrations(eventId);
+              alert(`Fixed ${result.fixed} registrations, ${result.errors} errors`);
+            }}
+            className="w-full text-xs text-amber-600"
+          >
+            🔧 Fix Event Registrations (Dev)
           </Button>
         )}
       </div>

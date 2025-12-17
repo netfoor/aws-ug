@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
@@ -39,7 +39,7 @@ export function useUserData() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     if (!user?.userId) {
       setUserData(null);
       setIsLoading(false);
@@ -71,7 +71,7 @@ export function useUserData() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.userId]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -80,7 +80,7 @@ export function useUserData() {
       setUserData(null);
       setIsLoading(false);
     }
-  }, [user?.userId, isAuthenticated]);
+  }, [loadUserData, user, isAuthenticated]);
 
   return {
     userData,

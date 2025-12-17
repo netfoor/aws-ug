@@ -3,11 +3,19 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ScannerState, QRTokenData, QRTokenUtils } from '@/lib/qr-config';
+import { ScannerState, QRTokenData, QRTokenUtils, CameraUtils } from '@/lib/qr-config';
+
+// Type for QR Scanner instance
+interface QRScannerInstance {
+  start(): Promise<void>;
+  stop(): void;
+  destroy(): void;
+  setCamera(facingModeOrDeviceId: string): Promise<void>;
+}
 
 interface UseQRScannerOptions {
   eventId?: string;
-  onCheckIn?: (token: QRTokenData) => Promise<void>;
+  onCheckIn?: (tokenString: string) => Promise<void>;
   onError: (error: string) => void;
   onScanSuccess?: (qrData: QRTokenData) => void;
 }
@@ -16,9 +24,12 @@ interface UseQRScannerReturn {
   scannerState: ScannerState;
   isScanning: boolean;
   hasCamera: boolean;
+  availableCameras: Array<{ id: string; label: string }>;
+  currentCamera: string;
   startScanning: () => Promise<void>;
   stopScanning: () => void;
   resetScanner: () => void;
+  switchCamera: (cameraId: string) => Promise<void>;
   videoRef: React.RefObject<HTMLVideoElement | null>;
 }
 
@@ -31,9 +42,11 @@ export function useQRScanner({
   const [scannerState, setScannerState] = useState<ScannerState>(ScannerState.INITIALIZING);
   const [hasCamera, setHasCamera] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [availableCameras, setAvailableCameras] = useState<Array<{ id: string; label: string }>>([]);
+  const [currentCamera, setCurrentCamera] = useState<string>('environment'); // 'environment' = back camera
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const scannerRef = useRef<any>(null); // QrScanner instance
+  const scannerRef = useRef<QRScannerInstance | null>(null); // QrScanner instance
   const processedTokensRef = useRef<Set<string>>(new Set()); // Para evitar duplicados
 
   // Verificar disponibilidad de cámara al montar
@@ -53,6 +66,29 @@ export function useQRScanner({
       // Importación dinámica para evitar errores en SSR
       const QrScanner = (await import('qr-scanner')).default;
       const cameraAvailable = await QrScanner.hasCamera();
+
+      if (cameraAvailable) {
+        // Listar cámaras disponibles
+        try {
+          const cameras = await QrScanner.listCameras(true);
+          setAvailableCameras(cameras);
+
+          // Buscar cámara trasera por defecto usando utilidades
+          const backCamera = cameras.find(camera => CameraUtils.isBackCamera(camera.label));
+
+          if (backCamera) {
+            console.log('Found back camera:', backCamera.label);
+            setCurrentCamera(backCamera.id);
+          } else {
+            // Si no encuentra cámara trasera por etiqueta, usar 'environment' como fallback
+            console.log('No back camera found by label, using environment constraint');
+            setCurrentCamera('environment');
+          }
+        } catch (error) {
+          console.warn('Could not list cameras, using default:', error);
+          setCurrentCamera('environment');
+        }
+      }
 
       setHasCamera(cameraAvailable);
       setScannerState(cameraAvailable ? ScannerState.READY : ScannerState.NO_CAMERA);
@@ -98,7 +134,7 @@ export function useQRScanner({
 
       // Procesar el check-in
       if (onCheckIn) {
-        await onCheckIn(token);
+        await onCheckIn(tokenString);
       }
 
       // Breve pausa antes de continuar escaneando
@@ -138,9 +174,9 @@ export function useQRScanner({
           highlightScanRegion: true,
           highlightCodeOutline: true,
           maxScansPerSecond: 3,
-          preferredCamera: 'back',
+          preferredCamera: "back", 
         }
-      );
+      ) as QRScannerInstance;
 
       await scannerRef.current.start();
       setIsScanning(true);
@@ -183,13 +219,32 @@ export function useQRScanner({
     setScannerState(hasCamera ? ScannerState.READY : ScannerState.NO_CAMERA);
   }, [hasCamera]);
 
+  const switchCamera = useCallback(async (cameraId: string) => {
+    try {
+      if (scannerRef.current && isScanning) {
+        // Si está escaneando, cambiar la cámara directamente
+        await scannerRef.current.setCamera(cameraId);
+        setCurrentCamera(cameraId);
+      } else {
+        // Si no está escaneando, solo actualizar la cámara para el próximo inicio
+        setCurrentCamera(cameraId);
+      }
+    } catch (error) {
+      console.error('Error switching camera:', error);
+      onError('No se pudo cambiar la cámara');
+    }
+  }, [isScanning, onError]);
+
   return {
     scannerState,
     isScanning,
     hasCamera,
+    availableCameras,
+    currentCamera,
     startScanning,
     stopScanning,
     resetScanner,
+    switchCamera,
     videoRef,
   };
 }

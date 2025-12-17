@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // 3️⃣ Invocar Lambda manual-approve-speaker
     // El nombre viene de amplify_outputs.json (generado por Amplify)
-    const outputs = await import('../../../../../amplify_outputs.json') as any;
+    const outputs = await import('../../../../../amplify_outputs.json') as { custom?: { manualApproveLambdaName?: string } };
     const lambdaFunctionName = outputs.custom?.manualApproveLambdaName;
     
     if (!lambdaFunctionName) {
@@ -77,22 +77,23 @@ export async function POST(request: NextRequest) {
     let response;
     try {
       response = await lambdaClient.send(command);
-    } catch (awsErr: any) {
+    } catch (awsErr: unknown) {
       console.error('❌ Error invoking Lambda:', awsErr);
-      if (awsErr.name === 'ResourceNotFoundException' || awsErr.Code === 'ResourceNotFoundException') {
+      const error = awsErr as { name?: string; Code?: string; message?: string };
+      if (error.name === 'ResourceNotFoundException' || error.Code === 'ResourceNotFoundException') {
         return NextResponse.json(
-          { error: 'Lambda no encontrada', details: awsErr.message },
+          { error: 'Lambda no encontrada', details: error.message },
           { status: 502 }
         );
       }
       return NextResponse.json(
-        { error: 'Error al invocar la Lambda', details: awsErr.message || String(awsErr) },
+        { error: 'Error al invocar la Lambda', details: error.message || String(awsErr) },
         { status: 502 }
       );
     }
 
     // Intentar decodificar el payload de la Lambda (puede ser vacío)
-    let result: any = null;
+    let result: unknown = null;
     try {
       if (response.Payload) {
         const decoded = new TextDecoder().decode(response.Payload);

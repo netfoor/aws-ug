@@ -6,7 +6,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
-import { Loader2, UserPlus, Search, Filter, CheckCircle, XCircle, Clock, Mail, Shield, Mic } from 'lucide-react';
+import { Loader2, UserPlus, Search, CheckCircle, XCircle, Clock, Mail, Shield, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
@@ -26,7 +26,7 @@ interface AttendeeWithDetails {
 export default function AttendeesPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, isAdmin } = useAuth();
+  const { isLoading: authLoading, isAdmin } = useAuth();
   const eventId = params?.id as string;
 
   const [event, setEvent] = useState<EventType | null>(null);
@@ -261,7 +261,7 @@ export default function AttendeesPage() {
           </div>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => setFilterStatus(e.target.value as 'ALL' | 'GOING' | 'WAITLIST' | 'NOT_GOING')}
             className="px-4 py-2 rounded-lg border border-border bg-surface text-text-primary"
           >
             <option value="ALL">Todos</option>

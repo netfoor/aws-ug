@@ -20,6 +20,47 @@ export const DEFAULT_SCANNER_OPTIONS = {
   preferredCamera: 'back' as const,
 } as const;
 
+// Utilidades para cámaras
+export class CameraUtils {
+  /**
+   * Identifica si una cámara es trasera basándose en su etiqueta
+   */
+  static isBackCamera(cameraLabel: string): boolean {
+    const label = cameraLabel.toLowerCase();
+    return label.includes('back') || 
+           label.includes('rear') ||
+           label.includes('environment') ||
+           label.includes('world') ||
+           label.includes('outer') ||
+           label.includes('main');
+  }
+
+  /**
+   * Identifica si una cámara es frontal basándose en su etiqueta
+   */
+  static isFrontCamera(cameraLabel: string): boolean {
+    const label = cameraLabel.toLowerCase();
+    return label.includes('front') || 
+           label.includes('user') ||
+           label.includes('face') ||
+           label.includes('selfie') ||
+           label.includes('inner');
+  }
+
+  /**
+   * Obtiene un nombre amigable para la cámara
+   */
+  static getFriendlyName(cameraLabel: string): string {
+    if (this.isBackCamera(cameraLabel)) {
+      return '📷 Cámara Trasera';
+    } else if (this.isFrontCamera(cameraLabel)) {
+      return '🤳 Cámara Frontal';
+    } else {
+      return `📹 ${cameraLabel.substring(0, 15)}${cameraLabel.length > 15 ? '...' : ''}`;
+    }
+  }
+}
+
 // Estructura del token QR
 export interface QRTokenData {
   eventId: string;

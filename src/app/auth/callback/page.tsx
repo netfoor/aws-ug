@@ -15,13 +15,13 @@ function AuthCallbackContent() {
   useEffect(() => {
     // Usar una flag para prevenir ejecuciones múltiples
     let isMounted = true;
-    
+
     const handleCallback = async () => {
       try {
         // Verificar si hay errores en los parámetros de la URL
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
-        
+
         if (error) {
           console.error('OAuth Error:', error, errorDescription);
           if (isMounted) {
@@ -32,8 +32,8 @@ function AuthCallbackContent() {
         }
 
         // Obtener la returnUrl desde sessionStorage (guardada durante el login)
-        let returnUrl = '/dashboard'; // Default seguro
-        
+        let returnUrl = '/'; // Default seguro
+
         try {
           const storedReturnUrl = sessionStorage.getItem('auth_return_url');
           if (storedReturnUrl && storedReturnUrl.startsWith('/')) {
@@ -53,7 +53,7 @@ function AuthCallbackContent() {
         setTimeout(() => {
           if (isMounted) {
             setIsProcessing(false);
-            // Siempre redirigir después del callback exitoso
+            // Redirigir a la URL original - el OnboardingGuard se encargará de verificar onboarding
             router.push(returnUrl);
           }
         }, 1000);
@@ -68,12 +68,12 @@ function AuthCallbackContent() {
     };
 
     handleCallback();
-    
+
     // Cleanup function
     return () => {
       isMounted = false;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo ejecutar una vez al montar
 
   // Mostrar error si hay uno
@@ -131,11 +131,11 @@ function AuthCallbackContent() {
           <p className="mt-2 text-center text-sm text-gray-600">
             {isProcessing ? 'Verificando credenciales...' : 'Redirigiendo...'}
           </p>
-          
+
           {/* Indicador de progreso */}
           <div className="mt-8">
             <div className="bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-1000 ease-out"
                 style={{ width: isProcessing ? '60%' : '100%' }}
               ></div>

@@ -8,7 +8,7 @@ import { useAuth } from '@/context/auth-context';
 import { Loader2, Plus, Trash2, GripVertical, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
+
 
 const client = generateClient<Schema>();
 
@@ -27,7 +27,7 @@ interface RegistrationQuestion {
 export default function RegistrationQuestionsPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, isAdmin } = useAuth();
+  const { isLoading: authLoading, isAdmin } = useAuth();
   const eventId = params?.id as string;
 
   const [event, setEvent] = useState<EventType | null>(null);
@@ -112,7 +112,7 @@ export default function RegistrationQuestionsPage() {
       setError('Error al cargar el evento');
     } finally {
       setIsLoading(false);
-    }4567
+    }
   }
 
   const handleAddQuestion = () => {
@@ -131,7 +131,7 @@ export default function RegistrationQuestionsPage() {
     setQuestions(questions.filter(q => q.id !== questionId));
   };
 
-  const handleUpdateQuestion = (questionId: string, field: keyof RegistrationQuestion, value: any) => {
+  const handleUpdateQuestion = (questionId: string, field: keyof RegistrationQuestion, value: string | boolean | string[]) => {
     setQuestions(questions.map(q => 
       q.id === questionId ? { ...q, [field]: value } : q
     ));
@@ -182,7 +182,7 @@ export default function RegistrationQuestionsPage() {
       setSuccessMessage(null);
 
       // Guardar las preguntas en el campo JSON del evento
-      const { data: updatedEvent, errors: updateErrors } = await client.models.Event.update({
+      const { errors: updateErrors } = await client.models.Event.update({
         id: eventId,
         registrationQuestions: JSON.stringify(questions),
       });
@@ -203,17 +203,7 @@ export default function RegistrationQuestionsPage() {
     }
   };
 
-  const getTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      text: 'Texto corto',
-      email: 'Email',
-      phone: 'Teléfono',
-      select: 'Selección única',
-      checkbox: 'Casillas de verificación',
-      textarea: 'Texto largo'
-    };
-    return labels[type] || type;
-  };
+
 
   if (authLoading || isLoading) {
     return (
@@ -285,7 +275,7 @@ export default function RegistrationQuestionsPage() {
           {/* Info */}
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              💡 Estas preguntas aparecerán cuando los usuarios hagan clic en "Registro" para este evento.
+              💡 Estas preguntas aparecerán cuando los usuarios hagan clic en &quot;Registro&quot; para este evento.
             </p>
           </div>
         </div>

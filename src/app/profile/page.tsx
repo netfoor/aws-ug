@@ -26,7 +26,7 @@ export default function ProfilePage() {
   const [showProfessionalForm, setShowProfessionalForm] = useState(false);
 
   // Handler para guardar perfil profesional
-  async function handleSaveProfessionalProfile(data: any) {
+  async function handleSaveProfessionalProfile(data: { speakerPhotoKey?: string; speakerCvKey?: string; linkedInUrl?: string; expertiseArea?: string }) {
     if (!user) return;
 
     try {

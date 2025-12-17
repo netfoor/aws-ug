@@ -54,9 +54,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const lastRefreshTimeRef = useRef<number>(0);
   const refreshPromiseRef = useRef<Promise<void> | null>(null);
   
-  // Constantes de optimización
-  const CACHE_DURATION = 5000; // 5 segundos de cache
-  const DEBOUNCE_DELAY = 300; // 300ms de debounce
+  // Constantes de optimización - INCREASED cache duration to reduce re-renders
+  const CACHE_DURATION = 30000; // 30 segundos de cache (era 5 segundos)
+  const DEBOUNCE_DELAY = 1000; // 1 segundo de debounce (era 300ms)
   
   /**
    * Función para obtener el usuario y actualizar el estado

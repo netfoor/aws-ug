@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3️⃣ Invocar Lambda notify-admins-new-proposal
-    const outputs = await import('../../../../../amplify_outputs.json') as any;
+    const outputs = await import('../../../../../amplify_outputs.json') as { custom?: { notifyAdminsNewProposalLambdaName?: string } };
     const lambdaFunctionName = outputs.custom?.notifyAdminsNewProposalLambdaName;
     
     if (!lambdaFunctionName) {

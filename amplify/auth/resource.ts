@@ -19,12 +19,14 @@ export const auth = defineAuth({
       callbackUrls: [
         'http://localhost:3000/auth/callback',
         'https://awspuebla.com/auth/callback',
-        'https://www.awspuebla.com/auth/callback'
+        'https://www.awspuebla.com/auth/callback',
+        'https://5985037a0f39.ngrok-free.app/auth/callback'
       ],
       logoutUrls: [
         'http://localhost:3000/',
         'https://awspuebla.com/',
-        'https://www.awspuebla.com/'
+        'https://www.awspuebla.com/',
+        'https://5985037a0f39.ngrok-free.app/'
       ],
     }
   },
@@ -59,7 +61,7 @@ export const auth = defineAuth({
   groups: ['ADMINS', 'SPEAKERS', 'MEMBERS'],
   // Políticas de contraseña robustas
   accountRecovery: 'EMAIL_ONLY', // Solo email para recuperación (más seguro que SMS)
-  
+
   // 🔐 TRIGGERS: Lambdas que se ejecutan en eventos de autenticación
   triggers: {
     // PreTokenGeneration: Se ejecuta ANTES de generar tokens JWT

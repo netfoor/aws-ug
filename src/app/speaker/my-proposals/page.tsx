@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../amplify/data/resource';
@@ -11,14 +11,13 @@ import { Button } from '@/components/ui/Button';
 const client = generateClient<Schema>();
 
 type TalkProposal = Schema['TalkProposal']['type'];
-type Event = Schema['Event']['type'];
 
 /**
  * 🎤 Mis Propuestas - Página para speakers
  * 
  * Muestra todas las propuestas de charlas del speaker actual.
  */
-export default function MyProposalsPage() {
+function MyProposalsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -286,5 +285,17 @@ export default function MyProposalsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function MyProposalsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    }>
+      <MyProposalsPageContent />
+    </Suspense>
   );
 }

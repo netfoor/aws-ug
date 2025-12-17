@@ -2,7 +2,7 @@
  * Hook personalizado para manejar la lógica del ticket QR
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import { QRTokenUtils } from '@/lib/qr-config';
@@ -32,7 +32,7 @@ export function useQRTicket({ eventId, userId }: UseQRTicketOptions): UseQRTicke
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRegistration = async () => {
+  const fetchRegistration = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -55,13 +55,13 @@ export function useQRTicket({ eventId, userId }: UseQRTicketOptions): UseQRTicke
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [eventId, userId]);
 
   useEffect(() => {
     if (eventId && userId) {
       fetchRegistration();
     }
-  }, [eventId, userId]);
+  }, [eventId, userId, fetchRegistration]);
 
   // Verificar si el token QR es válido
   const hasValidToken = (() => {

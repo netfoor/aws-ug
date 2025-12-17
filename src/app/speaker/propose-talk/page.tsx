@@ -418,7 +418,7 @@ export default function ProposeTalkPage() {
                 <select
                   id="audience"
                   value={targetAudience}
-                  onChange={(e) => setTargetAudience(e.target.value as any)}
+                  onChange={(e) => setTargetAudience(e.target.value as 'ALL' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED')}
                   className="w-full mt-1 px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary theme-transition"
                   required
                 >

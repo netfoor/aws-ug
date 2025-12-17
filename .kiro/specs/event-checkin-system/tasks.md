@@ -68,6 +68,7 @@
 
 
 
+
   - Implementar validación de autenticidad de tokens QR
   - Añadir verificación de uso único (prevenir duplicados)
   - Implementar validación de evento correcto

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Clock, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -23,7 +24,6 @@ interface EventCardMinimalProps {
 }
 
 export default function EventCardMinimal({
-  id,
   title,
   slug,
   coverImageUrl,
@@ -47,16 +47,9 @@ export default function EventCardMinimal({
   const isFull = spotsLeft !== null && spotsLeft <= 0;
   const isAlmostFull = spotsLeft !== null && spotsLeft > 0 && spotsLeft <= 10;
 
-  // Load cover image URL
-  useEffect(() => {
-    if (coverImageUrl) {
-      loadCoverImageUrl();
-    }
-  }, [coverImageUrl]);
-
-  const loadCoverImageUrl = async () => {
+  const loadCoverImageUrl = useCallback(async () => {
     if (!coverImageUrl) return;
-    
+
     try {
       const urlResult = await getUrl({
         path: coverImageUrl,
@@ -69,10 +62,17 @@ export default function EventCardMinimal({
       console.warn('Error loading cover image URL:', err);
       setFullCoverImageUrl(null);
     }
-  };
+  }, [coverImageUrl]);
+
+  // Load cover image URL
+  useEffect(() => {
+    if (coverImageUrl) {
+      loadCoverImageUrl();
+    }
+  }, [coverImageUrl, loadCoverImageUrl]);
 
   return (
-    <Link 
+    <Link
       href={`/events/${slug}`}
       className="block bg-transparent hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-200"
     >
@@ -83,9 +83,11 @@ export default function EventCardMinimal({
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden flex-shrink-0">
               {speakerAvatar ? (
-                <img 
-                  src={speakerAvatar} 
+                <Image
+                  src={speakerAvatar}
                   alt={speakerName}
+                  width={20}
+                  height={20}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -135,9 +137,11 @@ export default function EventCardMinimal({
           {/* Image aligned with title */}
           <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-accent/20 to-accent/5 mt-6">
             {fullCoverImageUrl ? (
-              <img 
-                src={fullCoverImageUrl} 
+              <Image
+                src={fullCoverImageUrl}
                 alt={title}
+                width={80}
+                height={80}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -145,7 +149,7 @@ export default function EventCardMinimal({
                 <span className="text-2xl">🎯</span>
               </div>
             )}
-            
+
             {/* Status badge */}
             {isFull && (
               <div className="absolute top-1 right-1 bg-red-500 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded-full">

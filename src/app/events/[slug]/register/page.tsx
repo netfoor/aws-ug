@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
 import { getUrl } from 'aws-amplify/storage';
@@ -34,7 +34,7 @@ export default function EventRegistrationPage() {
 
   const [event, setEvent] = useState<EventType | null>(null);
   const [questions, setQuestions] = useState<RegistrationQuestion[]>([]);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, string | boolean | string[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,14 +47,7 @@ export default function EventRegistrationPage() {
     }
   }, [authLoading, isAuthenticated, router, slug]);
 
-  useEffect(() => {
-    if (slug && isAuthenticated) {
-      loadEventAndQuestions();
-      checkIfAlreadyRegistered();
-    }
-  }, [slug, isAuthenticated]);
-
-  async function loadEventAndQuestions() {
+  const loadEventAndQuestions = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -97,7 +90,7 @@ export default function EventRegistrationPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [slug]);
 
   async function loadCoverImage(imagePath: string) {
     try {
@@ -114,7 +107,7 @@ export default function EventRegistrationPage() {
     }
   }
 
-  async function checkIfAlreadyRegistered() {
+  const checkIfAlreadyRegistered = useCallback(async () => {
     if (!user?.userId || !event?.id) return;
 
     try {
@@ -133,9 +126,16 @@ export default function EventRegistrationPage() {
     } catch (err) {
       console.error('Error checking registration:', err);
     }
-  }
+  }, [user?.userId, event?.id]);
 
-  const handleAnswerChange = (questionId: string, value: any) => {
+  useEffect(() => {
+    if (slug && isAuthenticated) {
+      loadEventAndQuestions();
+      checkIfAlreadyRegistered();
+    }
+  }, [slug, isAuthenticated, loadEventAndQuestions, checkIfAlreadyRegistered]);
+
+  const handleAnswerChange = (questionId: string, value: string | boolean | string[]) => {
     setAnswers(prev => ({
       ...prev,
       [questionId]: value
@@ -143,7 +143,8 @@ export default function EventRegistrationPage() {
   };
 
   const handleCheckboxChange = (questionId: string, option: string, checked: boolean) => {
-    const currentValues = answers[questionId] || [];
+    const currentAnswer = answers[questionId];
+    const currentValues = Array.isArray(currentAnswer) ? currentAnswer : [];
     let newValues: string[];
 
     if (checked) {
@@ -196,7 +197,7 @@ export default function EventRegistrationPage() {
       setIsSubmitting(true);
 
       // Generar un ID temporal para el QR token
-      const tempRegistrationId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const tempRegistrationId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
       // Generar QR token con ID temporal
       const qrToken = QRTokenUtils.generateToken({
@@ -218,7 +219,7 @@ export default function EventRegistrationPage() {
         checkedIn: false,
       });
 
-      if (regErrors || !registration) {
+      if (regErrors || !registration || !registration.id) {
         console.error('Registration errors:', regErrors);
         console.error('Registration data attempted:', {
           eventId: event.id,
@@ -235,8 +236,18 @@ export default function EventRegistrationPage() {
         return;
       }
 
-      // El QR token con ID temporal es suficiente y único
-      // No necesitamos actualizarlo ya que funciona correctamente
+      // Actualizar el QR token con el ID real del registro
+      const finalQrToken = QRTokenUtils.generateToken({
+        eventId: event.id,
+        userId: user.userId,
+        registrationId: registration.id, // Ahora sabemos que no es null
+      });
+
+      // Actualizar el registro con el token correcto
+      await client.models.EventRegistration.update({
+        id: registration.id,
+        qrCodeToken: finalQrToken,
+      });
 
       // Actualizar contador de registros en el evento
       const newGoingCount = (event.goingCount || 0) + 1;
@@ -387,7 +398,7 @@ export default function EventRegistrationPage() {
               </div>
             ) : (
               <div className="space-y-6">
-                {questions.map((question, index) => (
+                {questions.map((question) => (
                   <div key={question.id}>
                     <label className="block text-sm font-medium text-text-primary mb-2">
                       {question.label}
@@ -396,7 +407,7 @@ export default function EventRegistrationPage() {
 
                     {question.type === 'textarea' ? (
                       <textarea
-                        value={answers[question.id] || ''}
+                        value={typeof answers[question.id] === 'string' ? answers[question.id] as string : ''}
                         onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                         placeholder={question.placeholder}
                         required={question.required}
@@ -404,25 +415,25 @@ export default function EventRegistrationPage() {
                       />
                     ) : question.type === 'select' ? (
                       <select
-                        value={answers[question.id] || ''}
+                        value={typeof answers[question.id] === 'string' ? answers[question.id] as string : ''}
                         onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                         required={question.required}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
                       >
                         <option value="">Selecciona una opción...</option>
-                        {(question.options || []).map((option, idx) => (
-                          <option key={idx} value={option}>
+                        {(question.options || []).map((option) => (
+                          <option key={option} value={option}>
                             {option}
                           </option>
                         ))}
                       </select>
                     ) : question.type === 'checkbox' ? (
                       <div className="space-y-3">
-                        {(question.options || []).map((option, idx) => (
-                          <label key={idx} className="flex items-center gap-3 cursor-pointer group">
+                        {(question.options || []).map((option) => (
+                          <label key={option} className="flex items-center gap-3 cursor-pointer group">
                             <input
                               type="checkbox"
-                              checked={(answers[question.id] || []).includes(option)}
+                              checked={Array.isArray(answers[question.id]) ? (answers[question.id] as string[]).includes(option) : false}
                               onChange={(e) => handleCheckboxChange(question.id, option, e.target.checked)}
                               className="w-4 h-4 text-accent rounded focus:ring-accent"
                             />
@@ -435,7 +446,7 @@ export default function EventRegistrationPage() {
                     ) : (
                       <Input
                         type={question.type}
-                        value={answers[question.id] || ''}
+                        value={typeof answers[question.id] === 'string' ? answers[question.id] as string : ''}
                         onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                         placeholder={question.placeholder}
                         required={question.required}

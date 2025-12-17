@@ -71,7 +71,7 @@ declare module 'qr-scanner' {
           width: number;
           height: number;
         };
-        qrEngine?: any;
+        qrEngine?: unknown;
         canvas?: HTMLCanvasElement;
         disallowCanvasResizing?: boolean;
         alsoTryWithoutScanRegion?: boolean;

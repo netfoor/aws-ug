@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '../../../amplify/data/resource';
@@ -41,11 +41,7 @@ export default function EventsPage() {
   // Map de eventId -> contador real de asistentes
   const [attendeeCounts, setAttendeeCounts] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    loadEvents();
-  }, []);
-
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     if (typeof window === 'undefined') return; // Solo ejecutar en cliente
     
     try {
@@ -86,7 +82,11 @@ export default function EventsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
 
   const loadCoverImages = async (eventsList: Event[]) => {
     const urls: Record<string, string> = {};

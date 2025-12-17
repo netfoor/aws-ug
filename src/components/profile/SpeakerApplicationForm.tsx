@@ -8,7 +8,7 @@ import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { Label } from '../ui/Label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card';
-import { Loader2, Plus, X, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { Loader2, Plus, X, CheckCircle, XCircle } from 'lucide-react';
 
 const client = generateClient<Schema>();
 
@@ -99,9 +99,10 @@ export default function SpeakerApplicationForm({
       } else {
         throw new Error('Error al crear la aplicación');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error submitting application:', err);
-      setError(err.message || 'Error al enviar la postulación');
+      const error = err as { message?: string };
+      setError(error.message || 'Error al enviar la postulación');
     } finally {
       setLoading(false);
     }

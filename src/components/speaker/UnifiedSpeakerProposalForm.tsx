@@ -713,7 +713,7 @@ export default function UnifiedSpeakerProposalForm({
               <select
                 id="targetAudience"
                 value={formData.targetAudience}
-                onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value as 'ALL' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' })}
                 className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
               >
                 <option value="ALL">Todos los niveles</option>

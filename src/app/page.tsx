@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { useUserData, getUserInitials, getFullName } from '@/hooks/useUserData';
 import Link from 'next/link';
 import { ChevronRight, Calendar } from 'lucide-react';
 import { generateClient } from 'aws-amplify/data';
@@ -17,19 +16,12 @@ const client = generateClient<Schema>();
 type EventType = Schema['Event']['type'];
 
 export default function Home() {
-  const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
-  const { userData } = useUserData();
+  const { isAuthenticated } = useAuth();
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'upcoming' | 'past'>('upcoming');
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchEvents();
-    }
-  }, [filter, isAuthenticated]);
-
-  async function fetchEvents() {
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
       const now = new Date().toISOString();
@@ -58,7 +50,13 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [filter]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchEvents();
+    }
+  }, [filter, isAuthenticated, fetchEvents]);
 
   // Empty state component
   const EmptyState = () => (

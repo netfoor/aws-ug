@@ -1,21 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
 import { uploadData } from 'aws-amplify/storage';
 import type { Schema } from '../../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
-import { useUserData, getFullName } from '@/hooks/useUserData';
+import { getFullName } from '@/hooks/useUserData';
 import { 
   Loader2, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Clock,
   Upload,
   X,
-  Image as ImageIcon,
   ArrowLeft,
   Save
 } from 'lucide-react';
@@ -83,11 +78,7 @@ export default function CreateEventPage() {
     }
   }, [isAdmin, authLoading, router]);
 
-  useEffect(() => {
-    loadSpeakers();
-  }, []);
-
-  const loadSpeakers = async () => {
+  const loadSpeakers = useCallback(async () => {
     try {
       setLoadingSpeakers(true);
       
@@ -111,7 +102,11 @@ export default function CreateEventPage() {
     } finally {
       setLoadingSpeakers(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadSpeakers();
+  }, [loadSpeakers]);
 
   const handleAddTopic = () => {
     if (topicInput.trim() && !topics.includes(topicInput.trim())) {
@@ -319,7 +314,7 @@ export default function CreateEventPage() {
               coverImageUrl: coverUrl,
             });
           }
-        } catch (uploadErr) {
+        } catch {
           // No fallar si falla el upload, el evento ya está creado
         }
       }
@@ -338,7 +333,7 @@ export default function CreateEventPage() {
           createdAt: new Date().toISOString(),
             owner: speakerApp.userId,
           });
-        } catch (notifErr) {
+        } catch {
           // No bloquear si falla la notificación
         }
       }
@@ -425,7 +420,7 @@ export default function CreateEventPage() {
               <select
                 id="eventType"
                 value={eventType}
-                onChange={(e) => setEventType(e.target.value as any)}
+                onChange={(e) => setEventType(e.target.value as 'TALK' | 'WORKSHOP' | 'MEETUP' | 'NETWORKING')}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="TALK">Charla/Talk</option>
@@ -732,7 +727,7 @@ export default function CreateEventPage() {
               <select
                 id="status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
+                onChange={(e) => setStatus(e.target.value as 'DRAFT' | 'PUBLISHED')}
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="DRAFT">Borrador (no visible)</option>

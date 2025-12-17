@@ -10,10 +10,7 @@ import {
   Calendar, 
   MapPin, 
   Users, 
-  Clock,
   Eye,
-  Edit,
-  Trash2,
   CheckCircle,
   XCircle,
   Plus
@@ -88,7 +85,7 @@ export default function AdminEventsPage() {
 
     setIsProcessing(true);
     try {
-      const { data, errors } = await client.models.Event.update({
+      const { errors } = await client.models.Event.update({
         id: eventId,
         status: 'PUBLISHED',
         publishedAt: new Date().toISOString(),
@@ -116,7 +113,7 @@ export default function AdminEventsPage() {
 
     setIsProcessing(true);
     try {
-      const { data, errors } = await client.models.Event.update({
+      const { errors } = await client.models.Event.update({
         id: eventId,
         status: 'CANCELLED',
       });

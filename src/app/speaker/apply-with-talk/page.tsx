@@ -11,6 +11,29 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 
 const client = generateClient<Schema>();
 
+interface UnifiedFormData {
+  givenName: string;
+  familyName: string;
+  email: string;
+  phoneNumber: string;
+  company: string;
+  jobTitle: string;
+  expertiseArea: string;
+  photoFile: File | null;
+  photoKey: string | null;
+  cvFile: File | null;
+  cvKey: string | null;
+  linkedInUrl: string;
+  motivation: string;
+  experience: string;
+  topics: string[];
+  talkTitle: string;
+  talkDescription: string;
+  duration: number;
+  targetAudience: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL';
+  proposedDate: Date | null;
+}
+
 export default function ApplyWithTalkPage() {
   const router = useRouter();
   const { user, userAttributes, isLoading: authLoading } = useAuth();
@@ -21,7 +44,7 @@ export default function ApplyWithTalkPage() {
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Check if user has access
+  // Check if user has access - OPTIMIZED to prevent constant re-renders
   useEffect(() => {
     async function checkAccess() {
       if (authLoading || profileLoading) return;
@@ -71,10 +94,13 @@ export default function ApplyWithTalkPage() {
       }
     }
 
-    checkAccess();
-  }, [user, userAttributes, authLoading, profileLoading, profile?.role, router]);
+    // Only run when we have stable user data and not loading
+    if (!authLoading && !profileLoading && user?.userId && userAttributes?.email) {
+      checkAccess();
+    }
+  }, [user?.userId, userAttributes?.email, profile?.role, authLoading, profileLoading]);
 
-  async function handleSubmit(formData: any) {
+  async function handleSubmit(formData: UnifiedFormData) {
     if (!user) return;
 
     const userEmail = (userAttributes?.email as string) || '';

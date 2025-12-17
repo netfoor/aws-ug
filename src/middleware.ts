@@ -7,7 +7,7 @@ const PROTECTED_ROUTES = ['/profile', '/dashboard', '/admin'];
 const ADMIN_ROUTES = ['/admin'];
 
 // Rutas públicas (no requieren autenticación)
-const PUBLIC_ROUTES = ['/', '/login', '/auth/callback', '/access-denied'];
+const PUBLIC_ROUTES = ['/', '/login', '/auth/callback', '/access-denied', '/onboarding'];
 
 /**
  * Verifica si una ruta comienza con alguno de los prefijos dados
@@ -65,7 +65,26 @@ export async function middleware(request: NextRequest) {
 
       return NextResponse.next();
     } catch (error) {
-      console.error('Error en middleware:', error);
+      console.error('Error en middleware:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        pathname,
+        url: request.url,
+        host: request.headers.get('host')
+      });
+      
+      // DEVELOPMENT ONLY: Handle ngrok testing issues
+      const host = request.headers.get('host') || '';
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const ngrokMode = process.env.ENABLE_NGROK_MODE === 'true';
+      const isNgrok = host.includes('ngrok');
+      const isNetworkError = error instanceof Error && 
+        (error.message.includes('fetch failed') || error.message.includes('timeout'));
+      
+      if (isDevelopment && ngrokMode && (isNgrok || isNetworkError)) {
+        console.log('🔓 DEV: Middleware bypassed for ngrok testing:', pathname);
+        return NextResponse.next();
+      }
+      
       const loginUrl = new URL('/login?error=session_error', request.url);
       return NextResponse.redirect(loginUrl);
     }

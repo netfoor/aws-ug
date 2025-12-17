@@ -35,7 +35,7 @@ export default function SpeakerApplicationStatus({ userId }: SpeakerApplicationS
           }
         },
         limit: 1,
-        // @ts-ignore - sortDirection existe pero TypeScript no lo reconoce
+        // @ts-expect-error - sortDirection existe pero TypeScript no lo reconoce
         sortDirection: 'DESC'
       });
 

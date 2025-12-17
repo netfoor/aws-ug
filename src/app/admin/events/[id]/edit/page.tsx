@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
-import { Loader2, Save, X, Calendar, MapPin, Users, Image as ImageIcon, Link as LinkIcon, Tag, FileText } from 'lucide-react';
+import { Loader2, Save, X, Calendar, MapPin, Users, Image as ImageIcon, Tag, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
@@ -38,7 +38,7 @@ interface EventFormData {
 export default function EditEventPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, isAdmin } = useAuth();
+  const { isLoading: authLoading, isAdmin } = useAuth();
   const eventId = params?.id as string;
 
   const [event, setEvent] = useState<EventType | null>(null);
@@ -124,7 +124,7 @@ export default function EditEventPage() {
     }
   }
 
-  const handleInputChange = (field: keyof EventFormData, value: any) => {
+  const handleInputChange = (field: keyof EventFormData, value: string | number | boolean | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setSuccessMessage(null);
   };
@@ -188,7 +188,7 @@ export default function EditEventPage() {
       }
 
       // Actualizar evento
-      const { data: updatedEvent, errors: updateErrors } = await client.models.Event.update({
+      const { errors: updateErrors } = await client.models.Event.update({
         id: eventId,
         title: formData.title,
         description: formData.description,
@@ -531,7 +531,7 @@ export default function EditEventPage() {
                   <Input
                     type="number"
                     value={formData.maxAttendees || ''}
-                    onChange={(e) => handleInputChange('maxAttendees', parseInt(e.target.value) || null)}
+                    onChange={(e) => handleInputChange('maxAttendees', e.target.value ? parseInt(e.target.value) : '')}
                     placeholder="50"
                     min="1"
                   />

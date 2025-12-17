@@ -90,7 +90,7 @@ export default function TalkProposalsAdminPage() {
         return;
       }
 
-      const { data, errors } = await client.models.TalkProposal.update({
+      const { errors } = await client.models.TalkProposal.update({
         id: proposalId,
         status: 'APPROVED',
         reviewedBy: user.userId,
@@ -116,7 +116,7 @@ export default function TalkProposalsAdminPage() {
           createdAt: new Date().toISOString(),
             owner: proposal.userId,
           });
-        } catch (notifyError) {
+        } catch {
           // No bloquear si falla la notificación
         }      // Recargar lista
       await loadProposals();
@@ -135,7 +135,7 @@ export default function TalkProposalsAdminPage() {
 
     setIsProcessing(true);
     try {
-      const { data, errors } = await client.models.TalkProposal.update({
+      const { errors } = await client.models.TalkProposal.update({
         id: selectedProposal.id,
         status: 'REJECTED',
         reviewedBy: user.userId,

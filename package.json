@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:mobile": "next dev --turbopack --hostname 0.0.0.0",
+    "dev:ngrok": "cross-env ENABLE_NGROK_MODE=true next dev --turbopack",
     "build": "node scripts/validate-config.js && next build --turbopack",
     "start": "next start",
     "lint": "eslint",
@@ -52,6 +54,7 @@
     "@types/react-dom": "^19",
     "aws-cdk-lib": "^2.204.0",
     "constructs": "^10.4.2",
+    "cross-env": "^10.1.0",
     "esbuild": "^0.25.10",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",

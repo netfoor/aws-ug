@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import { useAuth } from '@/context/auth-context';
 import { getUserRoleFromCognito } from '@/lib/amplify/auth';
@@ -38,7 +38,7 @@ export function useUserProfile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user?.userId) return;
     
     setLoading(true);
@@ -60,7 +60,7 @@ export function useUserProfile() {
               parsedSocialLinks = JSON.parse(userData.socialLinks);
             } else {
               // Si ya es objeto (por alguna razón), usarlo directamente
-              parsedSocialLinks = userData.socialLinks as any;
+              parsedSocialLinks = userData.socialLinks as Record<string, string>;
             }
           } catch (e) {
             console.error('Error parsing socialLinks:', e);
@@ -109,7 +109,7 @@ export function useUserProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.userId, userAttributes]);
 
   const updateProfile = async (updatedProfile: Partial<UserProfile>) => {
     if (!user?.userId) {
@@ -138,7 +138,7 @@ export function useUserProfile() {
       };
 
       // Campos opcionales - IMPORTANTE: Solo incluir si tienen valores válidos
-      const optionalFields: any = {};
+      const optionalFields: Record<string, unknown> = {};
       
       // Phone number
       if (updatedProfile.phoneNumber || profile?.phoneNumber) {
@@ -197,10 +197,10 @@ export function useUserProfile() {
       // IMPORTANTE: Verificar si hay errores en la respuesta
       if (result.errors && result.errors.length > 0) {
         console.error('❌ Error en la operación de DynamoDB:', result.errors);
-        result.errors.forEach((error: any, index: number) => {
+        result.errors.forEach((error, index) => {
           console.error(`Error ${index + 1}:`, {
             message: error.message,
-            errorType: error.errorType,
+            errorType: (error as { errorType?: string }).errorType,
             path: error.path,
             locations: error.locations
           });
@@ -240,10 +240,11 @@ export function useUserProfile() {
   };
 
   useEffect(() => {
-    if (user?.userId) {
+    // Only fetch profile once when user ID is available and we don't have a profile yet
+    if (user?.userId && !profile && !loading) {
       fetchProfile();
     }
-  }, [user?.userId]);
+  }, [user?.userId]); // Removed fetchProfile from dependencies to prevent loops
 
   return {
     profile,

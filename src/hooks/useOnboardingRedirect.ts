@@ -27,9 +27,9 @@ export function useOnboardingRedirect() {
     // No hacer nada si está cargando o no hay usuario
     if (authLoading || !user) return;
 
-    // No redirigir si ya está en onboarding o en páginas públicas
-    const publicPaths = ['/onboarding', '/login', '/auth/callback', '/'];
-    if (publicPaths.includes(pathname)) return;
+    // No redirigir si ya está en onboarding o en páginas de autenticación
+    const excludedPaths = ['/onboarding', '/login', '/auth/callback'];
+    if (excludedPaths.includes(pathname)) return;
 
     // Verificar estado de onboarding
     const checkOnboarding = async () => {

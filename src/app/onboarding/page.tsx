@@ -48,24 +48,26 @@ export default function OnboardingPage() {
     { value: 'CONTENT', label: '💡 Contenido técnico interesante' },
   ];
 
-  // Pre-llenar con datos de Cognito
+  // Pre-llenar con datos de Cognito (solo una vez al montar)
   useEffect(() => {
     if (userAttributes) {
-      // Pre-llenar nombre si viene de Cognito
-      if (userAttributes.given_name && !givenName) {
+      // Pre-llenar nombre si viene de Cognito (solo si no se ha inicializado)
+      if (userAttributes.given_name && givenName === '') {
         setGivenName(userAttributes.given_name as string);
       }
-      if (userAttributes.family_name && !familyName) {
+      if (userAttributes.family_name && familyName === '') {
         setFamilyName(userAttributes.family_name as string);
       }
-      // Pre-llenar teléfono si viene de Cognito
+      // Pre-llenar teléfono si viene de Cognito (solo si está en el valor inicial)
       if (userAttributes.phone_number && phoneNumber === '+52 ') {
         const phone = userAttributes.phone_number as string;
         // Si ya tiene el +52, úsalo; si no, agrégalo
         setPhoneNumber(phone.startsWith('+52') ? phone : `+52 ${phone}`);
       }
     }
-  }, [userAttributes, givenName, familyName, phoneNumber]);
+  }, [userAttributes]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Nota: Intencionalmente no incluimos givenName, familyName, phoneNumber como dependencias
+  // para evitar que se re-ejecute cuando el usuario edita los campos
 
   useEffect(() => {
     // Si el usuario ya completó onboarding, redirigir
@@ -75,7 +77,7 @@ export default function OnboardingPage() {
       try {
         const { data: userData } = await client.models.User.get({ id: user.userId });
         if (userData?.profileCompleted) {
-          router.push('/dashboard');
+          router.push('/');
         }
       } catch (err) {
         console.error('Error verificando estado de onboarding:', err);
@@ -335,7 +337,7 @@ export default function OnboardingPage() {
                         name="awsExperienceLevel"
                         value={option.value}
                         checked={awsExperienceLevel === option.value}
-                        onChange={(e) => setAwsExperienceLevel(e.target.value as any)}
+                        onChange={(e) => setAwsExperienceLevel(e.target.value as 'PROFESSIONAL' | 'PERSONAL' | 'NONE' | 'LEARNING')}
                         className="w-4 h-4 text-accent"
                       />
                       <span className="text-sm text-text-primary">{option.label}</span>

@@ -121,7 +121,7 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
     }
   };
 
-  const handleInputChange = (field: keyof UserProfile, value: any) => {
+  const handleInputChange = (field: keyof UserProfile, value: string | boolean | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

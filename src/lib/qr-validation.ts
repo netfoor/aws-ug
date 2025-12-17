@@ -69,14 +69,43 @@ export class QRValidator {
             }
 
             // 3. Buscar el registro en la base de datos
+            console.log('🔍 Looking for registration with ID:', tokenData.registrationId);
             const { data: registration } = await client.models.EventRegistration.get({
                 id: tokenData.registrationId
             });
 
+            console.log('📋 Registration found:', registration ? 'Yes' : 'No');
+            if (registration) {
+                console.log('📋 Registration details:', {
+                    id: registration.id,
+                    eventId: registration.eventId,
+                    userId: registration.userId,
+                    status: registration.status,
+                    checkedIn: registration.checkedIn
+                });
+            }
+
             if (!registration) {
+                console.error('❌ Registration not found. Token data:', tokenData);
+                console.error('❌ Searched for ID:', tokenData.registrationId);
+                
+                // Try to find registration by other means for debugging
+                try {
+                    const { data: allRegistrations } = await client.models.EventRegistration.registrationsByEvent({
+                        eventId: expectedEventId,
+                    });
+                    console.log('📊 Total registrations in event:', allRegistrations?.length || 0);
+                    
+                    if (allRegistrations && allRegistrations.length > 0) {
+                        console.log('📊 Sample registration IDs:', allRegistrations.slice(0, 3).map(r => r.id));
+                    }
+                } catch (debugError) {
+                    console.error('Debug query failed:', debugError);
+                }
+                
                 return {
                     isValid: false,
-                    error: 'Registro no encontrado'
+                    error: `Registro no encontrado (ID: ${tokenData.registrationId.substring(0, 8)}...)`
                 };
             }
 
