@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { QRTicketModal, TicketStatus } from '@/components/events';
 import { useQRTicket } from '@/hooks';
+import { getIconColors } from '@/lib/iconColorUtils';
 
 const client = generateClient<Schema>();
 
@@ -312,8 +313,8 @@ export default function EventDetailsPage() {
                 onClick={() => router.push(`/admin/events/${event.id}/questions`)}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-hover hover:bg-border transition-colors"
               >
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div className={`w-10 h-10 rounded-full ${getIconColors('blue').bgColor} flex items-center justify-center`}>
+                  <MessageSquare className={`w-5 h-5 ${getIconColors('blue').textColor}`} />
                 </div>
                 <span className="text-xs font-medium text-text-primary">Preguntas</span>
               </button>
@@ -322,8 +323,8 @@ export default function EventDetailsPage() {
                 onClick={() => router.push(`/admin/events/${event.id}/edit`)}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-hover hover:bg-border transition-colors"
               >
-                <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                  <Edit className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                <div className={`w-10 h-10 rounded-full ${getIconColors('orange').bgColor} flex items-center justify-center`}>
+                  <Edit className={`w-5 h-5 ${getIconColors('orange').textColor}`} />
                 </div>
                 <span className="text-xs font-medium text-text-primary">Editar</span>
               </button>
@@ -332,8 +333,8 @@ export default function EventDetailsPage() {
                 onClick={() => router.push(`/admin/events/${event.id}/attendees`)}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-hover hover:bg-border transition-colors"
               >
-                <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <UserPlus className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <div className={`w-10 h-10 rounded-full ${getIconColors('purple').bgColor} flex items-center justify-center`}>
+                  <UserPlus className={`w-5 h-5 ${getIconColors('purple').textColor}`} />
                 </div>
                 <span className="text-xs font-medium text-text-primary">Invitados</span>
               </button>
@@ -361,8 +362,8 @@ export default function EventDetailsPage() {
               onClick={handleContact}
               className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-hover hover:bg-border transition-colors"
             >
-              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30   flex items-center justify-center">
-                <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className={`w-10 h-10 rounded-full ${getIconColors('blue').bgColor} flex items-center justify-center`}>
+                <Mail className={`w-5 h-5 ${getIconColors('blue').textColor}`} />
               </div>
               <span className="text-xs font-medium text-text-primary">Contacto</span>
             </button>
@@ -371,8 +372,8 @@ export default function EventDetailsPage() {
               onClick={handleShare}
               className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-hover hover:bg-border transition-colors"
             >
-              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <Share2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <div className={`w-10 h-10 rounded-full ${getIconColors('green').bgColor} flex items-center justify-center`}>
+                <Share2 className={`w-5 h-5 ${getIconColors('green').textColor}`} />
               </div>
               <span className="text-xs font-medium text-text-primary">Compartir</span>
             </button>
@@ -381,8 +382,8 @@ export default function EventDetailsPage() {
               onClick={handleAddToCalendar}
               className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-hover hover:bg-border transition-colors"
             >
-              <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <Plus className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <div className={`w-10 h-10 rounded-full ${getIconColors('purple').bgColor} flex items-center justify-center`}>
+                <Plus className={`w-5 h-5 ${getIconColors('purple').textColor}`} />
               </div>
               <span className="text-xs font-medium text-text-primary">Agregar</span>
             </button>
