@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { AdminDateSelector } from './AdminDateSelector';
 import { 
   CheckCircle, 
-  Calendar, 
-  Clock, 
+  Clock,
   MapPin, 
   Users, 
   AlertCircle,
@@ -119,37 +119,15 @@ export function EventCreationWizard({
           <p className="text-sm font-semibold text-text-primary">{talkTitle}</p>
         </div>
 
-        {/* Event Date */}
-        <div>
-          <label htmlFor="eventDate" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-2">
-            <Calendar className="w-3.5 h-3.5 text-accent" />
-            Fecha del Evento
-          </label>
-          <input
-            id="eventDate"
-            type="date"
-            value={formData.eventDate}
-            onChange={(e) => setFormData(prev => ({ ...prev, eventDate: e.target.value }))}
-            required
-            className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
-          />
-        </div>
-
-        {/* Event Time */}
-        <div>
-          <label htmlFor="eventTime" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-2">
-            <Clock className="w-3.5 h-3.5 text-accent" />
-            Hora
-          </label>
-          <input
-            id="eventTime"
-            type="time"
-            value={formData.eventTime}
-            onChange={(e) => setFormData(prev => ({ ...prev, eventTime: e.target.value }))}
-            required
-            className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
-          />
-        </div>
+        {/* Date & Time Selector - Deshabilita fechas ocupadas */}
+        <AdminDateSelector
+          selectedDate={formData.eventDate}
+          selectedTime={formData.eventTime}
+          onDateChange={(date) => setFormData(prev => ({ ...prev, eventDate: date }))}
+          onTimeChange={(time) => setFormData(prev => ({ ...prev, eventTime: time }))}
+          currentProposalId={talkProposalId}
+          disabled={loading}
+        />
 
         {/* Location */}
         <div>
