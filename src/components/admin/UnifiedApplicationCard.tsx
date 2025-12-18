@@ -20,6 +20,7 @@ import {
   FileText,
   XCircle,
   Sparkles,
+  Linkedin,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
@@ -200,7 +201,18 @@ export function UnifiedApplicationCard({
     <div className="bg-surface rounded-lg border-2 border-accent/30 shadow-lg hover:shadow-xl transition-all theme-transition overflow-hidden">
       {/* Header - Siempre visible */}
       <div className="p-4 sm:p-6">
-        <div className="flex items-start gap-3 sm:gap-4">
+        {/* Mobile: Badge y tiempo primero */}
+        <div className="flex items-start justify-between gap-2 mb-4 sm:hidden">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/50 text-amber-800 text-[10px] font-bold rounded-full whitespace-nowrap">
+            <Rocket className="w-3 h-3 flex-shrink-0" />
+            PROPUESTA
+          </span>
+          <span className="text-[10px] text-text-secondary whitespace-nowrap">
+            {formatDate(application.submittedAt)}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3 sm:gap-4">
           {/* Avatar/Photo */}
           <div className="flex-shrink-0">
             {professionalProfile?.photoKey ? (
@@ -225,24 +237,65 @@ export function UnifiedApplicationCard({
                     ? `${professionalProfile.givenName} ${professionalProfile.familyName}`
                     : application.email}
                 </h3>
-                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1 sm:gap-3 text-xs sm:text-sm text-text-secondary">
-                  <span className="flex items-center gap-1 truncate">
-                    <Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                    <span className="truncate">{application.email}</span>
-                  </span>
-                  {professionalProfile?.company && (
+                {/* Info compacta para móvil */}
+                <div className="flex flex-col gap-1 text-xs sm:text-sm text-text-secondary">
+                  {/* Puesto @ Empresa */}
+                  {professionalProfile?.jobTitle && professionalProfile?.company ? (
+                    <span className="truncate font-medium">
+                      {professionalProfile.jobTitle} @ {professionalProfile.company}
+                    </span>
+                  ) : professionalProfile?.company ? (
                     <span className="flex items-center gap-1 truncate">
                       <Building className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                       <span className="truncate">{professionalProfile.company}</span>
                     </span>
-                  )}
+                  ) : null}
+                  
+                  {/* Fila de contacto */}
+                  <div className="flex items-center gap-3 sm:gap-4 flex-wrap mt-0.5">
+                    {/* Email como icono en móvil, texto en desktop */}
+                    <a 
+                      href={`mailto:${application.email}`}
+                      className="flex items-center justify-center p-1.5 rounded-lg hover:bg-accent/10 text-accent hover:text-accent-dark transition-colors"
+                      title={application.email}
+                    >
+                      <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                      <span className="hidden sm:inline truncate max-w-[200px] ml-1.5">{application.email}</span>
+                    </a>
+                    
+                    {/* Teléfono */}
+                    {professionalProfile?.phoneNumber && (
+                      <a 
+                        href={`tel:${professionalProfile.phoneNumber}`}
+                        className="flex items-center justify-center p-1.5 rounded-lg hover:bg-secondary/50 hover:text-text-primary transition-colors"
+                        title={professionalProfile.phoneNumber}
+                      >
+                        <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                        <span className="hidden sm:inline ml-1.5">{professionalProfile.phoneNumber}</span>
+                      </a>
+                    )}
+                    
+                    {/* LinkedIn */}
+                    {professionalProfile?.linkedInUrl && (
+                      <a
+                        href={professionalProfile.linkedInUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                        title="Ver LinkedIn"
+                      >
+                        <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                        <span className="hidden sm:inline text-xs ml-1.5">LinkedIn</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              {/* Badges */}
-              <div className="flex flex-col items-end gap-1 sm:gap-2 flex-shrink-0">
-                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 text-[10px] sm:text-xs font-bold rounded-full whitespace-nowrap">
-                  <Rocket className="w-3 h-3" />
+              {/* Badges - Solo desktop */}
+              <div className="hidden sm:flex flex-col items-end gap-1 sm:gap-2 flex-shrink-0">
+                <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 bg-amber-100 dark:bg-amber-900/50 text-amber-800 text-[10px] sm:text-xs font-bold rounded-full whitespace-nowrap">
+                  <Rocket className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                   PROPUESTA
                 </span>
                 <span className="text-[10px] sm:text-xs text-text-secondary whitespace-nowrap">
@@ -250,59 +303,60 @@ export function UnifiedApplicationCard({
                 </span>
               </div>
             </div>
-
-            {/* Preview de la propuesta */}
-            {attachedProposal && (
-              <div className="mt-3 p-3 sm:p-4 bg-accent/5 border border-accent/20 rounded-lg">
-                <div className="flex items-start justify-between gap-2 sm:gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2 mb-2">
-                      <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-accent flex-shrink-0 mt-0.5" />
-                      <h4 className="font-semibold text-sm sm:text-base text-text-primary line-clamp-2">
-                        {attachedProposal.talkTitle}
-                      </h4>
-                    </div>
-                    <p className="text-xs sm:text-sm text-text-secondary line-clamp-2">
-                      {attachedProposal.talkDescription}
-                    </p>
-                    <div className="flex flex-wrap gap-2 sm:gap-3 mt-2 text-[10px] sm:text-xs text-text-secondary">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 flex-shrink-0" />
-                        {attachedProposal.duration} min
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <UsersIcon className="w-3 h-3 flex-shrink-0" />
-                        <span className="truncate">{targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience}</span>
-                      </span>
-                      {attachedProposal.proposedDate && (
-                        <span className="hidden sm:flex items-center gap-1">
-                          <Calendar className="w-3 h-3 flex-shrink-0" />
-                          {new Date(attachedProposal.proposedDate).toLocaleDateString('es-MX', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="p-1 sm:p-2 hover:bg-accent/10 rounded-lg transition-colors flex-shrink-0"
-                    aria-label={isExpanded ? 'Ocultar detalles' : 'Ver detalles'}
-                  >
-                    {isExpanded ? (
-                      <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Preview de la propuesta - Ocupa todo el ancho */}
+        {attachedProposal && (
+          <div className="mt-4 sm:mt-5 p-3 sm:p-4 bg-accent/5 border border-accent/20 rounded-lg">
+            <div className="flex items-start justify-between gap-2 sm:gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start gap-2 mb-2">
+                  <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-accent flex-shrink-0 mt-0.5" />
+                  <h4 className="font-semibold text-sm sm:text-base text-text-primary line-clamp-2">
+                    {attachedProposal.talkTitle}
+                  </h4>
+                </div>
+                <p className="text-xs sm:text-sm text-text-secondary line-clamp-2">
+                  {attachedProposal.talkDescription}
+                </p>
+                <div className="flex flex-wrap gap-2 sm:gap-3 mt-2 text-[10px] sm:text-xs text-text-secondary">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 flex-shrink-0" />
+                    {attachedProposal.duration} min
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <UsersIcon className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience}</span>
+                  </span>
+                  {attachedProposal.proposedDate && (
+                    <span className="flex items-center gap-1 font-medium text-accent">
+                      <Calendar className="w-3 h-3 flex-shrink-0" />
+                      {new Date(attachedProposal.proposedDate).toLocaleDateString('es-MX', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="p-1 sm:p-2 hover:bg-accent/10 rounded-lg transition-colors flex-shrink-0"
+                aria-label={isExpanded ? 'Ocultar detalles' : 'Ver detalles'}
+              >
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+                )}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Acciones principales - Cambian según wizard step */}
         {wizardStep === 'pending' && !showRejectForm && (
