@@ -21,6 +21,18 @@ export function Navigation({ className }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
+  // Bloquear scroll del body cuando el menú está abierto
+  React.useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
   // ✅ Obtener rol desde User table
   const isSpeaker = userData?.role === 'SPEAKER' || userData?.role === 'ADMIN';
 
@@ -137,7 +149,7 @@ export function Navigation({ className }: NavigationProps) {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-surface border-t border-border md:hidden z-50 h-[calc(100vh-4rem)] flex flex-col">
+          <div className="absolute top-full left-0 right-0 bg-surface border-t border-border md:hidden z-50 h-[calc(100dvh-4rem)] flex flex-col">
             {/* Links scrollables */}
             <div className="flex-1 overflow-y-auto px-2 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
@@ -157,64 +169,91 @@ export function Navigation({ className }: NavigationProps) {
                     <>
                       <Link
                         href="/speaker/propose-talk"
-                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
                         Proponer Charla
                       </Link>
                       <Link
                         href="/speaker/my-proposals"
-                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                         Mis Propuestas
                       </Link>
                     </>
                   ) : (
                     <Link
                       href="/speaker/apply"
-                      className="block px-3 py-2 text-base font-medium text-accent hover:text-accent-dark hover:bg-accent/10 rounded-md transition-colors border border-accent/20"
+                      className="flex items-center gap-2 px-3 py-2 text-base font-medium text-accent hover:text-accent-dark hover:bg-accent/10 rounded-md transition-colors border border-accent/20"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      🎤 Aplicar como Speaker
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                      </svg>
+                      Aplicar como Speaker
                     </Link>
                   )}
                   {isAdmin && (
                     <>
                       <Link
                         href="/admin/speakers"
-                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                         Panel Admin
                       </Link>
                       <Link
                         href="/admin/talk-proposals"
-                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                         Gestionar Propuestas
                       </Link>
                       <Link
                         href="/admin/events"
-                        className="block px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0V6a2 2 0 012-2h4a2 2 0 012 2v1m-6 0h6m-6 0l-.5 8.5A2 2 0 0013.5 21h-3A2 2 0 018.5 15.5L8 7z" />
+                        </svg>
                         Gestión de Eventos
                       </Link>
                     </>
                   )}
                   <button
                     onClick={() => { logout(); setIsMenuOpen(false); }}
-                    className="w-full text-left px-3 py-2 text-base font-medium text-text-secondary hover:text-text-primary hover:bg-secondary/50 rounded-md transition-colors"
+                    className="flex items-center gap-2 w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
                   >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                     Cerrar Sesión
                   </button>
                 </>
               ) : (
                 <div className="px-3 py-2">
-                  <Button variant="accent" size="sm" className="w-full" asChild>
-                    <Link href="/login">Iniciar Sesión</Link>
+                  <Button 
+                    variant="accent" 
+                    size="sm" 
+                    className="w-full" 
+                    asChild
+                  >
+                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>Iniciar Sesión</Link>
                   </Button>
                 </div>
               )}
