@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { ChevronRight, Calendar } from 'lucide-react';
+import { ChevronRight, Calendar, CalendarDays, Clock } from 'lucide-react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/../../amplify/data/resource';
 import EventCardMinimal from '@/components/events/EventCardMinimal';
@@ -302,7 +302,8 @@ export default function Home() {
               }`}
             >
               <span className="flex items-center justify-center gap-2">
-                📅 Próximos
+                <CalendarDays className="w-4 h-4" />
+                Próximos
               </span>
             </button>
             <button
@@ -314,7 +315,8 @@ export default function Home() {
               }`}
             >
               <span className="flex items-center justify-center gap-2">
-                🕐 Pasados
+                <Clock className="w-4 h-4" />
+                Pasados
               </span>
             </button>
           </div>

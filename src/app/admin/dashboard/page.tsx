@@ -8,8 +8,9 @@ import type { Schema } from '../../../../amplify/data/resource';
 import { QuickStatsGrid } from '@/components/admin/QuickStatsGrid';
 import { UnifiedApplicationCard } from '@/components/admin/UnifiedApplicationCard';
 import { ActionTimeline } from '@/components/admin/ActionTimeline';
-import { Loader2, Home, TrendingUp } from 'lucide-react';
+import { Loader2, Home, TrendingUp, AlertCircle, Clipboard, Mic, MessageSquare, Calendar, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { getIconColors } from '@/lib/iconColorUtils';
 
 const client = generateClient<Schema>();
 
@@ -235,8 +236,8 @@ export default function AdminDashboardPage() {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
-            <div className="p-1.5 sm:p-2 bg-accent/10 rounded-lg">
-              <Home className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
+            <div className={`p-1.5 sm:p-2 rounded-lg ${getIconColors('accent').bgColor}`}>
+              <Home className={`w-5 h-5 sm:w-6 sm:h-6 ${getIconColors('accent').textColor}`} />
             </div>
             <div>
               <h1 className="text-xl sm:text-3xl font-bold text-text-primary">
@@ -302,7 +303,9 @@ export default function AdminDashboardPage() {
         {/* Action Timeline */}
         <div className="mb-6 sm:mb-8">
           <h2 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 flex items-center gap-2">
-            <span className="text-xl sm:text-2xl">🚨</span>
+            <div className="p-1.5 bg-red-500/10 dark:bg-red-500/20 rounded-lg">
+              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400" />
+            </div>
             <span className="hidden sm:inline">Acciones Pendientes</span>
             <span className="sm:hidden">Pendientes</span>
           </h2>
@@ -317,36 +320,45 @@ export default function AdminDashboardPage() {
 
         {/* Quick Access Links */}
         <div className="bg-surface rounded-lg p-4 sm:p-6 shadow-sm theme-transition">
-          <h2 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4">
-            📋 Acceso Rápido
+          <h2 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 flex items-center gap-2">
+            <Clipboard className="w-5 h-5 text-accent" />
+            Acceso Rápido
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
             <Link
               href="/admin/speakers"
-              className="p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors text-center"
+              className="group p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors text-center"
             >
-              <div className="text-xl sm:text-2xl mb-1 sm:mb-2">🎤</div>
+              <div className="mb-1 sm:mb-2 flex justify-center">
+                <Mic className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
+              </div>
               <div className="text-xs sm:text-sm font-medium text-text-primary">Speakers</div>
             </Link>
             <Link
               href="/admin/talk-proposals"
-              className="p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors text-center"
+              className="group p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors text-center"
             >
-              <div className="text-xl sm:text-2xl mb-1 sm:mb-2">💬</div>
+              <div className="mb-1 sm:mb-2 flex justify-center">
+                <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
+              </div>
               <div className="text-xs sm:text-sm font-medium text-text-primary">Propuestas</div>
             </Link>
             <Link
               href="/admin/events"
-              className="p-3 sm:p-4 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-colors text-center"
+              className="group p-3 sm:p-4 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-colors text-center"
             >
-              <div className="text-xl sm:text-2xl mb-1 sm:mb-2">📅</div>
+              <div className="mb-1 sm:mb-2 flex justify-center">
+                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform" />
+              </div>
               <div className="text-xs sm:text-sm font-medium text-text-primary">Eventos</div>
             </Link>
             <Link
               href="/admin/events/new"
-              className="p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors text-center"
+              className="group p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors text-center"
             >
-              <div className="text-xl sm:text-2xl mb-1 sm:mb-2">➕</div>
+              <div className="mb-1 sm:mb-2 flex justify-center">
+                <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform" />
+              </div>
               <div className="text-xs sm:text-sm font-medium text-text-primary line-clamp-1">Crear</div>
             </Link>
           </div>

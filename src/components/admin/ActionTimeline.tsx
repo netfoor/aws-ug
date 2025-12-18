@@ -108,7 +108,7 @@ export function ActionTimeline({
           </svg>
         </div>
         <h3 className="text-lg font-semibold text-text-primary mb-2">
-          ¡Todo al día! 🎉
+          ¡Todo al día!
         </h3>
         <p className="text-text-secondary">
           No hay acciones pendientes en este momento.

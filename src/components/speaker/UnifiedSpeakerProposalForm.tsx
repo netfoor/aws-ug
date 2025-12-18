@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { User, Briefcase, Lightbulb, Calendar, FileText, Upload, LinkIcon, Check, Loader2 } from 'lucide-react';
+import { User, Briefcase, Lightbulb, Calendar, FileText, Upload, LinkIcon, Check, Loader2, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -438,8 +438,9 @@ export default function UnifiedSpeakerProposalForm({
 
           {/* Foto Personal */}
           <div>
-            <Label className="text-base font-semibold mb-4 block">
-              📸 Foto Personal <span className="text-red-500">*</span>
+            <Label className="text-base font-semibold mb-4 flex items-center gap-2">
+              <Camera className="w-5 h-5 text-accent" />
+              Foto Personal <span className="text-red-500">*</span>
             </Label>
             <p className="text-sm text-text-secondary mb-4">
               Sube una foto tuya que podamos utilizar para la promoción de tu participación en nuestros eventos. Esta imagen será parte de los <strong>materiales de publicidad y difusión en nuestras redes sociales y plataformas</strong>. Te recomendamos que sea una foto profesional y de alta calidad, que refleje tu mejor presentación.

@@ -170,23 +170,6 @@ export default function ProfilePage() {
                 )}
               </div>
               
-              {/* Role Hierarchy Display */}
-              <div className="flex justify-center mt-3">
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg px-4 py-2 text-sm">
-                  <span className="text-text-secondary">Jerarquía de roles: </span>
-                  <span className={`font-medium ${profile?.role === 'ADMIN' ? 'text-amber-600' : 'text-text-secondary'}`}>
-                    ADMIN
-                  </span>
-                  <span className="text-text-secondary mx-2">&gt;</span>
-                  <span className={`font-medium ${profile?.role === 'SPEAKER' ? 'text-accent' : 'text-text-secondary'}`}>
-                    SPEAKER
-                  </span>
-                  <span className="text-text-secondary mx-2">&gt;</span>
-                  <span className={`font-medium ${profile?.role === 'MEMBER' || !profile?.role ? 'text-text-primary' : 'text-text-secondary'}`}>
-                    MEMBER
-                  </span>
-                </div>
-              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Información de Role */}
@@ -208,14 +191,7 @@ export default function ProfilePage() {
                         : ' Para convertirte en speaker, puedes aplicar usando el formulario unificado. Para obtener permisos de administrador, contacta a un admin existente.'
                       }
                     </p>
-                    {profile?.role === 'ADMIN' && (
-                      <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded text-xs">
-                        <p className="text-amber-800 dark:text-amber-200">
-                          <strong>🔐 Privilegios de Admin:</strong> Puedes aplicar como speaker sin generar notificaciones a otros admins, 
-                          gestionar aplicaciones de speakers, aprobar/rechazar propuestas de charlas, y administrar eventos.
-                        </p>
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               </div>

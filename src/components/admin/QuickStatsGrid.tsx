@@ -3,6 +3,7 @@
 import React from 'react';
 import { Users, MessageSquare, Calendar, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { getIconColors, type IconColorVariant } from '@/lib/iconColorUtils';
 
 interface QuickStatsGridProps {
   newSpeakers: number;
@@ -30,36 +31,28 @@ export function QuickStatsGrid({
       label: 'Nuevos Speakers',
       value: newSpeakers,
       icon: Users,
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-      textColor: 'text-blue-700 dark:text-blue-300',
+      colorVariant: 'blue' as IconColorVariant,
       href: '/admin/speakers?filter=PENDING',
     },
     {
       label: 'Propuestas',
       value: pendingProposals,
       icon: MessageSquare,
-      color: 'from-purple-500 to-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-      textColor: 'text-purple-700 dark:text-purple-300',
+      colorVariant: 'purple' as IconColorVariant,
       href: '/admin/talk-proposals?filter=PENDING',
     },
     {
       label: 'Eventos Draft',
       value: draftEvents,
       icon: Calendar,
-      color: 'from-orange-500 to-orange-600',
-      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-      textColor: 'text-orange-700 dark:text-orange-300',
+      colorVariant: 'orange' as IconColorVariant,
       href: '/admin/events?filter=DRAFT',
     },
     {
       label: 'Check-ins Hoy',
       value: upcomingCheckins,
       icon: CheckCircle,
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-50 dark:bg-green-900/20',
-      textColor: 'text-green-700 dark:text-green-300',
+      colorVariant: 'green' as IconColorVariant,
       href: '/admin/events',
     },
   ];
@@ -80,15 +73,18 @@ export function QuickStatsGrid({
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      {stats.map((stat) => (
+      {stats.map((stat) => {
+        const { bgColor, textColor } = getIconColors(stat.colorVariant);
+        
+        return (
         <Link
           key={stat.label}
           href={stat.href}
           className="group bg-surface rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all theme-transition border border-border hover:border-accent/30"
         >
           <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <div className={`p-2 sm:p-3 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform`}>
-              <stat.icon className={`w-4 h-4 sm:w-6 sm:h-6 ${stat.textColor}`} />
+            <div className={`p-2 sm:p-3 rounded-lg ${bgColor} group-hover:scale-110 transition-transform`}>
+              <stat.icon className={`w-4 h-4 sm:w-6 sm:h-6 ${textColor}`} />
             </div>
             {stat.value > 0 && (
               <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 rounded-full">
@@ -115,7 +111,8 @@ export function QuickStatsGrid({
             </svg>
           </div>
         </Link>
-      ))}
+        );
+      })}
     </div>
   );
 }
