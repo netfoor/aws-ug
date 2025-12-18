@@ -213,6 +213,11 @@ export function AdminDateSelector({
           className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
           required
         />
+        
+        {/* Info helper */}
+        <p className="text-xs text-text-secondary mt-1.5">
+          🕐 Habitual: 6:30 PM (18:30)
+        </p>
       </div>
     </div>
   );

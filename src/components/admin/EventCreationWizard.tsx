@@ -40,12 +40,18 @@ export function EventCreationWizard({
   const prefillDate = proposedDate 
     ? proposedDate.split('T')[0] // Tomar solo la parte de fecha sin conversión
     : '';
+  
+  // Para la hora: siempre usar 18:30 (hora habitual) a menos que haya una hora específica diferente
   const prefillTime = proposedDate 
     ? (() => {
-        // Extraer hora del ISO string sin conversión de zona horaria
         const timePart = proposedDate.split('T')[1];
         if (timePart) {
-          return timePart.slice(0, 5); // HH:MM
+          const hourMin = timePart.slice(0, 5); // HH:MM
+          // Si la hora es 00:00 (medianoche), usar la hora habitual 18:30
+          if (hourMin === '00:00') {
+            return '18:30';
+          }
+          return hourMin;
         }
         return '18:30';
       })()
@@ -165,7 +171,7 @@ export function EventCreationWizard({
           <div>
             <label htmlFor="deadline" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-2">
               <Clock className="w-3.5 h-3.5 text-accent" />
-              Fecha límite (opcional)
+              Fecha límite de registro
             </label>
             <input
               id="deadline"
@@ -175,6 +181,9 @@ export function EventCreationWizard({
               placeholder="Opcional"
               className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
             />
+            <p className="text-xs text-text-secondary mt-1.5">
+              📅 Hasta cuándo se pueden inscribir (opcional)
+            </p>
           </div>
         </div>
 

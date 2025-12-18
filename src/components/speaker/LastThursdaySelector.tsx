@@ -54,11 +54,18 @@ export default function LastThursdaySelector({
       // 2️⃣ Obtener todos los eventos existentes
       const { data: events } = await client.models.Event.list();
 
-      // 3️⃣ Obtener todas las propuestas aprobadas con fecha
-      const { data: proposals } = await client.models.TalkProposal.list({
-        filter: {
-          status: { eq: 'APPROVED' },
-        },
+      // 3️⃣ Obtener todas las propuestas con fecha (PENDING, APPROVED, EVENT_CREATED)
+      const { data: allProposals } = await client.models.TalkProposal.list();
+      
+      // Filtrar solo propuestas con fecha y status relevante
+      const proposalsWithDate = allProposals?.filter(p => 
+        p.proposedDate && 
+        (p.status === 'PENDING' || p.status === 'APPROVED' || p.status === 'EVENT_CREATED')
+      ) || [];
+
+      console.log('📅 LastThursdaySelector:', {
+        totalProposals: allProposals?.length,
+        proposalsWithDate: proposalsWithDate.length,
       });
 
       // 4️⃣ Verificar disponibilidad de cada fecha
@@ -70,8 +77,8 @@ export default function LastThursdaySelector({
           return isSameDay(eventDate, thursday);
         });
 
-        // Buscar si ya hay una propuesta aprobada para esta fecha
-        const existingProposal = proposals?.find((proposal) => {
+        // Buscar si ya hay una propuesta para esta fecha (PENDING, APPROVED, o EVENT_CREATED)
+        const existingProposal = proposalsWithDate.find((proposal) => {
           if (!proposal.proposedDate) return false;
           const proposalDate = new Date(proposal.proposedDate);
           return isSameDay(proposalDate, thursday);
