@@ -375,8 +375,7 @@ export function UnifiedApplicationCard({
               ) : (
                 <>
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  
-                  <span className="truncate">Aprobar Todo</span>
+                  <span className="truncate">Aprobar Speaker</span>
                 </>
               )}
             </Button>

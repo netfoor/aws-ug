@@ -72,12 +72,22 @@ export async function POST(request: NextRequest) {
 
     const proposal = proposalResponse.data;
 
-    // Validar que la propuesta esté aprobada
-    if (proposal.status !== 'APPROVED') {
+    // Validar que la propuesta esté pendiente (no aprobada todavía)
+    if (proposal.status !== 'PENDING' && proposal.status !== 'APPROVED') {
       return NextResponse.json(
-        { error: `La propuesta debe estar APPROVED. Estado actual: ${proposal.status}` },
+        { error: `La propuesta debe estar PENDING o APPROVED. Estado actual: ${proposal.status}` },
         { status: 400 }
       );
+    }
+
+    // 1.5. Aprobar la propuesta primero (si está PENDING)
+    if (proposal.status === 'PENDING') {
+      await client.models.TalkProposal.update({
+        id: talkProposalId,
+        status: 'APPROVED',
+        updatedAt: new Date().toISOString(),
+      });
+      console.log('✅ TalkProposal aprobada (PENDING → APPROVED)');
     }
 
     // 2. Crear el evento con los datos de la propuesta

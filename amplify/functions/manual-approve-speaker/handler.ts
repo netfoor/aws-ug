@@ -38,7 +38,7 @@ async function createTalkProposalFromAttached(
       targetAudience: attachedProposal.targetAudience,
       proposedDate: attachedProposal.proposedDate || null,
       proposedTimeSlot: '18:30-19:30', // Default slot
-      status: 'APPROVED', // Ya está aprobada implícitamente por el admin
+      status: 'PENDING', // Se aprobará cuando se cree el evento en el wizard
       submittedAt: now,
       createdAt: now,
       updatedAt: now,
@@ -66,7 +66,7 @@ async function createNotification(
   
   const baseMessage = 'Felicitaciones, ahora eres parte del equipo de speakers de AWS User Group Puebla. Tus permisos se actualizarán automáticamente.';
   const proposalMessage = hasAttachedProposal 
-    ? ' Tu propuesta de charla también ha sido aprobada automáticamente y puedes crear el evento cuando estés listo.'
+    ? ' Tu propuesta de charla ha sido guardada y está siendo revisada para crear el evento.'
     : ' Ya puedes proponer charlas para nuestros próximos eventos.';
   
   await docClient.send(new PutCommand({

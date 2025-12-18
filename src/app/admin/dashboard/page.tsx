@@ -8,7 +8,7 @@ import type { Schema } from '../../../../amplify/data/resource';
 import { QuickStatsGrid } from '@/components/admin/QuickStatsGrid';
 import { UnifiedApplicationCard } from '@/components/admin/UnifiedApplicationCard';
 import { ActionTimeline } from '@/components/admin/ActionTimeline';
-import { Loader2, Home, TrendingUp, AlertCircle, Clipboard, Mic, MessageSquare, Calendar, Plus } from 'lucide-react';
+import { Loader2, Home, TrendingUp, AlertCircle, Clipboard, Mic, MessageSquare, Calendar, Plus, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { getIconColors } from '@/lib/iconColorUtils';
 
@@ -94,6 +94,11 @@ export default function AdminDashboardPage() {
   // Calculate stats
   const pendingSpeakers = speakerApplications.filter(s => s.status === 'PENDING');
   const applicationsWithProposal = pendingSpeakers.filter(s => s.hasAttachedProposal);
+  
+  // Propuestas pendientes de evento (PENDING sin eventId, esperando que el wizard las apruebe y cree evento)
+  const proposalsWaitingForEvent = talkProposals.filter(p => 
+    p.status === 'PENDING' && !p.eventId
+  );
   const pendingProposals = talkProposals.filter(p => p.status === 'PENDING');
   const draftEvents = events.filter(e => e.status === 'DRAFT');
   
@@ -296,6 +301,63 @@ export default function AdminDashboardPage() {
                   onRefresh={loadDashboardData}
                 />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Propuestas esperando evento - Speakers ya aprobados */}
+        {proposalsWaitingForEvent.length > 0 && (
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-text-primary flex items-center gap-2">
+                <div className="p-1.5 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg">
+                  <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <span className="hidden sm:inline">Esperando Creación de Evento</span>
+                <span className="sm:hidden">En Progreso</span>
+              </h2>
+              <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-xs sm:text-sm font-bold rounded-full">
+                {proposalsWaitingForEvent.length}
+              </span>
+            </div>
+            <div className="space-y-3 sm:space-y-4">
+              {proposalsWaitingForEvent.map((proposal) => {
+                // Buscar la aplicación del speaker correspondiente
+                const speakerApp = speakerApplications.find(app => app.userId === proposal.userId);
+                
+                if (!speakerApp) return null;
+                
+                return (
+                  <div
+                    key={proposal.id}
+                    className="bg-surface rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all theme-transition p-4 sm:p-5"
+                  >
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
+                        <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-text-primary mb-1">{proposal.title}</h3>
+                        <p className="text-sm text-text-secondary mb-2">
+                          Speaker: {proposal.speakerName || speakerApp.email}
+                        </p>
+                        <p className="text-xs text-text-secondary">
+                          💡 Speaker aprobado - Propuesta guardada - Esperando creación de evento
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Botón para crear evento directamente */}
+                    <Link 
+                      href={`/admin/talk-proposals?id=${proposal.id}`}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Crear Evento
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
