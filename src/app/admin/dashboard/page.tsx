@@ -7,6 +7,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../amplify/data/resource';
 import { QuickStatsGrid } from '@/components/admin/QuickStatsGrid';
 import { UnifiedApplicationCard } from '@/components/admin/UnifiedApplicationCard';
+import { ProposalWaitingCard } from '@/components/admin/ProposalWaitingCard';
 import { ActionTimeline } from '@/components/admin/ActionTimeline';
 import { Loader2, Home, TrendingUp, AlertCircle, Clipboard, Mic, MessageSquare, Calendar, Plus, Clock } from 'lucide-react';
 import Link from 'next/link';
@@ -328,34 +329,16 @@ export default function AdminDashboardPage() {
                 if (!speakerApp) return null;
                 
                 return (
-                  <div
+                  <ProposalWaitingCard
                     key={proposal.id}
-                    className="bg-surface rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all theme-transition p-4 sm:p-5"
-                  >
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
-                        <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-text-primary mb-1">{proposal.title}</h3>
-                        <p className="text-sm text-text-secondary mb-2">
-                          Speaker: {proposal.speakerName || speakerApp.email}
-                        </p>
-                        <p className="text-xs text-text-secondary">
-                          💡 Speaker aprobado - Propuesta guardada - Esperando creación de evento
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Botón para crear evento directamente */}
-                    <Link 
-                      href={`/admin/talk-proposals?id=${proposal.id}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Crear Evento
-                    </Link>
-                  </div>
+                    proposal={proposal}
+                    speakerApp={speakerApp}
+                    onEventCreated={(eventId, published) => {
+                      console.log(`✅ Evento ${published ? 'publicado' : 'creado'}: ${eventId}`);
+                      loadDashboardData();
+                    }}
+                    onRefresh={loadDashboardData}
+                  />
                 );
               })}
             </div>
