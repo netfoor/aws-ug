@@ -9,8 +9,10 @@
  * Crea TalkProposal automáticamente desde attachedProposal
  */
 async function createTalkProposalFromAttached(
-  userId: string, 
+  userId: string,
+  userEmail: string,
   attachedProposal: AttachedProposal, 
+  applicationTopics: string[],
   talkProposalTableName: string
 ): Promise<string> {
   const { randomUUID } = await import('crypto');
@@ -18,24 +20,29 @@ async function createTalkProposalFromAttached(
   const now = new Date().toISOString();
   const proposalId = randomUUID();
   
+  // Obtener nombre del usuario desde el email (fallback)
+  const speakerName = userEmail.split('@')[0];
+  
   await docClient.send(new PutCommand({
     TableName: talkProposalTableName,
     Item: {
+      __typename: 'TalkProposal',
       id: proposalId,
       userId,
+      speakerName, // Required field
+      speakerEmail: userEmail, // Required field
       title: attachedProposal.talkTitle,
       description: attachedProposal.talkDescription,
+      topics: applicationTopics.length > 0 ? applicationTopics : ['General'], // Required field - usar topics de la aplicación
       duration: attachedProposal.duration,
       targetAudience: attachedProposal.targetAudience,
       proposedDate: attachedProposal.proposedDate || null,
-      status: 'PENDING',
+      proposedTimeSlot: '18:30-19:30', // Default slot
+      status: 'APPROVED', // Ya está aprobada implícitamente por el admin
       submittedAt: now,
       createdAt: now,
       updatedAt: now,
       owner: userId,
-      // Marcar que viene de aplicación unificada
-      source: 'UNIFIED_APPLICATION',
-      autoCreated: true,
     },
   }));
   
@@ -59,7 +66,7 @@ async function createNotification(
   
   const baseMessage = 'Felicitaciones, ahora eres parte del equipo de speakers de AWS User Group Puebla. Tus permisos se actualizarán automáticamente.';
   const proposalMessage = hasAttachedProposal 
-    ? ' Tu propuesta de charla también ha sido creada automáticamente y está pendiente de revisión.'
+    ? ' Tu propuesta de charla también ha sido aprobada automáticamente y puedes crear el evento cuando estés listo.'
     : ' Ya puedes proponer charlas para nuestros próximos eventos.';
   
   await docClient.send(new PutCommand({
@@ -154,7 +161,7 @@ interface SpeakerApplication {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   submittedAt: string;
   hasAttachedProposal?: boolean;
-  attachedProposal?: string; // JSON string
+  attachedProposal?: AttachedProposal; // Ya viene como objeto desde DynamoDB DocumentClient
   schedulerArn?: string; // ARN del EventBridge Schedule
 }
 
@@ -366,8 +373,15 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
       try {
         console.log('🎯 Creando TalkProposal automáticamente desde attachedProposal...');
         
-        const attachedProposal: AttachedProposal = JSON.parse(application.attachedProposal);
-        talkProposalId = await createTalkProposalFromAttached(userId, attachedProposal, talkProposalTableName);
+        // attachedProposal ya viene como objeto desde DynamoDB DocumentClient, no necesita JSON.parse()
+        const attachedProposal = application.attachedProposal;
+        talkProposalId = await createTalkProposalFromAttached(
+          userId,
+          application.email,
+          attachedProposal,
+          application.topics || [],
+          talkProposalTableName
+        );
         
         console.log(`✅ TalkProposal creada: ${talkProposalId}`);
       } catch (error) {
