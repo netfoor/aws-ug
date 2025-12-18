@@ -15,15 +15,18 @@ Flujo directo sin EventBridge Scheduler ni auto-aprobaciones:
 ### 2. **Admin revisa aplicaciones**
 - **Página:** `/admin/speakers`
 - **Componentes:** `SpeakerApplicationsList` + `SpeakerApplicationDetail`
+- **Vista:** Muestra datos profesionales + propuesta de charla adjunta
 - **Acciones:** Aprobar o Rechazar
 
 ### 3. **Aprobación/Rechazo**
 - **Lambda:** `manual-approve-speaker` o `reject-speaker-application`
-- **Resultado:** 
+- **Resultado Aprobación:** 
   - Actualiza status en DynamoDB
   - Agrega usuario a grupo Cognito "SPEAKERS"
+  - Actualiza role en User table
   - Envía email de notificación
-  - **NUEVO:** Crea `TalkProposal` automáticamente
+  - **🆕 AUTOMÁTICO:** Crea `TalkProposal` desde `attachedProposal`
+  - Crea notificación in-app con link a propuesta
 
 ## 🏗️ Arquitectura
 
@@ -42,7 +45,13 @@ Flujo directo sin EventBridge Scheduler ni auto-aprobaciones:
                                                        ▼
                                               ┌─────────────────┐
                                               │  TalkProposal   │
-                                              │   (nueva)       │
+                                              │  (automática)   │
+                                              └─────────────────┘
+                                                       │
+                                                       ▼
+                                              ┌─────────────────┐
+                                              │ Admin Review    │
+                                              │ Talk Proposals  │
                                               └─────────────────┘
 ```
 

@@ -382,13 +382,26 @@ export function SpeakerApplicationDetail({
 
                 {linkedProposal && (
                   <div className="mt-4 pt-4 border-t border-amber-200 dark:border-amber-800">
-                    <a
-                      href={`/admin/talk-proposals?id=${linkedProposal.id}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors text-sm font-medium"
-                    >
-                      Ver Propuesta Completa
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-amber-800 dark:text-amber-200">
+                        <span className="font-medium">Estado:</span> {linkedProposal.status === 'PENDING' ? '⏳ Pendiente' : linkedProposal.status}
+                      </div>
+                      <a
+                        href={`/admin/talk-proposals?id=${linkedProposal.id}`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors text-sm font-medium"
+                      >
+                        Ver Propuesta Completa
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {!linkedProposal && application.hasAttachedProposal && isApproved && (
+                  <div className="mt-4 pt-4 border-t border-amber-200 dark:border-amber-800">
+                    <div className="text-sm text-amber-800 dark:text-amber-200 bg-amber-100 dark:bg-amber-900/50 rounded-lg p-3">
+                      <span className="font-medium">💡 Nota:</span> Al aprobar esta aplicación, se creará automáticamente una TalkProposal basada en esta propuesta adjunta.
+                    </div>
                   </div>
                 )}
 

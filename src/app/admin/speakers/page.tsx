@@ -111,7 +111,13 @@ export default function AdminSpeakersPage() {
       // Recargar lista
       await loadApplications();
 
-      alert('✅ Postulación aprobada correctamente. Se ha enviado un email al usuario y se agregó al grupo SPEAKERS.');
+      // Mensaje mejorado con información de TalkProposal
+      const baseMessage = '✅ Postulación aprobada correctamente. Se ha enviado un email al usuario y se agregó al grupo SPEAKERS.';
+      const proposalMessage = result.talkProposalCreated 
+        ? `\n\n🎯 Bonus: Se creó automáticamente una TalkProposal (ID: ${result.talkProposalId?.slice(0, 8)}...) desde la propuesta adjunta.`
+        : '';
+      
+      alert(baseMessage + proposalMessage);
     } catch (error) {
       console.error('Error al aprobar:', error);
       throw error;

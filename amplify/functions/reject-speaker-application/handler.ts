@@ -11,18 +11,18 @@
  */
 
 import type { Handler } from 'aws-lambda';
-import { 
-  DynamoDBClient, 
-  ListTablesCommand 
+import {
+  DynamoDBClient,
+  ListTablesCommand
 } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
   GetCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { 
-  SESClient, 
-  SendEmailCommand 
+import {
+  SESClient,
+  SendEmailCommand
 } from '@aws-sdk/client-ses';
 
 // ========================================
@@ -70,11 +70,11 @@ interface SpeakerApplication {
 async function getTableName(prefix: string): Promise<string> {
   const response = await ddbClient.send(new ListTablesCommand({}));
   const tableName = response.TableNames?.find(name => name.startsWith(prefix));
-  
+
   if (!tableName) {
     throw new Error(`❌ No se encontró tabla con prefijo: ${prefix}`);
   }
-  
+
   return tableName;
 }
 
@@ -82,8 +82,8 @@ async function getTableName(prefix: string): Promise<string> {
  * Envía email de rechazo con razón personalizada
  */
 async function sendRejectionEmail(
-  email: string, 
-  userName: string, 
+  email: string,
+  userName: string,
   rejectionReason: string
 ): Promise<void> {
   const htmlBody = `
@@ -179,7 +179,7 @@ async function sendRejectionEmail(
 async function createNotification(userId: string, rejectionReason: string, notificationTableName: string): Promise<void> {
   const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
   const { randomUUID } = await import('crypto');
-  
+
   const now = new Date().toISOString();
   await docClient.send(new PutCommand({
     TableName: notificationTableName,
@@ -197,7 +197,7 @@ async function createNotification(userId: string, rejectionReason: string, notif
       owner: userId,
     },
   }));
-  
+
   console.log(`✅ Notificación creada para usuario ${userId}`);
 }
 

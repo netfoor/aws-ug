@@ -74,12 +74,13 @@ backend.manualApproveSpeaker.resources.lambda.addToRolePolicy(
       'dynamodb:Query',
       'dynamodb:Scan',
       'dynamodb:ListTables',
-      'dynamodb:PutItem', // Para crear notificaciones
+      'dynamodb:PutItem', // Para crear notificaciones y TalkProposal
     ],
     resources: [
       `arn:aws:dynamodb:*:*:table/SpeakerApplication-*`,
       `arn:aws:dynamodb:*:*:table/User-*`,
       `arn:aws:dynamodb:*:*:table/Notification-*`, // Tabla de notificaciones
+      `arn:aws:dynamodb:*:*:table/TalkProposal-*`, // 🆕 Tabla de propuestas
       '*',
     ],
   })
@@ -125,6 +126,11 @@ backend.manualApproveSpeaker.addEnvironment(
 backend.manualApproveSpeaker.addEnvironment(
   'USER_TABLE_PREFIX',
   'User'
+);
+
+backend.manualApproveSpeaker.addEnvironment(
+  'TALK_PROPOSAL_TABLE_PREFIX',
+  'TalkProposal'
 );
 
 // Lambda 4: Reject Speaker Application (Admin Panel)

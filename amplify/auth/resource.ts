@@ -20,13 +20,13 @@ export const auth = defineAuth({
         'http://localhost:3000/auth/callback',
         'https://awspuebla.com/auth/callback',
         'https://www.awspuebla.com/auth/callback',
-        'https://cc33316cd329.ngrok-free.app/auth/callback'
+        'https://afd04b1e41f4.ngrok-free.app/auth/callback'
       ],
       logoutUrls: [
         'http://localhost:3000/',
         'https://awspuebla.com/',
         'https://www.awspuebla.com/',
-        'https://cc33316cd329.ngrok-free.app/'
+        'https://afd04b1e41f4.ngrok-free.app'
       ],
     }
   },

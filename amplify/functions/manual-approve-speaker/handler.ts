@@ -6,13 +6,62 @@
  * - Triggered por API   console.log(`✅ Email de aprobación enviado: ${email}`);
 }
 /**
+ * Crea TalkProposal automáticamente desde attachedProposal
+ */
+async function createTalkProposalFromAttached(
+  userId: string, 
+  attachedProposal: AttachedProposal, 
+  talkProposalTableName: string
+): Promise<string> {
+  const { randomUUID } = await import('crypto');
+  
+  const now = new Date().toISOString();
+  const proposalId = randomUUID();
+  
+  await docClient.send(new PutCommand({
+    TableName: talkProposalTableName,
+    Item: {
+      id: proposalId,
+      userId,
+      title: attachedProposal.talkTitle,
+      description: attachedProposal.talkDescription,
+      duration: attachedProposal.duration,
+      targetAudience: attachedProposal.targetAudience,
+      proposedDate: attachedProposal.proposedDate || null,
+      status: 'PENDING',
+      submittedAt: now,
+      createdAt: now,
+      updatedAt: now,
+      owner: userId,
+      // Marcar que viene de aplicación unificada
+      source: 'UNIFIED_APPLICATION',
+      autoCreated: true,
+    },
+  }));
+  
+  console.log(`✅ TalkProposal creada automáticamente: ${proposalId}`);
+  return proposalId;
+}
+
+/**
  * Crea notificación in-app para el usuario
  */
-async function createNotification(userId: string, notificationTableName: string): Promise<void> {
+async function createNotification(
+  userId: string, 
+  notificationTableName: string, 
+  hasAttachedProposal: boolean = false,
+  talkProposalId?: string
+): Promise<void> {
   const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
   const { randomUUID } = await import('crypto');
   
   const now = new Date().toISOString();
+  
+  const baseMessage = 'Felicitaciones, ahora eres parte del equipo de speakers de AWS User Group Puebla. Tus permisos se actualizarán automáticamente.';
+  const proposalMessage = hasAttachedProposal 
+    ? ' Tu propuesta de charla también ha sido creada automáticamente y está pendiente de revisión.'
+    : ' Ya puedes proponer charlas para nuestros próximos eventos.';
+  
   await docClient.send(new PutCommand({
     TableName: notificationTableName,
     Item: {
@@ -20,9 +69,9 @@ async function createNotification(userId: string, notificationTableName: string)
       userId,
       type: 'SPEAKER_APPROVED',
       title: '🎉 ¡Tu postulación fue aprobada!',
-      message: 'Felicitaciones, ahora eres parte del equipo de speakers de AWS User Group Puebla. Tus permisos se actualizarán automáticamente. Ya puedes proponer charlas para nuestros eventos.',
+      message: baseMessage + proposalMessage,
       read: false,
-      link: '/speaker/propose-talk',
+      link: hasAttachedProposal && talkProposalId ? `/admin/talk-proposals?id=${talkProposalId}` : '/speaker/propose-talk',
       icon: '🎤',
       createdAt: now,
       updatedAt: now,
@@ -57,6 +106,7 @@ import {
   DynamoDBDocumentClient,
   GetCommand,
   UpdateCommand,
+  PutCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { 
   CognitoIdentityProviderClient,
@@ -73,6 +123,7 @@ import {
 const TABLE_PREFIX = process.env.SPEAKER_APPLICATION_TABLE_PREFIX || 'SpeakerApplication';
 const NOTIFICATION_TABLE_PREFIX = process.env.NOTIFICATION_TABLE_PREFIX || 'Notification';
 const USER_TABLE_PREFIX = process.env.USER_TABLE_PREFIX || 'User';
+const TALK_PROPOSAL_TABLE_PREFIX = process.env.TALK_PROPOSAL_TABLE_PREFIX || 'TalkProposal';
 const USER_POOL_ID = process.env.USER_POOL_ID;
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
 const REGION = process.env.AWS_REGION || 'us-east-1';
@@ -102,7 +153,17 @@ interface SpeakerApplication {
   topics: string[];
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   submittedAt: string;
+  hasAttachedProposal?: boolean;
+  attachedProposal?: string; // JSON string
   schedulerArn?: string; // ARN del EventBridge Schedule
+}
+
+interface AttachedProposal {
+  talkTitle: string;
+  talkDescription: string;
+  duration: number;
+  targetAudience: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL';
+  proposedDate?: string; // ISO date
 }
 
 // ========================================
@@ -225,7 +286,8 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
     const tableName = await getTableName(TABLE_PREFIX);
     const notificationTableName = await getTableName(NOTIFICATION_TABLE_PREFIX);
     const userTableName = await getTableName(USER_TABLE_PREFIX);
-    console.log(`📋 Usando tablas: ${tableName}, ${notificationTableName}, ${userTableName}`);
+    const talkProposalTableName = await getTableName(TALK_PROPOSAL_TABLE_PREFIX);
+    console.log(`📋 Usando tablas: ${tableName}, ${notificationTableName}, ${userTableName}, ${talkProposalTableName}`);
 
     // 1️⃣ Obtener datos de la postulación
     console.log(`📖 Obteniendo postulación: ${applicationId}`);
@@ -297,8 +359,25 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
 
     console.log('✅ Email de aprobación enviado');
 
-    // 7️⃣ Crear notificación in-app
-    await createNotification(userId, notificationTableName);
+    // 7️⃣ 🆕 Crear TalkProposal automáticamente si tiene propuesta adjunta
+    let talkProposalId: string | undefined;
+    
+    if (application.hasAttachedProposal && application.attachedProposal) {
+      try {
+        console.log('🎯 Creando TalkProposal automáticamente desde attachedProposal...');
+        
+        const attachedProposal: AttachedProposal = JSON.parse(application.attachedProposal);
+        talkProposalId = await createTalkProposalFromAttached(userId, attachedProposal, talkProposalTableName);
+        
+        console.log(`✅ TalkProposal creada: ${talkProposalId}`);
+      } catch (error) {
+        console.error('⚠️ Error creando TalkProposal automática:', error);
+        // No fallar la aprobación por esto, solo logear
+      }
+    }
+
+    // 8️⃣ Crear notificación in-app
+    await createNotification(userId, notificationTableName, !!application.hasAttachedProposal, talkProposalId);
 
     console.log('✅ Notificación in-app creada');
 
@@ -314,6 +393,8 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
         userId,
         status: 'APPROVED',
         approvedBy,
+        talkProposalCreated: !!talkProposalId,
+        talkProposalId: talkProposalId || null,
       }),
     };
 
