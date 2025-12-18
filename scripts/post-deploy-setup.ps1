@@ -54,13 +54,13 @@ if ($streamEnabled -eq $true) {
 $streamArn = $tableInfo.Table.LatestStreamArn
 
 # ========================================
-# 3. BUSCAR LAMBDA PROCESS-SPEAKER-APPLICATION
+# 3. VERIFICAR LAMBDAS ACTIVAS (SIN LEGACY)
 # ========================================
 
 Write-Host ""
-Write-Host "Buscando Lambda process-speaker-application..." -ForegroundColor Cyan
+Write-Host "Verificando Lambdas activas (flujo simplificado)..." -ForegroundColor Cyan
 $functions = aws lambda list-functions --output json | ConvertFrom-Json
-$lambda = $functions.Functions | Where-Object { $_.FunctionName -like '*processspeakerapplicatio*' } | Select-Object -First 1
+$manualLambda = $functions.Functions | Where-Object { $_.FunctionName -like '*manual-approve-speaker*' } | Select-Object -First 1
 
 if (-not $lambda) {
     Write-Host "No se encontro la Lambda" -ForegroundColor Red
