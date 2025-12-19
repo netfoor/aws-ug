@@ -98,7 +98,7 @@ async function notifyAdmins(proposalId: string, speakerName: string, title: stri
           title: '📢 Nueva propuesta de charla',
           message: `${speakerName} ha enviado una propuesta: "${title}"`,
           read: false,
-          link: '/admin/talk-proposals',
+          link: '/admin/dashboard',
           icon: '🎤',
           createdAt: now,
           updatedAt: now,

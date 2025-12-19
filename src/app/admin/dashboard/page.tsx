@@ -348,23 +348,25 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Action Timeline */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 flex items-center gap-2">
-            <div className="p-1.5 bg-red-500/10 dark:bg-red-500/20 rounded-lg">
-              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400" />
-            </div>
-            <span className="hidden sm:inline">Acciones Pendientes</span>
-            <span className="sm:hidden">Pendientes</span>
-          </h2>
-          <ActionTimeline
-            pendingSpeakers={pendingSpeakers.filter(s => !s.hasAttachedProposal)}
-            pendingProposals={pendingProposals}
-            draftEvents={draftEvents}
-            onViewSpeaker={(app) => setSelectedApplication(app)}
-            isLoading={isLoading}
-          />
-        </div>
+        {/* Action Timeline - Solo mostrar cuando hay eventos en borrador */}
+        {draftEvents.length > 0 && (
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4 flex items-center gap-2">
+              <div className="p-1.5 bg-amber-500/10 dark:bg-amber-500/20 rounded-lg">
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span className="hidden sm:inline">Eventos en Borrador</span>
+              <span className="sm:hidden">Borradores</span>
+            </h2>
+            <ActionTimeline
+              pendingSpeakers={[]} // No mostrar speakers aquí, ya están en otras secciones
+              pendingProposals={[]} // No mostrar propuestas aquí, ya están en otras secciones
+              draftEvents={draftEvents}
+              onViewSpeaker={(app) => setSelectedApplication(app)}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
 
         {/* Quick Access Links */}
         <div className="bg-surface rounded-lg p-4 sm:p-6 shadow-sm theme-transition">
