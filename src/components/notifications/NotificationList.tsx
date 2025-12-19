@@ -30,7 +30,7 @@ export function NotificationList({
   onMarkAsRead,
   onClose,
 }: NotificationListProps) {
-  const { refreshUser, logout } = useAuth();
+  const { logout } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showReloginDialog, setShowReloginDialog] = useState(false);
   const [pendingNotificationId, setPendingNotificationId] = useState<string | null>(null);

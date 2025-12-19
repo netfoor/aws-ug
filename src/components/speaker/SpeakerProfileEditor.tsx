@@ -11,7 +11,6 @@ import {
   validateLinkedInUrl,
   formatFileSize,
   EXPERTISE_AREAS,
-  type ExpertiseArea,
 } from '@/lib/speaker-uploads';
 
 interface SpeakerProfileEditorProps {

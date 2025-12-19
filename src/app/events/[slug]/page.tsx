@@ -12,7 +12,6 @@ import Image from 'next/image';
 // import Link from 'next/link'; // Unused import
 import { Calendar, Clock, MapPin, Share2, Plus, Mail, Loader2, Users, Tag, ClipboardList, MessageSquare, Edit, UserPlus, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { QRTicketModal, TicketStatus } from '@/components/events';
 import { useQRTicket } from '@/hooks';
 import { getIconColors } from '@/lib/iconColorUtils';

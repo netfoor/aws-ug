@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    let approveResult: any = {};
+    let approveResult: { statusCode?: number; body?: string; message?: string; talkProposalCreated?: boolean; talkProposalId?: string } = {};
     if (response.Payload) {
       const decoded = new TextDecoder().decode(response.Payload);
       const lambdaResponse = decoded ? JSON.parse(decoded) : {};
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     console.log('✅ Speaker aprobado exitosamente');
 
     // STEP 2: Si se creó una TalkProposal, crear el evento en borrador
-    let eventId = null;
+    const eventId = null;
     if (approveResult.talkProposalCreated && approveResult.talkProposalId) {
       console.log('🎯 Creando evento desde propuesta:', approveResult.talkProposalId);
       

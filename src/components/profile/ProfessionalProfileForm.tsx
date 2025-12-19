@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Briefcase, Upload, FileText, Link as LinkIcon, Loader2, Check, X } from 'lucide-react';
+import { Briefcase, Upload, FileText, Link as LinkIcon, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
@@ -11,7 +11,6 @@ import {
   validateLinkedInUrl,
   formatFileSize,
   EXPERTISE_AREAS,
-  type ExpertiseArea,
 } from '@/lib/speaker-uploads';
 
 interface ProfessionalProfileFormProps {

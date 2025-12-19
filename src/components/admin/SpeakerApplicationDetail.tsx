@@ -15,7 +15,6 @@ import {
   Loader2,
   Briefcase,
   Phone,
-  Building,
   ExternalLink,
   FileText,
   Lightbulb,

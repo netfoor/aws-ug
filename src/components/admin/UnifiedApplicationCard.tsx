@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import {
-  User,
   Mail,
   Calendar,
   Clock,
@@ -33,9 +32,16 @@ type SpeakerApplication = Schema['SpeakerApplication']['type'];
 
 type WizardStep = 'pending' | 'speaker-approved' | 'event-created' | 'completed';
 
+interface ApproveAllResult {
+  talkProposalCreated?: boolean;
+  talkProposalId?: string;
+  statusCode?: number;
+  message?: string;
+}
+
 interface UnifiedApplicationCardProps {
   application: SpeakerApplication;
-  onApproveAll: (applicationId: string, userId: string) => Promise<any>; // Retorna el result del API
+  onApproveAll: (applicationId: string, userId: string) => Promise<ApproveAllResult>; // Retorna el result del API
   onApproveSpeakerOnly: (applicationId: string, userId: string) => Promise<void>;
   onReject: (applicationId: string, userId: string, reason: string) => Promise<void>;
   onRefresh?: () => void; // Para refrescar el dashboard después de completar
