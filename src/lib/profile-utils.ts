@@ -82,7 +82,8 @@ export function calculateProfileCompleteness(profile: UserProfile | null): Profi
 
 /**
  * Verifica si el perfil está listo para proponer charlas
- * Requiere al menos: foto, (CV o LinkedIn), expertise
+ * Requiere: foto, (CV o LinkedIn), expertise
+ * Company es opcional pero recomendado
  */
 export function canProposeTalk(profile: UserProfile | null): { allowed: boolean; reason?: string } {
   if (!profile) {
@@ -115,6 +116,9 @@ export function canProposeTalk(profile: UserProfile | null): { allowed: boolean;
       reason: 'Necesitas seleccionar tu área de especialización',
     };
   }
+
+  // Company es recomendado pero no obligatorio
+  // Si falta, permitir pero mostrar advertencia en otro lugar
 
   return { allowed: true };
 }

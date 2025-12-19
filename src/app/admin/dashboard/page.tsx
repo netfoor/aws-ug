@@ -9,6 +9,8 @@ import { QuickStatsGrid } from '@/components/admin/QuickStatsGrid';
 import { UnifiedApplicationCard } from '@/components/admin/UnifiedApplicationCard';
 import { ProposalWaitingCard } from '@/components/admin/ProposalWaitingCard';
 import { ActionTimeline } from '@/components/admin/ActionTimeline';
+import { useDialog } from '@/hooks/useDialog';
+import { DialogRenderer } from '@/components/ui/DialogRenderer';
 import { Loader2, Home, TrendingUp, AlertCircle, Clipboard, Mic, MessageSquare, Calendar, Plus, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { getIconColors } from '@/lib/iconColorUtils';
@@ -32,6 +34,7 @@ type Event = Schema['Event']['type'];
  */
 export default function AdminDashboardPage() {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
+  const { alert: showAlert, dialogState, handleClose, handleConfirm } = useDialog();
   const router = useRouter();
   
   const [isLoading, setIsLoading] = useState(true);
@@ -144,7 +147,7 @@ export default function AdminDashboardPage() {
       return result;
     } catch (error) {
       console.error('Error:', error);
-      alert(`Error al aprobar: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      await showAlert(`Error al aprobar: ${error instanceof Error ? error.message : 'Error desconocido'}`, { variant: 'danger' });
       throw error;
     }
   };
@@ -174,14 +177,14 @@ export default function AdminDashboardPage() {
       const result = await response.json();
       console.log('✅ Resultado:', result);
 
-      alert('✅ Speaker aprobado correctamente.\n\nSe ha enviado un email de notificación.');
+      await showAlert('Speaker aprobado correctamente.\n\nSe ha enviado un email de notificación.', { variant: 'success' });
 
       // Reload data
       await loadDashboardData();
       setSelectedApplication(null);
     } catch (error) {
       console.error('Error:', error);
-      alert(`Error al aprobar: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      await showAlert(`Error al aprobar: ${error instanceof Error ? error.message : 'Error desconocido'}`, { variant: 'danger' });
       throw error;
     }
   };
@@ -209,14 +212,14 @@ export default function AdminDashboardPage() {
         throw new Error(error.message || 'Error al rechazar la aplicación');
       }
 
-      alert('✅ Aplicación rechazada.\n\nSe ha enviado un email con el feedback.');
+      await showAlert('Aplicación rechazada.\n\nSe ha enviado un email con el feedback.', { variant: 'success' });
 
       // Reload data
       await loadDashboardData();
       setSelectedApplication(null);
     } catch (error) {
       console.error('Error:', error);
-      alert(`Error al rechazar: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      await showAlert(`Error al rechazar: ${error instanceof Error ? error.message : 'Error desconocido'}`, { variant: 'danger' });
       throw error;
     }
   };
@@ -247,7 +250,7 @@ export default function AdminDashboardPage() {
             </div>
             <div>
               <h1 className="text-xl sm:text-3xl font-bold text-text-primary">
-                Command Center
+                Administrador
               </h1>
               <p className="text-xs sm:text-sm text-text-secondary">
                 Dashboard de gestión
@@ -433,6 +436,13 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Dialog Renderer */}
+      <DialogRenderer
+        state={dialogState}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

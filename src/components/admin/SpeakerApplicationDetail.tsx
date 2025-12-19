@@ -26,6 +26,8 @@ import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Textarea';
 import { Label } from '../ui/Label';
 import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
+import { useDialog } from '@/hooks/useDialog';
+import { DialogRenderer } from '@/components/ui/DialogRenderer';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../amplify/data/resource';
 
@@ -54,6 +56,7 @@ export function SpeakerApplicationDetail({
   onApprove,
   onReject,
 }: SpeakerApplicationDetailProps) {
+  const { alert: showAlert, dialogState, handleClose: closeDialog, handleConfirm } = useDialog();
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
@@ -133,7 +136,7 @@ export function SpeakerApplicationDetail({
 
   const handleApprove = async () => {
     if (!application.id || !application.userId) {
-      alert('Error: Datos incompletos de la aplicación');
+      await showAlert('Error: Datos incompletos de la aplicación', { variant: 'danger' });
       return;
     }
 
@@ -143,7 +146,7 @@ export function SpeakerApplicationDetail({
       onClose();
     } catch (error) {
       console.error('Error al aprobar:', error);
-      alert('Error al aprobar la postulación');
+      await showAlert('Error al aprobar la postulación', { variant: 'danger' });
     } finally {
       setIsApproving(false);
     }
@@ -151,12 +154,12 @@ export function SpeakerApplicationDetail({
 
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      alert('Por favor proporciona una razón para el rechazo');
+      await showAlert('Por favor proporciona una razón para el rechazo', { variant: 'warning' });
       return;
     }
 
     if (!application.id || !application.userId) {
-      alert('Error: Datos incompletos de la aplicación');
+      await showAlert('Error: Datos incompletos de la aplicación', { variant: 'danger' });
       return;
     }
 
@@ -168,7 +171,7 @@ export function SpeakerApplicationDetail({
       onClose();
     } catch (error) {
       console.error('Error al rechazar:', error);
-      alert('Error al rechazar la postulación');
+      await showAlert('Error al rechazar la postulación', { variant: 'danger' });
     } finally {
       setIsRejecting(false);
     }
@@ -598,6 +601,13 @@ export function SpeakerApplicationDetail({
           </div>
         )}
       </div>
+
+      {/* Dialog Renderer */}
+      <DialogRenderer
+        state={dialogState}
+        onClose={closeDialog}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

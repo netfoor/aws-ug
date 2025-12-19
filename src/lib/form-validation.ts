@@ -245,15 +245,21 @@ export function validateProposedDate(date: Date | null): ValidationResult {
     return { valid: false, errors };
   }
 
+  // Normalize dates to start of day (midnight) for accurate comparison
   const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  
+  const selectedDate = new Date(date);
+  selectedDate.setHours(0, 0, 0, 0);
+  
   const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const sixMonthsFromNow = new Date(now.getTime() + 6 * 30 * 24 * 60 * 60 * 1000);
 
-  if (date < oneWeekFromNow) {
+  if (selectedDate < oneWeekFromNow) {
     errors.push('La fecha debe ser al menos una semana en el futuro');
   }
 
-  if (date > sixMonthsFromNow) {
+  if (selectedDate > sixMonthsFromNow) {
     warnings.push('La fecha está muy lejos en el futuro. Considera una fecha más cercana.');
   }
 

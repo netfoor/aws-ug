@@ -6,6 +6,8 @@ import { generateClient } from 'aws-amplify/data';
 import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
+import { useDialog } from '@/hooks/useDialog';
+import { DialogRenderer } from '@/components/ui/DialogRenderer';
 import Image from 'next/image';
 // import Link from 'next/link'; // Unused import
 import { Calendar, Clock, MapPin, Share2, Plus, Mail, Loader2, Users, Tag, ClipboardList, MessageSquare, Edit, UserPlus, Ticket } from 'lucide-react';
@@ -24,6 +26,7 @@ export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { isAuthenticated, isAdmin, user } = useAuth();
+  const { alert: showAlert, dialogState, handleClose, handleConfirm } = useDialog();
   const slug = params?.slug as string;
 
   const [event, setEvent] = useState<EventType | null>(null);
@@ -168,7 +171,7 @@ export default function EventDetailsPage() {
     } else {
       // Copiar al clipboard
       navigator.clipboard.writeText(url);
-      alert('Link copiado al clipboard');
+      await showAlert('Link copiado al clipboard', { variant: 'success' });
     }
   };
 
@@ -660,6 +663,13 @@ export default function EventDetailsPage() {
           userName={registration.userName || 'Usuario'}
         />
       )}
+
+      {/* Dialog Renderer */}
+      <DialogRenderer
+        state={dialogState}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

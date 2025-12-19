@@ -13,6 +13,7 @@ import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
 import { Linkedin, Twitter, Github, Globe } from 'lucide-react';
 import { EditProfileForm } from '@/components/profile';
 import ProfessionalProfileForm from '@/components/profile/ProfessionalProfileForm';
+import SpeakerProfileEditor from '@/components/speaker/SpeakerProfileEditor';
 import { calculateProfileCompleteness, getCompletenessMessage } from '@/lib/profile-utils';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../amplify/data/resource';
@@ -37,6 +38,26 @@ export default function ProfilePage() {
         return;
       }
       
+      // Handle professional profile hash
+      if (window.location.hash === '#professional-profile') {
+        console.log('🔍 Hash detected: #professional-profile');
+        console.log('📊 Profile data:', profile);
+        console.log('⏳ Profile loading:', profileLoading);
+        
+        // Solo mostrar el formulario cuando el perfil ya se haya cargado
+        if (!profileLoading && profile) {
+          setShowProfessionalForm(true);
+          // Scroll to professional profile section
+          setTimeout(() => {
+            const element = document.getElementById('professional-profile-section');
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }
+        return;
+      }
+      
       // Handle query parameter redirect (from Next.js config)
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('section') === 'speaker') {
@@ -44,26 +65,45 @@ export default function ProfilePage() {
         return;
       }
     }
-  }, [router]);
+  }, [router, profile, profileLoading]);
 
   // Handler para guardar perfil profesional
-  async function handleSaveProfessionalProfile(data: { speakerPhotoKey?: string; speakerCvKey?: string; linkedInUrl?: string; expertiseArea?: string }) {
+  async function handleSaveProfessionalProfile(data: { 
+    speakerPhotoKey?: string; 
+    speakerCvKey?: string; 
+    linkedInUrl?: string; 
+    expertiseArea?: string;
+    company?: string;
+    jobTitle?: string;
+  }) {
     if (!user) return;
 
+    console.log('💾 Guardando perfil profesional:', data);
+
     try {
-      await client.models.User.update({
+      const updateData = {
         id: user.userId,
         speakerPhotoKey: data.speakerPhotoKey,
         speakerCvKey: data.speakerCvKey,
         linkedInUrl: data.linkedInUrl,
         expertiseArea: data.expertiseArea,
+        company: data.company,
+        jobTitle: data.jobTitle,
         updatedAt: new Date().toISOString(),
-      });
+      };
+      
+      console.log('📤 Enviando a DynamoDB:', updateData);
+      
+      const result = await client.models.User.update(updateData);
+      
+      console.log('✅ Perfil actualizado en DynamoDB:', result);
 
       await refetch();
+      console.log('🔄 Perfil refetcheado');
+      
       setShowProfessionalForm(false);
     } catch (error) {
-      console.error('Error updating professional profile:', error);
+      console.error('❌ Error updating professional profile:', error);
       throw error;
     }
   }
@@ -309,7 +349,7 @@ export default function ProfilePage() {
 
           {/* Professional Profile Section (For Speakers) */}
           {(profile?.role === 'SPEAKER' || profile?.role === 'ADMIN') && (
-            <div className="mb-8">
+            <div id="professional-profile-section" className="mb-8 scroll-mt-20">
               <Card variant="elevated">
                 <CardHeader>
                   <div className="space-y-3">
@@ -342,7 +382,14 @@ export default function ProfilePage() {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  {!showProfessionalForm ? (
+                  {profileLoading && showProfessionalForm ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-accent border-t-transparent mx-auto mb-4"></div>
+                        <p className="text-text-secondary">Cargando datos del perfil...</p>
+                      </div>
+                    </div>
+                  ) : !showProfessionalForm ? (
                     <div className="space-y-4">
                       {/* Status actual */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -401,18 +448,36 @@ export default function ProfilePage() {
                       )}
                     </div>
                   ) : (
-                    <ProfessionalProfileForm
-                      userId={user.userId}
-                      initialData={{
-                        speakerPhotoKey: profile?.speakerPhotoKey || undefined,
-                        speakerCvKey: profile?.speakerCvKey || undefined,
-                        linkedInUrl: profile?.linkedInUrl || undefined,
-                        expertiseArea: profile?.expertiseArea || undefined,
-                      }}
-                      onSave={handleSaveProfessionalProfile}
-                      onSkip={() => setShowProfessionalForm(false)}
-                      showSkipButton={true}
-                    />
+                    // Usar SpeakerProfileEditor para edición (mejor UX)
+                    profile?.speakerPhotoKey || profile?.speakerCvKey || profile?.linkedInUrl ? (
+                      <SpeakerProfileEditor
+                        userId={user.userId}
+                        currentData={{
+                          speakerPhotoKey: profile?.speakerPhotoKey || undefined,
+                          speakerCvKey: profile?.speakerCvKey || undefined,
+                          linkedInUrl: profile?.linkedInUrl || undefined,
+                          expertiseArea: profile?.expertiseArea || undefined,
+                          company: profile?.company || undefined,
+                          jobTitle: profile?.jobTitle || undefined,
+                        }}
+                        onSave={handleSaveProfessionalProfile}
+                        onCancel={() => setShowProfessionalForm(false)}
+                      />
+                    ) : (
+                      // Usar ProfessionalProfileForm para primera vez
+                      <ProfessionalProfileForm
+                        userId={user.userId}
+                        initialData={{
+                          speakerPhotoKey: profile?.speakerPhotoKey || undefined,
+                          speakerCvKey: profile?.speakerCvKey || undefined,
+                          linkedInUrl: profile?.linkedInUrl || undefined,
+                          expertiseArea: profile?.expertiseArea || undefined,
+                        }}
+                        onSave={handleSaveProfessionalProfile}
+                        onSkip={() => setShowProfessionalForm(false)}
+                        showSkipButton={true}
+                      />
+                    )
                   )}
                 </CardContent>
               </Card>

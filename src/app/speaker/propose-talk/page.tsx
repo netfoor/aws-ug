@@ -70,7 +70,17 @@ export default function ProposeTalkPage() {
   // Verificar completitud del perfil profesional
   useEffect(() => {
     if (profile && !profileLoading) {
+      console.log('🔍 Verificando perfil para propose-talk:', profile);
+      console.log('📋 Datos profesionales:', {
+        speakerPhotoKey: profile.speakerPhotoKey,
+        speakerCvKey: profile.speakerCvKey,
+        linkedInUrl: profile.linkedInUrl,
+        expertiseArea: profile.expertiseArea,
+      });
+      
       const check = canProposeTalk(profile);
+      console.log('✅ Resultado de canProposeTalk:', check);
+      
       if (!check.allowed) {
         setShowProfileWarning(true);
         setError(check.reason || 'Perfil incompleto');
@@ -80,6 +90,17 @@ export default function ProposeTalkPage() {
       }
     }
   }, [profile, profileLoading]);
+
+  // Redirigir automáticamente si el perfil no está completo
+  useEffect(() => {
+    if (showProfileWarning && !profileLoading) {
+      // Dar tiempo para que el usuario vea el mensaje antes de redirigir
+      const timer = setTimeout(() => {
+        router.push('/profile#professional-profile');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showProfileWarning, profileLoading, router]);
 
   // Agregar topic
   const handleAddTopic = () => {
@@ -258,22 +279,48 @@ export default function ProposeTalkPage() {
           >
             ← Volver
           </button>
-          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">
-            Proponer una Charla
-          </h1>
-          <p className="text-text-secondary">
-            Comparte tu conocimiento con la comunidad AWS Puebla
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">
+                Proponer una Charla
+              </h1>
+              <p className="text-text-secondary">
+                Comparte tu conocimiento con la comunidad AWS Puebla
+              </p>
+            </div>
+            {/* Link para editar perfil profesional */}
+            {!showProfileWarning && profile && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.push('/profile#professional-profile')}
+                className="text-sm whitespace-nowrap hidden sm:flex"
+              >
+                ✏️ Editar Perfil
+              </Button>
+            )}
+          </div>
+          {/* Versión móvil del botón */}
+          {!showProfileWarning && profile && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/profile#professional-profile')}
+              className="text-sm w-full mt-3 sm:hidden"
+            >
+              ✏️ Editar mi Perfil Profesional
+            </Button>
+          )}
         </div>
 
         {/* Warning de perfil incompleto */}
         {showProfileWarning && (
-          <div className="mb-6 p-6 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded-lg">
+          <div className="mb-6 p-6 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded-lg animate-pulse">
             <div className="flex items-start gap-4">
               <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">
-                  ¡Completa tu Perfil Profesional!
+                  ¡Completa tu Perfil Profesional Primero!
                 </h3>
                 <p className="text-amber-800 dark:text-amber-200 mb-3">
                   {error}
@@ -281,13 +328,16 @@ export default function ProposeTalkPage() {
                 <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
                   Necesitamos esta información para promocionar tu participación en nuestros eventos y redes sociales.
                 </p>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mb-4">
+                  Serás redirigido automáticamente en 3 segundos...
+                </p>
                 <Button
                   type="button"
                   variant="accent"
                   onClick={() => router.push('/profile#professional-profile')}
                   className="bg-amber-600 hover:bg-amber-700 text-white"
                 >
-                  Completar Perfil Ahora
+                  Ir Ahora al Perfil
                 </Button>
               </div>
             </div>

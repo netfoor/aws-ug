@@ -16,6 +16,8 @@ import {
   Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { useDialog } from '@/hooks/useDialog';
+import { DialogRenderer } from '@/components/ui/DialogRenderer';
 import Link from 'next/link';
 
 const client = generateClient<Schema>();
@@ -31,6 +33,7 @@ type FilterStatus = 'ALL' | 'DRAFT' | 'PUBLISHED' | 'CANCELLED' | 'COMPLETED';
  */
 export default function AdminEventsPage() {
   const { user, isAuthenticated, isLoading: authLoading, isAdmin } = useAuth();
+  const { confirm: showConfirm, dialogState, handleClose, handleConfirm } = useDialog();
   
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
@@ -108,7 +111,13 @@ export default function AdminEventsPage() {
 
   // Cancelar evento
   const handleCancel = async (eventId: string) => {
-    if (!confirm('¿Estás seguro de cancelar este evento?')) return;
+    const confirmed = await showConfirm('¿Estás seguro de cancelar este evento?', {
+      variant: 'warning',
+      confirmText: 'Sí, cancelar',
+      cancelText: 'No'
+    });
+    
+    if (!confirmed) return;
     if (!user) return;
 
     setIsProcessing(true);
@@ -427,6 +436,13 @@ export default function AdminEventsPage() {
           </div>
         )}
       </div>
+
+      {/* Dialog Renderer */}
+      <DialogRenderer
+        state={dialogState}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

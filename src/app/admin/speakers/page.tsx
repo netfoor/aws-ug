@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { SpeakerApplicationsList } from '@/components/admin/SpeakerApplicationsList';
 import { SpeakerApplicationDetail } from '@/components/admin/SpeakerApplicationDetail';
+import { useDialog } from '@/hooks/useDialog';
+import { DialogRenderer } from '@/components/ui/DialogRenderer';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
@@ -25,6 +27,7 @@ const client = generateClient<Schema>();
  */
 export default function AdminSpeakersPage() {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
+  const { alert: showAlert, dialogState, handleClose, handleConfirm } = useDialog();
   const [applications, setApplications] = useState<Schema['SpeakerApplication']['type'][]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState<Schema['SpeakerApplication']['type'] | null>(null);
@@ -112,12 +115,12 @@ export default function AdminSpeakersPage() {
       await loadApplications();
 
       // Mensaje mejorado con información de TalkProposal
-      const baseMessage = '✅ Postulación aprobada correctamente. Se ha enviado un email al usuario y se agregó al grupo SPEAKERS.';
+      const baseMessage = 'Postulación aprobada correctamente. Se ha enviado un email al usuario y se agregó al grupo SPEAKERS.';
       const proposalMessage = result.talkProposalCreated 
         ? `\n\n🎯 Bonus: Se creó automáticamente una TalkProposal (ID: ${result.talkProposalId?.slice(0, 8)}...) desde la propuesta adjunta.`
         : '';
       
-      alert(baseMessage + proposalMessage);
+      await showAlert(baseMessage + proposalMessage, { variant: 'success' });
     } catch (error) {
       console.error('Error al aprobar:', error);
       throw error;
@@ -154,7 +157,7 @@ export default function AdminSpeakersPage() {
       // Recargar lista
       await loadApplications();
 
-      alert('✅ Postulación rechazada. Se ha enviado un email al usuario con el feedback.');
+      await showAlert('Postulación rechazada. Se ha enviado un email al usuario con el feedback.', { variant: 'success' });
     } catch (error) {
       console.error('Error al rechazar:', error);
       throw error;
@@ -260,6 +263,13 @@ export default function AdminSpeakersPage() {
         }}
         onApprove={handleApprove}
         onReject={handleReject}
+      />
+
+      {/* Dialog Renderer */}
+      <DialogRenderer
+        state={dialogState}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
       />
     </div>
   );

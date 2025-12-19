@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle, XCircle, Calendar, MessageSquare, Megaphone, ExternalLink, FileText, RefreshCw } from 'lucide-react';
 import type { Schema } from '../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 type Notification = Schema['Notification']['type'];
 
@@ -30,33 +31,27 @@ export function NotificationList({
   onClose,
 }: NotificationListProps) {
   const { refreshUser, logout } = useAuth();
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showReloginDialog, setShowReloginDialog] = useState(false);
+  const [pendingNotificationId, setPendingNotificationId] = useState<string | null>(null);
 
   // Refrescar sesión del usuario (forzar re-login)
-  const handleRefreshSession = async (notificationId: string) => {
+  const handleRefreshSession = async () => {
+    if (!pendingNotificationId) return;
+    
     setIsRefreshing(true);
-    
-    const confirmed = confirm(
-      '🔄 Para activar tus nuevos permisos, necesitas cerrar sesión y volver a iniciar.\n\n¿Continuar?'
-    );
-    
-    if (!confirmed) {
-      setIsRefreshing(false);
-      return;
-    }
     
     try {
       // Marcar como leída antes de hacer logout
-      onMarkAsRead(notificationId);
+      onMarkAsRead(pendingNotificationId);
       
       // Esperar un momento para que se guarde
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Hacer logout - esto redirigirá automáticamente a /login
-      window.location.href = '/logout';
+      // Hacer logout (esto redirigirá a Cognito Hosted UI)
+      await logout();
     } catch (error) {
-      console.error('Error refreshing session:', error);
-      alert('❌ Error al cerrar sesión. Intenta manualmente desde el menú.');
+      console.error('Error logging out:', error);
       setIsRefreshing(false);
     }
   };
@@ -105,8 +100,9 @@ export function NotificationList({
   };
 
   return (
-    <div className="divide-y divide-border">
-      {notifications.map((notification) => {
+    <>
+      <div className="divide-y divide-border">
+        {notifications.map((notification) => {
         const hasLink = notification.link && notification.link.trim() !== '';
 
         const NotificationContent = (
@@ -158,22 +154,8 @@ export function NotificationList({
                       e.preventDefault();
                       e.stopPropagation();
                       
-                      const confirmed = confirm('🔄 Para activar tus nuevos permisos de speaker, necesitas cerrar sesión y volver a iniciar.\\n\\n¿Cerrar sesión ahora?');
-                      
-                      if (confirmed) {
-                        setIsRefreshing(true);
-                        try {
-                          // Marcar como leída
-                          onMarkAsRead(notification.id!);
-                          // Esperar un momento
-                          await new Promise(resolve => setTimeout(resolve, 500));
-                          // Hacer logout (esto redirigirá a Cognito Hosted UI)
-                          await logout();
-                        } catch (error) {
-                          console.error('Error logging out:', error);
-                          setIsRefreshing(false);
-                        }
-                      }
+                      setPendingNotificationId(notification.id!);
+                      setShowReloginDialog(true);
                     }}
                     disabled={isRefreshing}
                     className="mt-3 w-full text-xs"
@@ -230,5 +212,21 @@ export function NotificationList({
         );
       })}
     </div>
+
+    {/* Diálogo de confirmación para relogin */}
+    <ConfirmDialog
+      isOpen={showReloginDialog}
+      onClose={() => {
+        setShowReloginDialog(false);
+        setPendingNotificationId(null);
+      }}
+      onConfirm={handleRefreshSession}
+      title="🔄 Activar Nuevos Permisos"
+      message={`Para activar tus nuevos permisos de speaker, necesitas cerrar sesión y volver a iniciar.\n\n¿Cerrar sesión ahora?`}
+      confirmText="Cerrar sesión"
+      cancelText="Más tarde"
+      variant="info"
+    />
+    </>
   );
 }

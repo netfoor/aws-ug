@@ -25,6 +25,8 @@ import {
 import { Button } from '@/components/ui/Button';
 import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
 import { EventCreationWizard } from './EventCreationWizard';
+import { useDialog } from '@/hooks/useDialog';
+import { DialogRenderer } from '@/components/ui/DialogRenderer';
 import type { Schema } from '../../../amplify/data/resource';
 
 type SpeakerApplication = Schema['SpeakerApplication']['type'];
@@ -57,6 +59,7 @@ export function UnifiedApplicationCard({
   onReject,
   onRefresh,
 }: UnifiedApplicationCardProps) {
+  const { alert: showAlert, dialogState, handleClose, handleConfirm } = useDialog();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
@@ -131,7 +134,7 @@ export function UnifiedApplicationCard({
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al aprobar. Por favor intenta de nuevo.');
+      await showAlert('Error al aprobar. Por favor intenta de nuevo.', { variant: 'danger' });
     } finally {
       setIsProcessing(false);
     }
@@ -163,7 +166,7 @@ export function UnifiedApplicationCard({
       await onApproveSpeakerOnly(application.id as string, application.userId as string);
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al aprobar. Por favor intenta de nuevo.');
+      await showAlert('Error al aprobar. Por favor intenta de nuevo.', { variant: 'danger' });
     } finally {
       setIsProcessing(false);
     }
@@ -171,7 +174,7 @@ export function UnifiedApplicationCard({
 
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      alert('Por favor proporciona una razón para el rechazo');
+      await showAlert('Por favor proporciona una razón para el rechazo', { variant: 'warning' });
       return;
     }
 
@@ -184,7 +187,7 @@ export function UnifiedApplicationCard({
       setRejectionReason('');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al rechazar. Por favor intenta de nuevo.');
+      await showAlert('Error al rechazar. Por favor intenta de nuevo.', { variant: 'danger' });
     } finally {
       setIsProcessing(false);
     }
@@ -603,6 +606,13 @@ export function UnifiedApplicationCard({
           )}
         </div>
       )}
+
+      {/* Dialog Renderer */}
+      <DialogRenderer
+        state={dialogState}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

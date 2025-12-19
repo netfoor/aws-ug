@@ -208,6 +208,8 @@ export default function UnifiedSpeakerProposalForm({
 
     if (!validation.valid) {
       setError(validation.errors[0]); // Show first error
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return false;
     }
 
@@ -221,6 +223,7 @@ export default function UnifiedSpeakerProposalForm({
       const profileValidation = validateProfessionalProfileCompletion(formData as ValidationFormData);
       if (!profileValidation.valid) {
         setError('Debes completar tu perfil profesional antes de continuar con la aplicación como speaker');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return false;
       }
     }
@@ -230,6 +233,7 @@ export default function UnifiedSpeakerProposalForm({
       const talkValidation = validateMandatoryTalkProposal(formData as ValidationFormData);
       if (!talkValidation.valid) {
         setError(talkValidation.errors[0]);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return false;
       }
     }
@@ -239,6 +243,7 @@ export default function UnifiedSpeakerProposalForm({
       const specializationValidation = validateSpecializationArea(formData as ValidationFormData);
       if (!specializationValidation.valid) {
         setError(specializationValidation.errors[0]);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return false;
       }
     }
@@ -269,6 +274,7 @@ export default function UnifiedSpeakerProposalForm({
     const completeValidation = validateCompleteForm(formData as ValidationFormData);
     if (!completeValidation.valid) {
       setError(completeValidation.errors[0]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 

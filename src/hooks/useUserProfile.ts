@@ -37,12 +37,15 @@ export function useUserProfile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     if (!user?.userId) return;
     
     setLoading(true);
     setError(null);
+    
+    console.log('🔄 useUserProfile: Fetching profile for userId:', user.userId);
     
     try {
       // IMPORTANTE: Obtener el role desde los grupos de Cognito (fuente de verdad)
@@ -103,6 +106,8 @@ export function useUserProfile() {
         };
         setProfile(initialProfile);
       }
+      
+      setHasFetched(true);
     } catch (err) {
       setError('Error al cargar el perfil');
       console.error('Error fetching profile:', err);
@@ -240,17 +245,29 @@ export function useUserProfile() {
   };
 
   useEffect(() => {
-    // Only fetch profile once when user ID is available and we don't have a profile yet
-    if (user?.userId && !profile && !loading) {
+    // Fetch profile when user ID is available and we haven't fetched yet
+    if (user?.userId && !hasFetched && !loading) {
+      console.log('🎯 useUserProfile: Initial fetch for userId:', user.userId);
       fetchProfile();
     }
-  }, [user?.userId]); // Removed fetchProfile from dependencies to prevent loops
+    
+    // Clear profile when user logs out
+    if (!user?.userId && profile) {
+      console.log('🚪 useUserProfile: Clearing profile (user logged out)');
+      setProfile(null);
+      setHasFetched(false);
+    }
+  }, [user?.userId, hasFetched, loading, profile, fetchProfile]);
 
   return {
     profile,
     loading,
     error,
     updateProfile,
-    refetch: fetchProfile,
+    refetch: () => {
+      console.log('🔄 useUserProfile: Manual refetch requested');
+      setHasFetched(false); // Reset flag to allow re-fetch
+      return fetchProfile();
+    },
   };
 }

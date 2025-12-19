@@ -162,6 +162,7 @@ interface SpeakerApplication {
   submittedAt: string;
   hasAttachedProposal?: boolean;
   attachedProposal?: AttachedProposal; // Ya viene como objeto desde DynamoDB DocumentClient
+  professionalProfile?: ProfessionalProfile; // Datos profesionales del speaker
   schedulerArn?: string; // ARN del EventBridge Schedule
 }
 
@@ -171,6 +172,18 @@ interface AttachedProposal {
   duration: number;
   targetAudience: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL';
   proposedDate?: string; // ISO date
+}
+
+interface ProfessionalProfile {
+  photoKey?: string;
+  cvKey?: string;
+  linkedInUrl?: string;
+  expertiseArea?: string;
+  company?: string;
+  jobTitle?: string;
+  givenName?: string;
+  familyName?: string;
+  phoneNumber?: string;
 }
 
 // ========================================
@@ -343,22 +356,68 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
 
     console.log('✅ Usuario agregado al grupo SPEAKERS');
 
-    // 5️⃣ 🎯 Actualizar role en tabla User a SPEAKER
-    console.log(`📋 Actualizando role en User table: ${userId}`);
+    // 5️⃣ 🎯 Actualizar role en tabla User a SPEAKER y copiar professionalProfile
+    console.log(`📋 Actualizando role y perfil profesional en User table: ${userId}`);
+    
+    // Preparar los datos del perfil profesional si existen
+    const updateExpressions: string[] = ['#role = :role', 'updatedAt = :now'];
+    const expressionAttributeNames: Record<string, string> = { '#role': 'role' };
+    const expressionAttributeValues: Record<string, unknown> = {
+      ':role': 'SPEAKER',
+      ':now': new Date().toISOString(),
+    };
+    
+    // Copiar datos del professionalProfile a la tabla User si existen
+    if (application.professionalProfile) {
+      const profile = application.professionalProfile;
+      
+      if (profile.photoKey) {
+        updateExpressions.push('speakerPhotoKey = :photoKey');
+        expressionAttributeValues[':photoKey'] = profile.photoKey;
+        console.log(`  ✓ Copiando photoKey: ${profile.photoKey}`);
+      }
+      
+      if (profile.cvKey) {
+        updateExpressions.push('speakerCvKey = :cvKey');
+        expressionAttributeValues[':cvKey'] = profile.cvKey;
+        console.log(`  ✓ Copiando cvKey: ${profile.cvKey}`);
+      }
+      
+      if (profile.linkedInUrl) {
+        updateExpressions.push('linkedInUrl = :linkedInUrl');
+        expressionAttributeValues[':linkedInUrl'] = profile.linkedInUrl;
+        console.log(`  ✓ Copiando linkedInUrl: ${profile.linkedInUrl}`);
+      }
+      
+      if (profile.expertiseArea) {
+        updateExpressions.push('expertiseArea = :expertiseArea');
+        expressionAttributeValues[':expertiseArea'] = profile.expertiseArea;
+        console.log(`  ✓ Copiando expertiseArea: ${profile.expertiseArea}`);
+      }
+      
+      // También copiar company y jobTitle si existen y no están ya en User
+      if (profile.company) {
+        updateExpressions.push('company = :company');
+        expressionAttributeValues[':company'] = profile.company;
+        console.log(`  ✓ Copiando company: ${profile.company}`);
+      }
+      
+      if (profile.jobTitle) {
+        updateExpressions.push('jobTitle = :jobTitle');
+        expressionAttributeValues[':jobTitle'] = profile.jobTitle;
+        console.log(`  ✓ Copiando jobTitle: ${profile.jobTitle}`);
+      }
+    }
+    
     await docClient.send(new UpdateCommand({
       TableName: userTableName,
       Key: { id: userId },
-      UpdateExpression: 'SET #role = :role, updatedAt = :now',
-      ExpressionAttributeNames: {
-        '#role': 'role',
-      },
-      ExpressionAttributeValues: {
-        ':role': 'SPEAKER',
-        ':now': new Date().toISOString(),
-      },
+      UpdateExpression: `SET ${updateExpressions.join(', ')}`,
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: expressionAttributeValues,
     }));
 
-    console.log('✅ Role actualizado en User table');
+    console.log('✅ Role y perfil profesional actualizados en User table');
 
     // 6️⃣ Enviar email de aprobación
     const userName = application.email.split('@')[0]; // Fallback si no hay nombre
