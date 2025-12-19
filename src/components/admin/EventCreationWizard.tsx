@@ -361,7 +361,7 @@ export function EventCreationWizard({
         <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
           <div className="flex items-start gap-2">
             <Edit3 className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-blue-800 dark:text-blue-200">
+            <p className="text-xs text-blue-800 dark:text-blue-800">
               Puedes personalizar, agregar o eliminar preguntas después en la sección de gestión del evento
             </p>
           </div>

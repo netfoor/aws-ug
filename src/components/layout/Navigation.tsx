@@ -191,7 +191,7 @@ export function Navigation({ className }: NavigationProps) {
                   ) : (
                     <Link
                       href="/speaker/apply"
-                      className="flex items-center gap-2 px-3 py-2 text-base font-medium text-accent hover:text-accent-dark hover:bg-accent/10 rounded-md transition-colors border border-accent/20"
+                      className="flex items-center gap-2 px-3 py-2 text-base font-medium text-accent hover:text-accent-dark hover:bg-accent/10 rounded-md transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

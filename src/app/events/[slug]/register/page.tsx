@@ -196,22 +196,12 @@ export default function EventRegistrationPage() {
     try {
       setIsSubmitting(true);
 
-      // Generar un ID temporal para el QR token
-      const tempRegistrationId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-
-      // Generar QR token con ID temporal
-      const qrToken = QRTokenUtils.generateToken({
-        eventId: event.id,
-        userId: user.userId,
-        registrationId: tempRegistrationId,
-      });
-
-      // Crear registro con QR token
+      // Crear registro SIN QR token primero
       const { data: registration, errors: regErrors } = await client.models.EventRegistration.create({
         eventId: event.id,
         userId: user.userId,
         status: 'GOING',
-        qrCodeToken: qrToken,
+        qrCodeToken: '', // Temporal vacío
         registeredAt: new Date().toISOString(),
         userName: user.signInDetails?.loginId || user.username || 'Usuario',
         userEmail: user.signInDetails?.loginId || '',
@@ -221,26 +211,15 @@ export default function EventRegistrationPage() {
 
       if (regErrors || !registration || !registration.id) {
         console.error('Registration errors:', regErrors);
-        console.error('Registration data attempted:', {
-          eventId: event.id,
-          userId: user.userId,
-          status: 'GOING',
-          qrCodeToken: qrToken,
-          registeredAt: new Date().toISOString(),
-          userName: user.signInDetails?.loginId || user.username || 'Usuario',
-          userEmail: user.signInDetails?.loginId || '',
-          registrationAnswers: JSON.stringify(answers),
-          checkedIn: false,
-        });
         setError('Error al registrar. Por favor intenta de nuevo.');
         return;
       }
 
-      // Actualizar el QR token con el ID real del registro
+      // Ahora generar el QR token con el ID REAL del registro
       const finalQrToken = QRTokenUtils.generateToken({
         eventId: event.id,
         userId: user.userId,
-        registrationId: registration.id, // Ahora sabemos que no es null
+        registrationId: registration.id,
       });
 
       // Actualizar el registro con el token correcto

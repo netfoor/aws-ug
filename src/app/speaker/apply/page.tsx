@@ -166,6 +166,32 @@ export default function UnifiedSpeakerApplicationPage() {
 
       console.log('✅ Application created with attached proposal:', application);
 
+      // 🔔 Notify admins about new speaker application with proposal
+      if (application?.id) {
+        try {
+          const notifyResponse = await fetch('/api/speaker/notify-admins', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              proposalId: application.id,
+              speakerName: `${formData.givenName} ${formData.familyName}`,
+              title: formData.talkTitle,
+            }),
+          });
+
+          if (!notifyResponse.ok) {
+            console.warn('⚠️ No se pudo notificar a los admins:', await notifyResponse.text());
+          } else {
+            console.log('✅ Admins notificados sobre nueva aplicación');
+          }
+        } catch (notifyError) {
+          console.warn('⚠️ Error al notificar admins (no crítico):', notifyError);
+          // No fallar el flujo principal si falla la notificación
+        }
+      }
+
       // Update user profile with professional data
       if (profile?.id) {
         const updateData: {

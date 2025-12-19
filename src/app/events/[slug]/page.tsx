@@ -290,9 +290,11 @@ export default function EventDetailsPage() {
 
           {/* Event Type Badge */}
           {event.eventType && (
-            <Badge variant="accent" size="md" className="mb-4">
-              {event.eventType}
-            </Badge>
+            <div className="mb-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800">
+                {event.eventType}
+              </span>
+            </div>
           )}
 
           {/* Action Buttons */}
@@ -413,9 +415,12 @@ export default function EventDetailsPage() {
             </div>
             <div className="flex flex-wrap gap-2">
               {event.topics.map((topic, index) => (
-                <Badge key={index} variant="primary" size="sm">
+                <span
+                  key={index}
+                  className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800"
+                >
                   {topic}
-                </Badge>
+                </span>
               ))}
             </div>
           </div>
@@ -487,10 +492,18 @@ export default function EventDetailsPage() {
               
               <div className="flex-1">
                 <h3 className="font-semibold text-text-primary mb-1">
-                  {event.speakerName}
+                  {speaker.givenName && speaker.familyName 
+                    ? `${speaker.givenName} ${speaker.familyName}`
+                    : event.speakerName
+                  }
                 </h3>
-                {speaker.jobTitle && (
-                  <p className="text-sm text-text-secondary mb-2">{speaker.jobTitle}</p>
+                {speaker.jobTitle && speaker.company && (
+                  <p className="text-sm text-text-secondary mb-2">
+                    {speaker.jobTitle} @ {speaker.company}
+                  </p>
+                )}
+                {!speaker.jobTitle && speaker.company && (
+                  <p className="text-sm text-text-secondary mb-2">{speaker.company}</p>
                 )}
                 {event.speakerBio && (
                   <p className="text-sm text-text-secondary mb-3">{event.speakerBio}</p>

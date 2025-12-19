@@ -635,6 +635,22 @@ export function validateProfessionalProfileCompletion(formData: UnifiedFormData)
   };
 }
 
+// Validation for specialization area
+export function validateSpecializationArea(formData: UnifiedFormData): ValidationResult {
+  const errors: string[] = [];
+
+  // Specialization area is not optional, but must be provided
+  if (!formData.expertiseArea || formData.expertiseArea.trim().length === 0) {
+    errors.push('El área de especialización es requerida');
+  } else if (formData.expertiseArea.length > 100) {
+    errors.push('El área de especialización no puede exceder 100 caracteres');
+  }
+  return {
+    valid: errors.length === 0,
+    errors 
+  };
+}
+
 // Validation to ensure talk proposal cannot be skipped (Requirements 2.1, 2.2)
 export function validateMandatoryTalkProposal(formData: UnifiedFormData): ValidationResult {
   const errors: string[] = [];

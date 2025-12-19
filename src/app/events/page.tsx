@@ -40,6 +40,9 @@ export default function EventsPage() {
   
   // Map de eventId -> contador real de asistentes
   const [attendeeCounts, setAttendeeCounts] = useState<Record<string, number>>({});
+  
+  // Map de eventId -> speaker User data
+  const [speakers, setSpeakers] = useState<Record<string, Schema['User']['type']>>({});
 
   const loadEvents = useCallback(async () => {
     if (typeof window === 'undefined') return; // Solo ejecutar en cliente
@@ -76,6 +79,9 @@ export default function EventsPage() {
       
       // Cargar contadores reales de asistentes
       loadAttendeeCounts(sorted);
+      
+      // Cargar datos reales de speakers
+      loadSpeakers(sorted);
     } catch (err) {
       console.error('Error loading events:', err);
       setError('Error al cargar los eventos');
@@ -136,6 +142,28 @@ export default function EventsPage() {
     );
     
     setAttendeeCounts(counts);
+  };
+
+  const loadSpeakers = async (eventsList: Event[]) => {
+    const client = generateClient<Schema>();
+    const speakersData: Record<string, Schema['User']['type']> = {};
+    
+    await Promise.all(
+      eventsList.map(async (event) => {
+        if (event.speakerId && event.id) {
+          try {
+            const { data: speakerData } = await client.models.User.get({ id: event.speakerId });
+            if (speakerData) {
+              speakersData[event.id] = speakerData;
+            }
+          } catch (err) {
+            console.warn(`Error obteniendo speaker para evento ${event.id}:`, err);
+          }
+        }
+      })
+    );
+    
+    setSpeakers(speakersData);
   };
 
   // Filtrar eventos por búsqueda
@@ -355,9 +383,24 @@ export default function EventsPage() {
                       </h3>
 
                       {/* Speaker */}
-                      <p className="text-sm text-text-secondary mb-3">
-                        Por: <span className="font-semibold">{event.speakerName}</span>
-                      </p>
+                      {event.id && speakers[event.id] ? (
+                        <div className="text-sm text-text-secondary mb-3">
+                          <p className="font-semibold text-text-primary">
+                            {speakers[event.id].givenName && speakers[event.id].familyName
+                              ? `${speakers[event.id].givenName} ${speakers[event.id].familyName}`
+                              : event.speakerName}
+                          </p>
+                          {speakers[event.id].jobTitle && speakers[event.id].company && (
+                            <p className="text-xs">
+                              {speakers[event.id].jobTitle} @ {speakers[event.id].company}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-text-secondary mb-3">
+                          Por: <span className="font-semibold">{event.speakerName}</span>
+                        </p>
+                      )}
 
                       {/* Descripción */}
                       <p className="text-sm text-text-secondary mb-4 line-clamp-3 flex-1">

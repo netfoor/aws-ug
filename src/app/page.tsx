@@ -20,6 +20,7 @@ export default function Home() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'upcoming' | 'past'>('upcoming');
+  const [speakers, setSpeakers] = useState<Record<string, Schema['User']['type']>>({});
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -45,12 +46,36 @@ export default function Home() {
       });
 
       setEvents(sorted);
+      
+      // Load speaker data for all events
+      loadSpeakers(sorted);
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
       setLoading(false);
     }
   }, [filter]);
+
+  const loadSpeakers = async (eventsList: EventType[]) => {
+    const speakersData: Record<string, Schema['User']['type']> = {};
+    
+    await Promise.all(
+      eventsList.map(async (event) => {
+        if (event.speakerId && event.id) {
+          try {
+            const { data: speakerData } = await client.models.User.get({ id: event.speakerId });
+            if (speakerData) {
+              speakersData[event.id] = speakerData;
+            }
+          } catch (err) {
+            console.warn(`Error loading speaker for event ${event.id}:`, err);
+          }
+        }
+      })
+    );
+    
+    setSpeakers(speakersData);
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -340,6 +365,7 @@ export default function Home() {
                 coverImageUrl={event.coverImageUrl ?? undefined}
                 speakerName={event.speakerName}
                 speakerAvatar={event.speakerAvatar ?? undefined}
+                speaker={event.id ? speakers[event.id] : undefined}
                 startDate={event.startDate}
                 location={event.location}
                 isVirtual={event.isVirtual ?? false}

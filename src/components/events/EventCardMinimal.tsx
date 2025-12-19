@@ -7,6 +7,7 @@ import { Clock, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getUrl } from 'aws-amplify/storage';
+import type { Schema } from '../../../amplify/data/resource';
 
 interface EventCardMinimalProps {
   id: string;
@@ -15,6 +16,7 @@ interface EventCardMinimalProps {
   coverImageUrl?: string;
   speakerName: string;
   speakerAvatar?: string;
+  speaker?: Schema['User']['type'];
   startDate: string; // ISO string
   location: string;
   isVirtual: boolean;
@@ -29,6 +31,7 @@ export default function EventCardMinimal({
   coverImageUrl,
   speakerName,
   speakerAvatar,
+  speaker,
   startDate,
   location,
   isVirtual,
@@ -96,9 +99,14 @@ export default function EventCardMinimal({
                 </span>
               )}
             </div>
-            <span className="text-[11px] text-text-secondary font-medium truncate">
-              {speakerName}
-            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[11px] text-text-primary font-semibold truncate">
+                {speaker?.givenName && speaker?.familyName
+                  ? `${speaker.givenName} ${speaker.familyName}`
+                  : speakerName}
+              </span>
+              
+            </div>
           </div>
 
           {/* Event Title */}

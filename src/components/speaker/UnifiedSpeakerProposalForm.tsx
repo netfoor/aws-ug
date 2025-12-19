@@ -13,6 +13,7 @@ import {
   validateCompleteForm,
   validateProfessionalProfileCompletion,
   validateMandatoryTalkProposal,
+  validateSpecializationArea,
   type UnifiedFormData as ValidationFormData
 } from '@/lib/form-validation';
 
@@ -233,6 +234,15 @@ export default function UnifiedSpeakerProposalForm({
       }
     }
 
+      // Validate specialization area is assigned
+    if (section === 3) {
+      const specializationValidation = validateSpecializationArea(formData as ValidationFormData);
+      if (!specializationValidation.valid) {
+        setError(specializationValidation.errors[0]);
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -347,12 +357,15 @@ export default function UnifiedSpeakerProposalForm({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-red-800 dark:text-red-200 font-medium">{error}</p>
+            <p className="text-red-800 dark:text-red-700 font-medium">{error}</p>
           </div>
         </div>
       )}
 
-      {/* Validation warnings */}
+      {/* 
+     
+
+      Validation warnings 
       {validationWarnings.length > 0 && (
         <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
           <div className="flex items-start gap-2">
@@ -372,7 +385,7 @@ export default function UnifiedSpeakerProposalForm({
           </div>
         </div>
       )}
-
+ */}
       {/* Section 1: Datos Personales */}
       {currentSection === 1 && (
         <div className="bg-surface rounded-lg p-6 shadow theme-transition space-y-6">
@@ -382,10 +395,17 @@ export default function UnifiedSpeakerProposalForm({
             </div>
             <div>
               <h2 className="text-2xl font-bold text-text-primary">Datos Personales</h2>
-              <p className="text-sm text-text-secondary">
+              <div className="text-sm text-text-secondary">
                 En esta sección, te pedimos que ingreses tu información personal básica. Estos datos nos ayudarán a conocerte mejor y poder contactarte para coordinar tu participación.
-                <br></br>Toda la información será tratada con confidencialidad.
-              </p>
+                <br></br>
+                
+                <p className="mt-2 warning-text text-sm text-yellow-700 dark:text-red-700 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="inline w-4 h-4 mr-1 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Toda la información será tratada con confidencialidad.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -481,18 +501,18 @@ export default function UnifiedSpeakerProposalForm({
                   >
                     {photoUploading ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Subiendo... {photoProgress}%
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <span className="text-sm">Subiendo... {photoProgress}%</span>
                       </>
                     ) : formData.photoKey ? (
                       <>
-                        <Check className="w-4 h-4 mr-2 text-green-600" />
-                        Foto cargada
+                      <Check className="w-4 h-4 mr-2 text-green-600" />
+                      <span className="text-sm">Foto cargada</span>
                       </>
                     ) : (
                       <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Seleccionar Foto
+                      <Upload className="w-4 h-4 mr-2" />
+                      <span className="text-sm">Seleccionar Foto</span>
                       </>
                     )}
                   </Button>
@@ -639,23 +659,22 @@ export default function UnifiedSpeakerProposalForm({
               />
             </div>
           </div>
-
-          <div>
-            <Label htmlFor="expertiseArea">Área de especialización</Label>
+            <div>
+            <Label htmlFor="expertiseArea">Área de especialización <span className="text-red-500"></span></Label>
             <select
               id="expertiseArea"
               value={formData.expertiseArea}
               onChange={(e) => setFormData(prev => ({ ...prev, expertiseArea: e.target.value }))}
               className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
             >
-              <option value="">Selecciona un área (opcional)</option>
+              <option value="">Selecciona un área</option>
               {EXPERTISE_AREAS.map((area) => (
-                <option key={area} value={area}>
-                  {area}
-                </option>
+              <option key={area} value={area}>
+                {area}
+              </option>
               ))}
             </select>
-          </div>
+            </div>
 
 
         </div>
@@ -772,7 +791,7 @@ export default function UnifiedSpeakerProposalForm({
             </div>
           </div>
 
-          {/* Mensaje de invitación */}
+          {/* Mensaje de invitación 
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
             <div className="flex items-start gap-2">
               <div className="w-5 h-5 text-blue-600 mt-0.5">
@@ -780,18 +799,10 @@ export default function UnifiedSpeakerProposalForm({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <div>
-                <p className="text-blue-800 dark:text-blue-200 font-medium mb-1">
-                  💬 Paso Opcional
-                </p>
-                <p className="text-blue-700 dark:text-blue-300 text-sm">
-                  Puedes responder estas preguntas o simplemente continuar para finalizar tu aplicación.
-                  Cualquier información que compartas nos ayudará a brindarte una mejor experiencia.
-                </p>
-              </div>
+              
             </div>
           </div>
-
+*/}
           <div className="space-y-6">
             <div>
               <Label htmlFor="motivation">¿Por qué quieres ser speaker?</Label>
