@@ -259,7 +259,7 @@ const schema = a.schema({
     checkInMethod: a.enum(['QR_SCAN', 'MANUAL', 'SELF_CHECKIN']),
     
     // QR Code único para check-in
-    qrCodeToken: a.string().required(), // UUID único
+    qrCodeToken: a.string(), // UUID único (opcional para permitir creación y actualización posterior)
     
     // Metadata
     registeredAt: a.datetime().required(),

@@ -417,6 +417,9 @@ export function UnifiedApplicationCard({
             talkProposalId={talkProposalId}
             talkTitle={attachedProposal.talkTitle}
             proposedDate={attachedProposal.proposedDate}
+            duration={attachedProposal.duration}
+            startTime={attachedProposal.startTime}
+            endTime={attachedProposal.endTime}
             onEventCreated={handleEventCreated}
             onCancel={handleWizardCancel}
           />

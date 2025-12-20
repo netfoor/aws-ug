@@ -158,9 +158,9 @@ export function NotificationBell() {
           />
 
           {/* Panel de notificaciones */}
-          <div className="fixed inset-x-0 top-0 md:absolute md:right-0 md:left-auto md:top-auto mt-0 md:mt-2 w-full md:w-96 bg-surface rounded-none md:rounded-lg shadow-xl border-0 md:border border-border z-50 h-screen md:h-auto md:max-h-[80vh] overflow-hidden flex flex-col theme-transition animate-in slide-in-from-top md:slide-in-from-top-2 duration-300">
+          <div className="fixed inset-x-0 top-0 md:absolute md:right-0 md:left-auto md:top-auto mt-0 md:mt-2 w-full md:w-96 bg-surface rounded-none md:rounded-lg shadow-xl border-0 md:border border-border z-50 h-screen md:h-auto md:max-h-[80vh] overflow-hidden flex flex-col theme-transition animate-in slide-in-from-top md:slide-in-from-top-2 duration-300" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
             {/* Header */}
-            <div className="p-4 border-b border-border flex items-center justify-between bg-surface safe-top">
+            <div className="p-4 border-b border-border flex items-center justify-between bg-surface">
               <h3 className="text-lg font-semibold text-text-primary">
                 Notificaciones
               </h3>

@@ -142,6 +142,16 @@ export default function UnifiedSpeakerApplicationPage() {
           duration: formData.duration,
           targetAudience: formData.targetAudience,
           proposedDate: formData.proposedDate?.toISOString(),
+          // Calcular start/end times basados en la duración (ejemplo: 18:30 - 19:15 para 45 min)
+          startTime: '18:30', // Hora habitual de eventos
+          endTime: (() => {
+            const duration = formData.duration || 45;
+            const startMinutes = 18 * 60 + 30; // 18:30 en minutos
+            const endMinutes = startMinutes + duration;
+            const hours = Math.floor(endMinutes / 60);
+            const minutes = endMinutes % 60;
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+          })(),
         }),
         // Professional profile data (JSON as string)
         professionalProfile: JSON.stringify({

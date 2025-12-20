@@ -221,7 +221,7 @@ export function NotificationList({
         setPendingNotificationId(null);
       }}
       onConfirm={handleRefreshSession}
-      title="🔄 Activar Nuevos Permisos"
+      title="Activar Nuevos Permisos"
       message={`Para activar tus nuevos permisos de speaker, necesitas cerrar sesión y volver a iniciar.\n\n¿Cerrar sesión ahora?`}
       confirmText="Cerrar sesión"
       cancelText="Más tarde"

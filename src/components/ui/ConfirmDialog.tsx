@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from './Button';
 
@@ -49,9 +50,9 @@ export function ConfirmDialog({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-surface rounded-lg shadow-xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+  const dialogContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-surface rounded-lg shadow-xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
         {/* Icon */}
         <div className="flex justify-center mb-4">
           {getIcon()}
@@ -87,4 +88,7 @@ export function ConfirmDialog({
       </div>
     </div>
   );
+
+  if (typeof window === 'undefined') return null;
+  return createPortal(dialogContent, document.body);
 }

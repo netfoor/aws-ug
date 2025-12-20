@@ -89,6 +89,19 @@ export class QRValidator {
                 console.error('❌ Registration not found. Token data:', tokenData);
                 console.error('❌ Searched for ID:', tokenData.registrationId);
                 
+                // Detectar si es un ID temporal
+                const isTemporaryId = tokenData.registrationId.startsWith('temp-');
+                
+                if (isTemporaryId) {
+                    console.error('⚠️ TEMPORARY ID DETECTED! This QR code was generated with a temporary registration ID.');
+                    console.error('⚠️ The user needs to regenerate their QR code from the event details page.');
+                    
+                    return {
+                        isValid: false,
+                        error: 'Este código QR es inválido. Por favor, genera un nuevo código QR desde los detalles del evento.'
+                    };
+                }
+                
                 // Try to find registration by other means for debugging
                 try {
                     const { data: allRegistrations } = await client.models.EventRegistration.registrationsByEvent({
@@ -98,6 +111,19 @@ export class QRValidator {
                     
                     if (allRegistrations && allRegistrations.length > 0) {
                         console.log('📊 Sample registration IDs:', allRegistrations.slice(0, 3).map(r => r.id));
+                        
+                        // Check if there's a registration for the same user
+                        const userReg = allRegistrations.find(r => r.userId === tokenData.userId);
+                        if (userReg) {
+                            console.log('📊 Found registration for this user:', userReg.id);
+                            console.log('⚠️ User has a valid registration but QR token has wrong registration ID');
+                            console.log('⚠️ Expected:', userReg.id, 'Got:', tokenData.registrationId);
+                            
+                            return {
+                                isValid: false,
+                                error: 'Código QR desactualizado. Por favor, genera un nuevo código desde los detalles del evento.'
+                            };
+                        }
                     }
                 } catch (debugError) {
                     console.error('Debug query failed:', debugError);

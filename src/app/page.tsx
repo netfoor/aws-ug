@@ -47,6 +47,16 @@ export default function Home() {
 
       setEvents(sorted);
       
+      // DEBUG: Log goingCount values
+      console.log('📊 Events loaded with goingCount:', sorted.map(e => ({
+        title: e.title,
+        id: e.id,
+        goingCount: e.goingCount
+      })));
+      
+      // Load actual registration counts
+      await loadRegistrationCounts(sorted);
+      
       // Load speaker data for all events
       loadSpeakers(sorted);
     } catch (error) {
@@ -77,11 +87,75 @@ export default function Home() {
     setSpeakers(speakersData);
   };
 
+  const loadRegistrationCounts = async (eventsList: EventType[]) => {
+    try {
+      // Para cada evento, consultar cuántos registros tiene
+      const updatedEvents = await Promise.all(
+        eventsList.map(async (event) => {
+          if (!event.id) return event;
+          
+          try {
+            const { data: registrations } = await client.models.EventRegistration.registrationsByEvent({
+              eventId: event.id,
+            });
+            
+            // Contar solo los que tienen status GOING
+            const actualCount = registrations?.filter(r => r.status === 'GOING').length || 0;
+            
+            console.log(`📊 Event "${event.title}": DB goingCount=${event.goingCount}, Actual registrations=${actualCount}`);
+            
+            // Si el count en DB no coincide con el real, usar el real
+            if (event.goingCount !== actualCount) {
+              console.warn(`⚠️ Count mismatch for "${event.title}". Updating from ${event.goingCount} to ${actualCount}`);
+              
+              // Actualizar también en la base de datos para sincronizar
+              try {
+                await client.models.Event.update({
+                  id: event.id,
+                  goingCount: actualCount,
+                });
+                console.log(`✅ Updated DB goingCount for "${event.title}" to ${actualCount}`);
+              } catch (updateErr) {
+                console.error(`Error updating goingCount in DB:`, updateErr);
+              }
+              
+              // Actualizar el evento en memoria con el count correcto
+              return { ...event, goingCount: actualCount };
+            }
+            
+            return event;
+          } catch (err) {
+            console.error(`Error loading registrations for event ${event.id}:`, err);
+            return event;
+          }
+        })
+      );
+      
+      setEvents(updatedEvents);
+    } catch (error) {
+      console.error('Error loading registration counts:', error);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchEvents();
     }
   }, [filter, isAuthenticated, fetchEvents]);
+
+  // Recargar eventos cuando la página vuelve a tener foco (después de registro)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const handleFocus = () => {
+      if (!loading) {
+        fetchEvents();
+      }
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [isAuthenticated, loading, fetchEvents]);
 
   // Empty state component
   const EmptyState = () => (
@@ -173,7 +247,7 @@ export default function Home() {
                 <Link href="/login">Únete a la Comunidad</Link>
               </Button>
               <Button variant="outline" size="lg" asChild className="hover:scale-105 transition-transform">
-                <Link href="/events">Ver Eventos</Link>
+                <Link href="/login">Iniciar Sesión</Link>
               </Button>
             </div>
           </div>
@@ -307,13 +381,6 @@ export default function Home() {
         <div className="px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-2xl font-bold text-text-primary">Tus Eventos</h1>
-            <Link 
-              href="/events"
-              className="text-sm font-medium text-accent flex items-center gap-1 hover:underline"
-            >
-              Ver todos
-              <ChevronRight className="w-4 h-4" />
-            </Link>
           </div>
 
           {/* Filter Tabs */}

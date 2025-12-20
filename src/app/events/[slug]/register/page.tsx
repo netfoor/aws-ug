@@ -196,37 +196,35 @@ export default function EventRegistrationPage() {
     try {
       setIsSubmitting(true);
 
-      // Crear registro SIN QR token primero
+      // Obtener el perfil completo del usuario para el nombre real
+      const { data: userProfile } = await client.models.User.get({ id: user.userId });
+      const fullName = userProfile 
+        ? `${userProfile.givenName} ${userProfile.familyName}`.trim()
+        : user.signInDetails?.loginId || user.username || 'Usuario';
+      const email = userProfile?.email || user.signInDetails?.loginId || '';
+
+      // Crear registro SIN el QR token
+      // El QR se generará automáticamente cuando el usuario vea los detalles del evento
       const { data: registration, errors: regErrors } = await client.models.EventRegistration.create({
         eventId: event.id,
         userId: user.userId,
         status: 'GOING',
-        qrCodeToken: '', // Temporal vacío
         registeredAt: new Date().toISOString(),
-        userName: user.signInDetails?.loginId || user.username || 'Usuario',
-        userEmail: user.signInDetails?.loginId || '',
+        userName: fullName,
+        userEmail: email,
         registrationAnswers: JSON.stringify(answers),
         checkedIn: false,
+        owner: user.userId, // ✅ Asignar owner explícitamente
       });
 
       if (regErrors || !registration || !registration.id) {
-        console.error('Registration errors:', regErrors);
+        console.error('❌ Registration errors:', regErrors);
         setError('Error al registrar. Por favor intenta de nuevo.');
         return;
       }
 
-      // Ahora generar el QR token con el ID REAL del registro
-      const finalQrToken = QRTokenUtils.generateToken({
-        eventId: event.id,
-        userId: user.userId,
-        registrationId: registration.id,
-      });
-
-      // Actualizar el registro con el token correcto
-      await client.models.EventRegistration.update({
-        id: registration.id,
-        qrCodeToken: finalQrToken,
-      });
+      console.log('✅ Registration created with ID:', registration.id);
+      console.log('ℹ️ QR token will be auto-generated when viewing event details');
 
       // Actualizar contador de registros en el evento
       const newGoingCount = (event.goingCount || 0) + 1;
@@ -310,8 +308,8 @@ export default function EventRegistrationPage() {
             <Button variant="accent" onClick={() => router.push(`/events/${slug}`)}>
               Ver detalles del evento
             </Button>
-            <Button variant="outline" onClick={() => router.push('/events')}>
-              Explorar más eventos
+            <Button variant="outline" onClick={() => router.push('/')}>
+              Volver al inicio
             </Button>
           </div>
         </div>

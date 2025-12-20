@@ -97,6 +97,9 @@ export default function QRScanner({
       console.log('✅ Validation result:', validationResult);
 
       if (!validationResult.isValid) {
+        // Reproducir sonido de error
+        playErrorSound();
+        
         // Manejar incidentes de seguridad
         if (validationResult.securityIncident) {
           addScanResult({
@@ -172,6 +175,7 @@ export default function QRScanner({
       message: error,
       timestamp: new Date(),
     });
+    playErrorSound();
   }
 
   function addScanResult(result: ScanResult) {
@@ -200,6 +204,31 @@ export default function QRScanner({
     } catch (error) {
       // Silenciar errores de audio
       console.warn('No se pudo reproducir sonido:', error);
+    }
+  }
+
+  function playErrorSound() {
+    try {
+      // Crear un beep de error (tono descendente)
+      const AudioContextClass = window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      const audioContext = new AudioContextClass();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Tono descendente para indicar error
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(400, audioContext.currentTime + 0.15);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.25);
+    } catch (error) {
+      console.warn('No se pudo reproducir sonido de error:', error);
     }
   }
 

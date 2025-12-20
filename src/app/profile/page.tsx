@@ -193,8 +193,8 @@ export default function ProfilePage() {
               <p className="text-text-secondary">{typeof displayEmail === 'string' ? displayEmail : ''}</p>
               <div className="flex justify-center gap-2 mt-4">
                 <Badge 
-                  variant={profile?.role === 'ADMIN' ? 'warning' : profile?.role === 'SPEAKER' ? 'accent' : 'default'}
-                  title="Este role se asigna automáticamente desde los grupos de Cognito"
+                  variant={profile?.role === 'ADMIN' ? 'warning' : profile?.role === 'SPEAKER' ? 'accent' : 'primary'}
+                  title="Este role se asigna automáticamente"
                 >
                   {profile?.role || 'MEMBER'}
                 </Badge>
@@ -204,7 +204,7 @@ export default function ProfilePage() {
                   </Badge>
                 )}
                 {profile?.newsletterOptIn && (
-                  <Badge variant="primary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 border border-blue-200 dark:border-blue-800">
+                  <Badge variant="primary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-100 border border-blue-200 dark:border-blue-800">
                     Newsletter Suscrito
                   </Badge>
                 )}
@@ -223,12 +223,12 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm mb-1">Sobre tu role</h4>
                     <p className="text-sm text-text-secondary">
-                      Tu role <strong>{profile?.role || 'MEMBER'}</strong> se asigna automáticamente desde los grupos de Cognito. 
+                      Tu role <strong>{profile?.role || 'MEMBER'}</strong> se asigna automáticamente. 
                       {profile?.role === 'ADMIN' 
                         ? ' Como administrador, tienes acceso completo a todas las funciones y puedes gestionar usuarios y contenido.'
                         : profile?.role === 'SPEAKER'
                         ? ' Como speaker, puedes proponer charlas y gestionar tu perfil profesional.'
-                        : ' Para convertirte en speaker, puedes aplicar usando el formulario unificado. Para obtener permisos de administrador, contacta a un admin existente.'
+                        : ' Para convertirte en speaker, puedes aplicar usando el formulario unificado.'
                       }
                     </p>
                     

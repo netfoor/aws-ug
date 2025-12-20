@@ -45,6 +45,80 @@ export function useQRTicket({ eventId, userId }: UseQRTicketOptions): UseQRTicke
       if (registrations && registrations.length > 0) {
         // Filtrar por userId ya que la query solo filtra por eventId
         const userRegistration = registrations.find(reg => reg.userId === userId);
+        
+        if (userRegistration) {
+          // Verificar si el token es válido y si el registrationId en el token coincide con el ID real
+          if (userRegistration.qrCodeToken) {
+            try {
+              const tokenData = QRTokenUtils.parseToken(userRegistration.qrCodeToken);
+              
+              // Si el token es válido pero el registrationId es temporal o no coincide, regenerar
+              if (tokenData) {
+                const isTemporaryId = tokenData.registrationId.startsWith('temp-');
+                const idMismatch = tokenData.registrationId !== userRegistration.id;
+                
+                if (isTemporaryId || idMismatch) {
+                  console.warn('⚠️ Detected invalid or temporary token, auto-regenerating...');
+                  console.log('Token registrationId:', tokenData.registrationId);
+                  console.log('Actual registration ID:', userRegistration.id);
+                  
+                  // Regenerar el token automáticamente
+                  const newToken = QRTokenUtils.generateToken({
+                    eventId,
+                    userId,
+                    registrationId: userRegistration.id || '',
+                  });
+                  
+                  // Actualizar el registro
+                  await client.models.EventRegistration.update({
+                    id: userRegistration.id || '',
+                    qrCodeToken: newToken,
+                  });
+                  
+                  console.log('✅ Token auto-regenerated successfully');
+                  
+                  // Actualizar el objeto local con el nuevo token
+                  userRegistration.qrCodeToken = newToken;
+                }
+              }
+            } catch (tokenError) {
+              // Si el token no es válido, regenerar automáticamente
+              console.warn('⚠️ Invalid token detected, auto-regenerating...', tokenError);
+              
+              const newToken = QRTokenUtils.generateToken({
+                eventId,
+                userId,
+                registrationId: userRegistration.id || '',
+              });
+              
+              await client.models.EventRegistration.update({
+                id: userRegistration.id || '',
+                qrCodeToken: newToken,
+              });
+              
+              console.log('✅ Token auto-regenerated successfully');
+              userRegistration.qrCodeToken = newToken;
+            }
+          } else if (userRegistration.id) {
+            // Si no hay token, generar uno nuevo
+            console.log('📝 No token found, generating new one...');
+            
+            const newToken = QRTokenUtils.generateToken({
+              eventId,
+              userId,
+              registrationId: userRegistration.id,
+            });
+            
+            await client.models.EventRegistration.update({
+              id: userRegistration.id,
+              qrCodeToken: newToken,
+            });
+            
+            console.log('✅ Token generated successfully');
+            userRegistration.qrCodeToken = newToken;
+          }
+        }
+        
         setRegistration(userRegistration || null);
       } else {
         setRegistration(null);

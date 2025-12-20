@@ -76,7 +76,7 @@ export async function middleware(request: NextRequest) {
       const host = request.headers.get('host') || '';
       const isDevelopment = process.env.NODE_ENV === 'development';
       const ngrokMode = process.env.ENABLE_NGROK_MODE === 'true';
-      const isNgrok = host.includes('ngrok');
+      const isNgrok = host.includes('trycloudflare');
       const isNetworkError = error instanceof Error && 
         (error.message.includes('fetch failed') || error.message.includes('timeout'));
       

@@ -24,6 +24,9 @@ interface EventCreationWizardProps {
   talkProposalId: string;
   talkTitle: string;
   proposedDate?: string; // ISO string from attachedProposal
+  duration?: number; // Duration in minutes
+  startTime?: string; // Format: HH:MM (e.g., "18:30")
+  endTime?: string; // Format: HH:MM (e.g., "19:15")
   onEventCreated: (eventId: string, published: boolean) => void;
   onCancel: () => void;
 }
@@ -38,6 +41,9 @@ export function EventCreationWizard({
   talkProposalId,
   talkTitle,
   proposedDate,
+  duration,
+  startTime,
+  endTime,
   onEventCreated,
   onCancel,
 }: EventCreationWizardProps) {
@@ -52,25 +58,23 @@ export function EventCreationWizard({
     ? proposedDate.split('T')[0] // Tomar solo la parte de fecha sin conversión
     : '';
   
-  // Para la hora: siempre usar 18:30 (hora habitual) a menos que haya una hora específica diferente
-  const prefillTime = proposedDate 
-    ? (() => {
-        const timePart = proposedDate.split('T')[1];
-        if (timePart) {
-          const hourMin = timePart.slice(0, 5); // HH:MM
-          // Si la hora es 00:00 (medianoche), usar la hora habitual 18:30
-          if (hourMin === '00:00') {
-            return '18:30';
-          }
-          return hourMin;
-        }
-        return '18:30';
-      })()
-    : '18:30';
+  // Usar startTime si está disponible, sino usar 18:30
+  const prefillTime = startTime || '18:30';
+  const prefillEndTime = endTime || (() => {
+    // Calcular end time basado en duración si no está disponible
+    const durationMin = duration || 45;
+    const [hours, minutes] = prefillTime.split(':').map(Number);
+    const startMinutes = hours * 60 + minutes;
+    const endMinutes = startMinutes + durationMin;
+    const endHours = Math.floor(endMinutes / 60);
+    const endMins = endMinutes % 60;
+    return `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+  })();
 
   const [formData, setFormData] = useState({
     eventDate: prefillDate,
     eventTime: prefillTime,
+    eventEndTime: prefillEndTime,
     location: 'Oficinas de AWS User Group Puebla',
     capacity: 50,
     registrationDeadline: '',
@@ -212,6 +216,24 @@ export function EventCreationWizard({
             currentProposalId={talkProposalId}
             disabled={loading}
           />
+
+          {/* End Time */}
+          <div>
+            <label htmlFor="endTime" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-2">
+              <Clock className="w-3.5 h-3.5 text-accent" />
+              Hora de fin
+            </label>
+            <input
+              id="endTime"
+              type="time"
+              value={formData.eventEndTime}
+              onChange={(e) => setFormData(prev => ({ ...prev, eventEndTime: e.target.value }))}
+              className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
+            />
+            <p className="text-xs text-text-secondary mt-1.5">
+              ⏰ {formData.eventTime} - {formData.eventEndTime}
+            </p>
+          </div>
 
           {/* Location */}
           <div>

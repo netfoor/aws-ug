@@ -56,6 +56,18 @@ export default function EventDetailsPage() {
     }
   }, [slug]);
 
+  // Recargar evento cuando la página vuelve a tener foco (después de registro)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (slug && !isLoading) {
+        loadEventDetails();
+      }
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [slug, isLoading]);
+
   async function loadEventDetails() {
     try {
       setIsLoading(true);
@@ -78,6 +90,28 @@ export default function EventDetailsPage() {
       }
 
       const eventData = events[0];
+      
+      // Verificar y corregir goingCount si es necesario
+      if (eventData.id) {
+        try {
+          const { data: registrations } = await client.models.EventRegistration.registrationsByEvent({
+            eventId: eventData.id,
+          });
+          
+          const actualCount = registrations?.filter(r => r.status === 'GOING').length || 0;
+          
+          console.log(`📊 Event "${eventData.title}": DB goingCount=${eventData.goingCount}, Actual registrations=${actualCount}`);
+          
+          // Si hay discrepancia, actualizar el display con el count real
+          if (eventData.goingCount !== actualCount) {
+            console.warn(`⚠️ Count mismatch. Using actual count: ${actualCount}`);
+            eventData.goingCount = actualCount;
+          }
+        } catch (err) {
+          console.warn('Error verifying registration count:', err);
+        }
+      }
+      
       setEvent(eventData);
 
       // Cargar cover image URL
