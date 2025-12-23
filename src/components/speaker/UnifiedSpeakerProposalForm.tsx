@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
-import LastThursdaySelector from './LastThursdaySelector';
+import DateSelector from '@/components/common/DateSelector';
 import { uploadSpeakerPhoto, uploadSpeakerCV, EXPERTISE_AREAS, formatFileSize } from '@/lib/speaker-uploads';
 import {
   validateFormSection,
@@ -774,10 +774,11 @@ export default function UnifiedSpeakerProposalForm({
             </div>
           </div>
 
-          <LastThursdaySelector
+          <DateSelector
             selectedDate={formData.proposedDate}
             onDateSelect={(date) => setFormData(prev => ({ ...prev, proposedDate: date }))}
             disabled={false}
+            adminMode={false}
           />
         </div>
       )}
@@ -947,7 +948,7 @@ export default function UnifiedSpeakerProposalForm({
               ) : (
                 <>
                   <span className="hidden sm:inline">✅ Enviar Propuesta Completa</span>
-                  <span className="sm:hidden">✅ Enviar</span>
+                  <span className="sm:hidden">Enviar</span>
                 </>
               )}
             </Button>

@@ -8,6 +8,8 @@ import { Loader2, Calendar, MapPin, Users, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
+import DateSelector from '@/components/common/DateSelector';
+import CoverImageUpload from '@/components/common/CoverImageUpload';
 
 const client = generateClient<Schema>();
 
@@ -44,6 +46,7 @@ export default function CreateEventModal({
   const [locationAddress, setLocationAddress] = useState('');
   const [maxAttendees, setMaxAttendees] = useState<number | null>(50);
   const [isUnlimited, setIsUnlimited] = useState(false);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +104,7 @@ export default function CreateEventModal({
         requiresApproval: false,
         createdBy: user.userId,
         createdAt: new Date().toISOString(),
+        coverImageUrl: coverImageUrl || undefined, // Agregar cover image URL si existe
         goingCount: 0,
         checkedInCount: 0,
         invitedCount: 0,
@@ -206,37 +210,18 @@ export default function CreateEventModal({
             </p>
           </div>
 
-          {/* Fecha y Hora */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="startDate">Fecha *</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary pointer-events-none" />
-                <input
-                  type="date"
-                  id="startDate"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="mt-1 w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-text-primary theme-transition"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="startTime">Hora *</Label>
-              <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary pointer-events-none" />
-                <input
-                  type="time"
-                  id="startTime"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="mt-1 w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-text-primary theme-transition"
-                  required
-                />
-              </div>
-            </div>
+          {/* Fecha y Hora con DateSelector Unificado */}
+          <div>
+            <DateSelector
+              adminMode={true}
+              selectedDateString={startDate}
+              selectedTime={startTime}
+              onDateChange={setStartDate}
+              onTimeChange={setStartTime}
+              currentProposalId={proposal.id ?? undefined}
+              disabled={isProcessing}
+              showTimeInput={true}
+            />
           </div>
 
           {/* Duración */}
@@ -318,6 +303,20 @@ export default function CreateEventModal({
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Cover Image Upload - Agregado en Fase 2 */}
+          <div>
+            <CoverImageUpload
+              onImageSelected={(file, previewUrl) => {
+                setCoverImageUrl(previewUrl);
+              }}
+              onImageRemoved={() => setCoverImageUrl(null)}
+              onError={(error) => setError(error)}
+              disabled={isProcessing}
+              autoUpload={false}
+              compact={false}
+            />
           </div>
 
           {/* Acciones */}

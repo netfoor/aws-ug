@@ -3,13 +3,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
-import { uploadData } from 'aws-amplify/storage';
 import type { Schema } from '../../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { getFullName } from '@/hooks/useUserData';
 import { 
   Loader2, 
-  Upload,
   X,
   ArrowLeft,
   Save
@@ -19,7 +17,8 @@ import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import Link from 'next/link';
-import { optimizeImage, validateImageFile, createImagePreview, revokeImagePreview } from '@/lib/image-optimizer';
+import DateSelector from '@/components/common/DateSelector';
+import CoverImageUpload from '@/components/common/CoverImageUpload';
 
 type SpeakerApplication = Schema['SpeakerApplication']['type'];
 
@@ -62,10 +61,8 @@ export default function CreateEventPage() {
   const [selectedSpeakerId, setSelectedSpeakerId] = useState<string>('');
   const [loadingSpeakers, setLoadingSpeakers] = useState(true);
   
-  // Cover image
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
+  // Cover image - simplificado con el componente
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   
   // Estado
   const [status, setStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
@@ -117,78 +114,6 @@ export default function CreateEventPage() {
 
   const handleRemoveTopic = (topic: string) => {
     setTopics(topics.filter(t => t !== topic));
-  };
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validar archivo
-    const validation = validateImageFile(file, 10);
-    if (!validation.valid) {
-      setError(validation.error || 'Imagen no válida');
-      return;
-    }
-
-    try {
-      // Optimizar imagen
-      const optimized = await optimizeImage(file, {
-        maxWidth: 1200,
-        maxHeight: 800,
-        quality: 0.85,
-        format: 'webp'
-      });
-
-      setCoverImage(optimized);
-      
-      // Crear preview
-      const preview = createImagePreview(optimized);
-      if (coverPreview) {
-        revokeImagePreview(coverPreview);
-      }
-      setCoverPreview(preview);
-      setError(null);
-    } catch (err) {
-      console.error('Error optimizando imagen:', err);
-      setError('Error al procesar la imagen');
-    }
-  };
-
-  const handleRemoveImage = () => {
-    if (coverPreview) {
-      revokeImagePreview(coverPreview);
-    }
-    setCoverImage(null);
-    setCoverPreview(null);
-  };
-
-  const uploadCoverImage = async (eventId: string): Promise<string | null> => {
-    if (!coverImage) return null;
-
-    try {
-      setUploadingImage(true);
-      
-      const fileName = `events/${eventId}/cover-${Date.now()}.webp`;
-      
-      const result = await uploadData({
-        path: fileName,
-        data: coverImage,
-        options: {
-          contentType: 'image/webp',
-        }
-      }).result;
-      
-      // Construir URL pública
-      // Formato: https://[bucket].s3.[region].amazonaws.com/[path]
-      // Por ahora retornamos el path, luego se construye la URL completa
-      return result.path;
-      
-    } catch (err) {
-      console.error('Error subiendo imagen:', err);
-      throw new Error('Error al subir la imagen');
-    } finally {
-      setUploadingImage(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -292,6 +217,7 @@ export default function CreateEventPage() {
         checkedInCount: 0,
         invitedCount: 0,
         notGoingCount: 0,
+        coverImageUrl: coverImageUrl || undefined, // Cover image si existe
       });
 
       if (errors || !createdEvent) {
@@ -301,25 +227,7 @@ export default function CreateEventPage() {
         return;
       }
 
-      // 2. Subir cover image si existe
-      let coverUrl: string | null = null;
-      if (coverImage && createdEvent.id) {
-        try {
-          coverUrl = await uploadCoverImage(createdEvent.id);
-          
-          // Actualizar evento con URL de cover
-          if (coverUrl) {
-            await client.models.Event.update({
-              id: createdEvent.id,
-              coverImageUrl: coverUrl,
-            });
-          }
-        } catch {
-          // No fallar si falla el upload, el evento ya está creado
-        }
-      }
-
-      // 3. Notificar al speaker
+      // Notificar al speaker
       if (speakerApp.userId) {
         try {
           await client.models.Notification.create({
@@ -548,41 +456,32 @@ export default function CreateEventPage() {
           <div className="bg-surface rounded-lg p-6 border border-border space-y-4">
             <h2 className="text-xl font-semibold text-text-primary mb-4">Fecha y Horario</h2>
             
-            <div className="grid md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="startDate">Fecha *</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="startTime">Hora de inicio *</Label>
-                <Input
-                  id="startTime"
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="duration">Duración (min) *</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  value={duration}
-                  onChange={(e) => setDuration(Number(e.target.value))}
-                  min={15}
-                  step={15}
-                  required
-                />
-              </div>
+            {/* DateSelector Unificado en modo admin */}
+            <DateSelector
+              adminMode={true}
+              selectedDateString={startDate}
+              selectedTime={startTime}
+              onDateChange={setStartDate}
+              onTimeChange={setStartTime}
+              disabled={isProcessing}
+              showTimeInput={true}
+            />
+            
+            <div className="mt-4">
+              <Label htmlFor="duration">Duración (minutos) *</Label>
+              <Input
+                id="duration"
+                type="number"
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                min={15}
+                step={15}
+                required
+                placeholder="60"
+              />
+              <p className="text-xs text-text-secondary mt-1">
+                Duración típica: 45-60 minutos
+              </p>
             </div>
           </div>
 
@@ -672,50 +571,26 @@ export default function CreateEventPage() {
             )}
           </div>
 
-          {/* Cover Image */}
+          {/* Cover Image - Ahora usa el componente unificado */}
           <div className="bg-surface rounded-lg p-6 border border-border space-y-4">
             <h2 className="text-xl font-semibold text-text-primary mb-4">Imagen de portada</h2>
             
-            {!coverPreview ? (
-              <div>
-                <Label htmlFor="coverImage" className="cursor-pointer">
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary theme-transition">
-                    <Upload className="w-12 h-12 mx-auto text-text-secondary mb-2" />
-                    <p className="text-text-secondary">
-                      Click para subir imagen de portada
-                    </p>
-                    <p className="text-sm text-text-secondary mt-1">
-                      JPG, PNG o WebP. Máximo 10MB.
-                    </p>
-                  </div>
-                </Label>
-                <input
-                  id="coverImage"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </div>
-            ) : (
-              <div className="relative">
-                <img
-                  src={coverPreview}
-                  alt="Preview"
-                  className="w-full h-64 object-cover rounded-lg"
-                />
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                <p className="text-sm text-text-secondary mt-2">
-                  Imagen optimizada: {(coverImage!.size / 1024).toFixed(2)}KB
-                </p>
-              </div>
-            )}
+            <CoverImageUpload
+              onImageUploaded={(imageUrl) => {
+                setCoverImageUrl(imageUrl);
+              }}
+              onImageSelected={(file, previewUrl) => {
+                // Guardar temporalmente el preview URL
+                setCoverImageUrl(previewUrl);
+              }}
+              onImageRemoved={() => {
+                setCoverImageUrl(null);
+              }}
+              onError={(error) => setError(error)}
+              disabled={isProcessing}
+              autoUpload={false}
+              compact={false}
+            />
           </div>
 
           {/* Estado */}
@@ -752,7 +627,7 @@ export default function CreateEventPage() {
             <Button
               type="submit"
               variant="primary"
-              disabled={isProcessing || uploadingImage}
+              disabled={isProcessing}
             >
               {isProcessing ? (
                 <>

@@ -116,6 +116,17 @@ export function UnifiedApplicationCard({
     });
   };
 
+  // Helper para formatear fecha usando UTC (evita problemas de timezone)
+  const formatProposedDateUTC = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getUTCDate();
+    const month = date.toLocaleDateString('es-MX', { month: 'short', timeZone: 'UTC' });
+    const year = date.getUTCFullYear();
+    const weekday = date.toLocaleDateString('es-MX', { weekday: 'short', timeZone: 'UTC' });
+    
+    return { day, month, year, weekday };
+  };
+
   const handleApproveAll = async () => {
     if (!application.id || !application.userId) return;
     
@@ -338,17 +349,15 @@ export function UnifiedApplicationCard({
                     <UsersIcon className="w-3 h-3 flex-shrink-0" />
                     <span className="truncate">{targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience}</span>
                   </span>
-                  {attachedProposal.proposedDate && (
-                    <span className="flex items-center gap-1 font-medium text-accent">
-                      <Calendar className="w-3 h-3 flex-shrink-0" />
-                      {new Date(attachedProposal.proposedDate).toLocaleDateString('es-MX', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  )}
+                  {attachedProposal.proposedDate && (() => {
+                    const { day, month, year, weekday } = formatProposedDateUTC(attachedProposal.proposedDate);
+                    return (
+                      <span className="flex items-center gap-1 font-medium text-accent">
+                        <Calendar className="w-3 h-3 flex-shrink-0" />
+                        {weekday}, {day} de {month} de {year}
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
               
@@ -415,6 +424,7 @@ export function UnifiedApplicationCard({
         {wizardStep === 'speaker-approved' && talkProposalId && attachedProposal && (
           <EventCreationWizard
             talkProposalId={talkProposalId}
+            speakerApplicationId={application.id || undefined}
             talkTitle={attachedProposal.talkTitle}
             proposedDate={attachedProposal.proposedDate}
             duration={attachedProposal.duration}
@@ -596,19 +606,17 @@ export function UnifiedApplicationCard({
                       {targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience}
                     </p>
                   </div>
-                  {attachedProposal.proposedDate && (
-                    <div>
-                      <span className="text-text-secondary">Fecha Propuesta:</span>
-                      <p className="text-text-primary font-medium">
-                        {new Date(attachedProposal.proposedDate).toLocaleDateString('es-MX', {
-                          weekday: 'short',
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  )}
+                  {attachedProposal.proposedDate && (() => {
+                    const { day, month, year, weekday } = formatProposedDateUTC(attachedProposal.proposedDate);
+                    return (
+                      <div>
+                        <span className="text-text-secondary">Fecha Propuesta:</span>
+                        <p className="text-text-primary font-medium">
+                          {weekday}, {day} de {month} de {year}
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

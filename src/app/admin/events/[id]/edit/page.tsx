@@ -9,6 +9,8 @@ import { Loader2, Save, X, Calendar, MapPin, Users, Image as ImageIcon, Tag, Fil
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import DateSelector from '@/components/common/DateSelector';
+import CoverImageUpload from '@/components/common/CoverImageUpload';
 
 const client = generateClient<Schema>();
 
@@ -398,19 +400,28 @@ export default function EditEventPage() {
               Fecha y Hora
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Fecha y Hora de Inicio *
-                </label>
-                <Input
-                  type="datetime-local"
-                  value={formData.startDate}
-                  onChange={(e) => handleInputChange('startDate', e.target.value)}
-                  required
-                />
-              </div>
+            {/* DateSelector Unificado */}
+            <div className="mb-4">
+              <DateSelector
+                adminMode={true}
+                selectedDateString={formData.startDate.split('T')[0]}
+                selectedTime={formData.startDate.split('T')[1]?.substring(0, 5) || '18:30'}
+                onDateChange={(date) => {
+                  // Mantener la hora existente o usar default
+                  const time = formData.startDate.split('T')[1] || '18:30:00';
+                  handleInputChange('startDate', `${date}T${time}`);
+                }}
+                onTimeChange={(time) => {
+                  // Mantener la fecha existente
+                  const date = formData.startDate.split('T')[0];
+                  handleInputChange('startDate', `${date}T${time}:00`);
+                }}
+                disabled={isSaving}
+                showTimeInput={true}
+              />
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
                   Fecha y Hora de Fin *
@@ -421,9 +432,12 @@ export default function EditEventPage() {
                   onChange={(e) => handleInputChange('endDate', e.target.value)}
                   required
                 />
+                <p className="text-xs text-text-secondary mt-1">
+                  O calcula automáticamente según duración
+                </p>
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
                   Zona Horaria
                 </label>
@@ -590,20 +604,30 @@ export default function EditEventPage() {
               Imágenes y Media
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* Cover Image con Upload */}
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  URL de Imagen de Portada
-                </label>
-                <Input
-                  type="url"
-                  value={formData.coverImageUrl}
-                  onChange={(e) => handleInputChange('coverImageUrl', e.target.value)}
-                  placeholder="https://example.com/image.jpg"
+                <CoverImageUpload
+                  eventId={eventId}
+                  currentImageUrl={formData.coverImageUrl}
+                  onImageUploaded={(imageUrl) => {
+                    handleInputChange('coverImageUrl', imageUrl);
+                  }}
+                  onImageSelected={(file, previewUrl) => {
+                    // Temporalmente guardar el preview
+                    handleInputChange('coverImageUrl', previewUrl);
+                  }}
+                  onImageRemoved={() => {
+                    handleInputChange('coverImageUrl', '');
+                  }}
+                  onError={(error) => setError(error)}
+                  disabled={isSaving}
+                  autoUpload={true}
+                  compact={false}
                 />
               </div>
 
-              <div>
+              <div className="pt-4 border-t border-border">
                 <label className="block text-sm font-medium text-text-primary mb-2">
                   URL de Avatar del Speaker
                 </label>
@@ -613,6 +637,9 @@ export default function EditEventPage() {
                   onChange={(e) => handleInputChange('speakerAvatar', e.target.value)}
                   placeholder="https://example.com/avatar.jpg"
                 />
+                <p className="text-xs text-text-secondary mt-1">
+                  URL del avatar del speaker (opcional)
+                </p>
               </div>
 
               <div>

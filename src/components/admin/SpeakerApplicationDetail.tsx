@@ -63,6 +63,16 @@ export function SpeakerApplicationDetail({
   const [linkedProposal, setLinkedProposal] = useState<Schema['TalkProposal']['type'] | null>(null);
   const [loadingProposal, setLoadingProposal] = useState(false);
 
+  // Helper para formatear fecha usando UTC (evita problemas de timezone)
+  const formatProposedDateUTC = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getUTCDate();
+    const month = date.toLocaleDateString('es-MX', { month: 'long', timeZone: 'UTC' });
+    const year = date.getUTCFullYear();
+    
+    return `${day} de ${month} de ${year}`;
+  };
+
   // Parse JSON fields
   const professionalProfile = application?.professionalProfile 
     ? (() => {
@@ -372,11 +382,7 @@ export function SpeakerApplicationDetail({
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-amber-600" />
                       <span className="text-text-primary">
-                        {new Date(attachedProposal.proposedDate).toLocaleDateString('es-MX', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
+                        {formatProposedDateUTC(attachedProposal.proposedDate)}
                       </span>
                     </div>
                   )}

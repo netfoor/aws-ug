@@ -63,6 +63,18 @@ export default function EventRegistrationPage() {
       }
 
       const eventData = events[0];
+      
+      // Verificar si el evento est\u00e1 lleno (antes de establecer el state)
+      if (!eventData.isUnlimited && eventData.maxAttendees) {
+        const currentCount = eventData.goingCount || 0;
+        if (currentCount >= eventData.maxAttendees) {
+          setError('Este evento ya alcanz\u00f3 su capacidad m\u00e1xima. No se pueden realizar m\u00e1s registros.');
+          setEvent(eventData); // Establecer el evento para mostrar informaci\u00f3n
+          setIsLoading(false);
+          return;
+        }
+      }
+      
       setEvent(eventData);
 
       // Cargar cover image URL
@@ -195,6 +207,18 @@ export default function EventRegistrationPage() {
 
     try {
       setIsSubmitting(true);
+
+      // VALIDACIÓN FINAL: Verificar capacidad del evento antes de crear el registro
+      // Obtener el evento actualizado para tener el conteo más reciente
+      const { data: currentEvent } = await client.models.Event.get({ id: event.id });
+      
+      if (currentEvent && !currentEvent.isUnlimited && currentEvent.maxAttendees) {
+        const currentCount = currentEvent.goingCount || 0;
+        if (currentCount >= currentEvent.maxAttendees) {
+          setError('Lo sentimos, este evento alcanzó su capacidad máxima mientras completabas el registro.');
+          return;
+        }
+      }
 
       // Obtener el perfil completo del usuario para el nombre real
       const { data: userProfile } = await client.models.User.get({ id: user.userId });

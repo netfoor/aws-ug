@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { AdminDateSelector } from './AdminDateSelector';
+import DateSelector from '@/components/common/DateSelector';
+import CoverImageUpload from '@/components/common/CoverImageUpload';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../amplify/data/resource';
 import { 
@@ -22,6 +23,7 @@ const client = generateClient<Schema>();
 
 interface EventCreationWizardProps {
   talkProposalId: string;
+  speakerApplicationId?: string; // ID de la SpeakerApplication para actualizar attachedProposal
   talkTitle: string;
   proposedDate?: string; // ISO string from attachedProposal
   duration?: number; // Duration in minutes
@@ -39,6 +41,7 @@ type WizardStep = 'event-details' | 'questions' | 'completed';
  */
 export function EventCreationWizard({
   talkProposalId,
+  speakerApplicationId,
   talkTitle,
   proposedDate,
   duration,
@@ -78,6 +81,7 @@ export function EventCreationWizard({
     location: 'Oficinas de AWS User Group Puebla',
     capacity: 50,
     registrationDeadline: '',
+    coverImageUrl: '', // Para almacenar el path de la imagen subida
   });
 
   const handleCreateEvent = async (publish: boolean) => {
@@ -90,6 +94,7 @@ export function EventCreationWizard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           talkProposalId,
+          speakerApplicationId, // Para actualizar attachedProposal si la fecha cambió
           ...formData,
           registrationDeadline: formData.registrationDeadline || `${formData.eventDate}T${formData.eventTime}:00.000Z`,
           publish,
@@ -208,13 +213,15 @@ export function EventCreationWizard({
           </div>
 
           {/* Date & Time Selector - Deshabilita fechas ocupadas */}
-          <AdminDateSelector
-            selectedDate={formData.eventDate}
+          <DateSelector
+            adminMode={true}
+            selectedDateString={formData.eventDate}
             selectedTime={formData.eventTime}
             onDateChange={(date) => setFormData(prev => ({ ...prev, eventDate: date }))}
             onTimeChange={(time) => setFormData(prev => ({ ...prev, eventTime: time }))}
             currentProposalId={talkProposalId}
             disabled={loading}
+            showTimeInput={true}
           />
 
           {/* End Time */}
@@ -285,6 +292,25 @@ export function EventCreationWizard({
                 📅 Hasta cuándo se pueden inscribir (opcional)
               </p>
             </div>
+          </div>
+
+          {/* Cover Image Upload - Agregado en Fase 2 */}
+          <div className="border-t border-border pt-4">
+            <CoverImageUpload
+              eventId={createdEventId || talkProposalId} // Usar talkProposalId como fallback
+              onImageUploaded={(imageUrl) => {
+                // Guardar el path de S3 en formData
+                console.log('✅ Imagen subida a S3:', imageUrl);
+                setFormData(prev => ({ ...prev, coverImageUrl: imageUrl }));
+              }}
+              onError={(error) => setError(error)}
+              disabled={loading}
+              autoUpload={true}
+              compact={true}
+            />
+            <p className="text-xs text-text-secondary mt-2">
+              Opcional: Agrega una imagen de portada para el evento
+            </p>
           </div>
 
           {/* Actions */}

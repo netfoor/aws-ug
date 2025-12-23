@@ -163,12 +163,26 @@ export default function EventDetailsPage() {
     }
   }
 
-  const handleRegister = () => {
+  // Verificar si el evento está lleno
+  const isEventFull = () => {
+    if (!event || event.isUnlimited) return false;
+    if (!event.maxAttendees) return false;
+    return (event.goingCount || 0) >= event.maxAttendees;
+  };
+
+  const handleRegister = async () => {
     if (!isAuthenticated) {
       router.push(`/login?returnUrl=/events/${slug}/register`);
-    } else {
-      router.push(`/events/${slug}/register`);
+      return;
     }
+    
+    // Verificar si el evento está lleno
+    if (isEventFull()) {
+      await showAlert('Este evento ya alcanzó su capacidad máxima', { variant: 'danger' });
+      return;
+    }
+    
+    router.push(`/events/${slug}/register`);
   };
 
   const handleContact = () => {
@@ -382,17 +396,30 @@ export default function EventDetailsPage() {
             <div className="grid grid-cols-4 gap-3">
             <button
               onClick={hasTicket ? handleShowTicket : handleRegister}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-accent/10 hover:bg-accent/20 transition-colors"
+              disabled={!hasTicket && isEventFull()}
+              className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-colors ${
+                hasTicket 
+                  ? 'bg-accent/10 hover:bg-accent/20' 
+                  : isEventFull()
+                  ? 'bg-gray-200 dark:bg-gray-800 cursor-not-allowed opacity-50'
+                  : 'bg-accent/10 hover:bg-accent/20'
+              }`}
             >
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                hasTicket
+                  ? 'bg-accent/20'
+                  : isEventFull()
+                  ? 'bg-gray-300 dark:bg-gray-700'
+                  : 'bg-accent/20'
+              }`}>
                 {hasTicket ? (
                   <Ticket className="w-5 h-5 text-accent" />
                 ) : (
-                  <Users className="w-5 h-5 text-accent" />
+                  <Users className={`w-5 h-5 ${isEventFull() ? 'text-gray-500' : 'text-accent'}`} />
                 )}
               </div>
               <span className="text-xs font-medium text-text-primary">
-                {hasTicket ? 'Mi Ticket' : 'Registro'}
+                {hasTicket ? 'Mi Ticket' : isEventFull() ? 'Lleno' : 'Registro'}
               </span>
             </button>
 
@@ -429,15 +456,43 @@ export default function EventDetailsPage() {
           )}
 
           {/* Capacity Info */}
-          {!event.isUnlimited && (
+          {!event.isUnlimited && event.maxAttendees && (
             <div className="mt-4 pt-4 border-t border-border">
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-text-secondary">Asistentes confirmados</span>
-                <span className="font-semibold text-text-primary">
-                  {event.goingCount || 0}
-                  {event.maxAttendees && ` / ${event.maxAttendees}`}
+                <span className={`font-semibold ${
+                  isEventFull() 
+                    ? 'text-red-600 dark:text-red-400'
+                    : (event.goingCount || 0) / event.maxAttendees >= 0.8
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-text-primary'
+                }`}>
+                  {event.goingCount || 0} / {event.maxAttendees}
                 </span>
               </div>
+              {/* Progress bar */}
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full transition-all ${
+                    isEventFull()
+                      ? 'bg-red-500'
+                      : (event.goingCount || 0) / event.maxAttendees >= 0.8
+                      ? 'bg-amber-500'
+                      : 'bg-accent'
+                  }`}
+                  style={{ width: `${Math.min(((event.goingCount || 0) / event.maxAttendees) * 100, 100)}%` }}
+                />
+              </div>
+              {isEventFull() && (
+                <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                  ⚠️ Este evento ha alcanzado su capacidad máxima
+                </p>
+              )}
+              {!isEventFull() && (event.goingCount || 0) / event.maxAttendees >= 0.8 && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                  ⚡ ¡Últimos lugares disponibles!
+                </p>
+              )}
             </div>
           )}
         </div>

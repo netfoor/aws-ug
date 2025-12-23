@@ -39,11 +39,19 @@ export function getLastThursdayOfMonth(year: number, month: number): Date {
     daysToSubtract = lastDayWeekday + 3;
   }
   
-  // Crear fecha del último jueves
-  const lastThursday = new Date(year, month, lastDayOfMonth.getDate() - daysToSubtract);
-  
-  // Establecer hora: 6:30 PM (18:30)
-  lastThursday.setHours(18, 30, 0, 0);
+  // Crear fecha del último jueves en UTC
+  // Usamos Date.UTC para evitar conversiones de timezone
+  // Hora: 18:30 en tiempo de México (UTC-6) = 00:30 UTC del día siguiente
+  // Para mantener el jueves correcto, usamos las 00:30 del día jueves
+  const lastThursday = new Date(Date.UTC(
+    year,
+    month,
+    lastDayOfMonth.getDate() - daysToSubtract,
+    0, // 00:30 UTC mantiene el día correcto
+    30,
+    0,
+    0
+  ));
   
   return lastThursday;
 }
@@ -76,6 +84,7 @@ export function getUpcomingLastThursdays(monthsAhead: number = 12): Date[] {
 /**
  * Formatea una fecha al estilo español bonito
  * Ejemplo: "Jueves 26 de Febrero 2026 (6:30-7:30 PM)"
+ * Usa UTC para evitar problemas de timezone
  */
 export function formatEventDate(date: Date): string {
   const months = [
@@ -83,9 +92,10 @@ export function formatEventDate(date: Date): string {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
   
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
+  // Usar UTC para obtener día/mes/año correcto
+  const day = date.getUTCDate();
+  const month = months[date.getUTCMonth()];
+  const year = date.getUTCFullYear();
   
   return `Jueves ${day} de ${month} ${year}`;
 }
@@ -106,13 +116,14 @@ export function isoToDate(iso: string): Date {
 
 /**
  * Verifica si dos fechas son el mismo día (ignora hora)
+ * Usa UTC para evitar problemas de timezone
  */
 export function isSameDay(date1: Date, date2: Date): boolean {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
+  // Normalizar ambas fechas a UTC y comparar solo YYYY-MM-DD
+  const date1UTC = date1.toISOString().split('T')[0];
+  const date2UTC = date2.toISOString().split('T')[0];
+  
+  return date1UTC === date2UTC;
 }
 
 /**

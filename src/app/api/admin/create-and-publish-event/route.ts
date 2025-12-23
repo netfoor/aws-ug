@@ -42,12 +42,14 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { 
-      talkProposalId, 
+      talkProposalId,
+      speakerApplicationId, // Para actualizar attachedProposal si la fecha cambió
       eventDate,
       eventTime,
       location,
       capacity,
       registrationDeadline,
+      coverImageUrl, // Cover image path de S3
       publish = false, // Si es true, crea como PUBLISHED, sino DRAFT
     } = body;
 
@@ -114,6 +116,7 @@ export async function POST(request: NextRequest) {
       endDate: endDate.toISOString(),
       location,
       maxAttendees: capacity || 50,
+      coverImageUrl: coverImageUrl || undefined, // Cover image si existe
       status: publish ? ('PUBLISHED' as const) : ('DRAFT' as const),
       speakerId: proposal.userId,
       speakerName: proposal.speakerName || 'Speaker',
@@ -144,9 +147,52 @@ export async function POST(request: NextRequest) {
         id: talkProposalId,
         status: 'EVENT_CREATED',
         eventId: event.id,
+        proposedDate: eventDateTime, // ✅ ACTUALIZAR fecha si cambió
         updatedAt: now,
       });
-      console.log('✅ TalkProposal actualizada a EVENT_CREATED');
+      console.log('✅ TalkProposal actualizada a EVENT_CREATED con nueva fecha');
+    }
+
+    // 4. Actualizar SpeakerApplication.attachedProposal.proposedDate si cambió la fecha
+    if (speakerApplicationId) {
+      console.log(`🔄 Intentando actualizar SpeakerApplication ${speakerApplicationId}...`);
+      try {
+        const appResponse = await client.models.SpeakerApplication.get({ id: speakerApplicationId });
+        console.log('📦 SpeakerApplication encontrada:', appResponse.data?.id);
+        
+        if (appResponse.data && appResponse.data.attachedProposal) {
+          const attachedProposal = typeof appResponse.data.attachedProposal === 'string'
+            ? JSON.parse(appResponse.data.attachedProposal)
+            : appResponse.data.attachedProposal;
+
+          const originalDate = attachedProposal.proposedDate;
+          console.log('📅 Comparando fechas:', { originalDate, eventDateTime });
+          
+          if (originalDate !== eventDateTime) {
+            // La fecha cambió, actualizar attachedProposal
+            const updatedProposal = {
+              ...attachedProposal,
+              proposedDate: eventDateTime,
+            };
+
+            console.log('💾 Actualizando attachedProposal...');
+            await client.models.SpeakerApplication.update({
+              id: speakerApplicationId,
+              attachedProposal: JSON.stringify(updatedProposal),
+            });
+            console.log(`✅ SpeakerApplication actualizada: fecha cambió de ${originalDate} a ${eventDateTime}`);
+          } else {
+            console.log(`ℹ️ SpeakerApplication: fecha NO cambió (${originalDate} = ${eventDateTime})`);
+          }
+        } else {
+          console.log('⚠️ SpeakerApplication no tiene attachedProposal');
+        }
+      } catch (err) {
+        console.error('⚠️ Error actualizando SpeakerApplication:', err);
+        // No lanzar error, continuar con el flujo
+      }
+    } else {
+      console.log('⚠️ No se proporcionó speakerApplicationId, saltando actualización');
     }
 
     return NextResponse.json({

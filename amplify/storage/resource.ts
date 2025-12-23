@@ -19,11 +19,12 @@ import { defineStorage } from '@aws-amplify/backend';
 export const storage = defineStorage({
   name: 'awsugStorage',
   access: (allow) => ({
-    // Cover images de eventos - público read, grupos autenticados write
+    // Cover images de eventos - PÚBLICO para lectura (sin autenticación), autenticados write
+    // Nota: allow.guest + allow.authenticated es necesario para evitar 403
     'events/*': [
-      allow.guest.to(['read']),
-      allow.authenticated.to(['read', 'write', 'delete']),
-      allow.groups(['ADMINS', 'SPEAKERS']).to(['read', 'write', 'delete']) // Grupos con permisos explícitos
+      allow.guest.to(['read']), // Lectura sin autenticación
+      allow.authenticated.to(['read', 'write', 'delete']), // Usuario autenticado
+      allow.groups(['ADMINS', 'SPEAKERS']).to(['read', 'write', 'delete']) // Roles específicos
     ],
     // Avatares - público read, owner write
     'avatars/{identity}/*': [
@@ -36,8 +37,9 @@ export const storage = defineStorage({
       allow.entity('identity').to(['read', 'write', 'delete'])
     ],
     // 🎤 Speaker professional files (CV y fotos) 
-    // Usuarios autenticados pueden escribir durante aplicación, speakers/admins full access
+    // PÚBLICO read para fotos de perfil, autenticados write durante aplicación
     'speakers/*': [
+      allow.guest.to(['read']), // ← Agregar read público para fotos de perfil
       allow.authenticated.to(['read', 'write']), // ← Permite upload durante aplicación
       allow.groups(['MEMBERS', 'SPEAKERS', 'ADMINS']).to(['read', 'write', 'delete'])
     ]
