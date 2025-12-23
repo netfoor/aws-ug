@@ -94,7 +94,7 @@ export default function UnifiedSpeakerProposalForm({
     topics: [],
     talkTitle: '',
     talkDescription: '',
-    duration: 45,
+    duration: 60, // Sprint 4: Siempre 60min (6:30-7:30 PM)
     targetAudience: 'ALL',
     proposedDate: null,
   });
@@ -785,35 +785,26 @@ export default function UnifiedSpeakerProposalForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="duration">Duración de la Plática (minutos) *</Label>
-              <select
-                id="duration"
-                value={formData.duration}
-                onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
-              >
-                <option value={30}>30 minutos</option>
-                <option value={45}>45 minutos</option>
-                <option value={60}>60 minutos</option>
-              </select>
-            </div>
+          {/* Duration fijo: 60 minutos (Sprint 4) */}
+          <div className="p-3 bg-accent/10 border border-accent/30 rounded-lg">
+            <p className="text-sm text-text-primary">
+              🕒 <strong>Duración:</strong> Todas las charlas tienen una duración estándar de <strong>60 minutos</strong> (6:30 - 7:30 PM)
+            </p>
+          </div>
 
-            <div>
-              <Label htmlFor="targetAudience">Nivel del público *</Label>
-              <select
-                id="targetAudience"
-                value={formData.targetAudience}
-                onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value as 'ALL' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' }))}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
-              >
-                <option value="ALL">Todos los niveles</option>
-                <option value="BEGINNER">Principiante</option>
-                <option value="INTERMEDIATE">Intermedio</option>
-                <option value="ADVANCED">Avanzado</option>
-              </select>
-            </div>
+          <div>
+            <Label htmlFor="targetAudience">Nivel del público *</Label>
+            <select
+              id="targetAudience"
+              value={formData.targetAudience}
+              onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value as 'ALL' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' }))}
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary"
+            >
+              <option value="ALL">Todos los niveles</option>
+              <option value="BEGINNER">Principiante</option>
+              <option value="INTERMEDIATE">Intermedio</option>
+              <option value="ADVANCED">Avanzado</option>
+            </select>
           </div>
         </div>
       )}
@@ -997,38 +988,26 @@ export default function UnifiedSpeakerProposalForm({
             </span>
           </Button>
         ) : (
-          <>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleSubmit}
-              disabled={isSubmitting || !formData.proposedDate}
-              className="flex-1 w-full sm:w-auto order-2 sm:order-1"
-            >
-              <span className="hidden sm:inline">Omitir y Enviar</span>
-              <span className="sm:hidden">Omitir y Enviar</span>
-            </Button>
-            <Button
-              type="button"
-              variant="accent"
-              onClick={handleSubmit}
-              disabled={isSubmitting || !formData.proposedDate}
-              className="flex-1 w-full sm:w-auto order-1 sm:order-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  <span className="hidden sm:inline">Enviando...</span>
-                  <span className="sm:hidden">Enviando...</span>
-                </>
-              ) : (
-                <>
-                  <span className="hidden sm:inline">✅ Enviar Propuesta Completa</span>
-                  <span className="sm:hidden">Enviar</span>
-                </>
-              )}
-            </Button>
-          </>
+          <Button
+            type="button"
+            variant="accent"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !formData.proposedDate}
+            className="flex-1 w-full sm:w-auto"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <span className="hidden sm:inline">Enviando...</span>
+                <span className="sm:hidden">Enviando...</span>
+              </>
+            ) : (
+              <>
+                <span className="hidden sm:inline">✅ Enviar Propuesta</span>
+                <span className="sm:hidden">Enviar</span>
+              </>
+            )}
+          </Button>
         )}
       </div>
     </div>

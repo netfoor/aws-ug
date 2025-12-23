@@ -360,52 +360,65 @@ return isSameDay(eventDate, thursday); // ❌ isSameDay no está funcionando por
 
 ---
 
-### **SPRINT 2: Uploads y Archivos (P1)**
-**Duración**: 2-3 días
+### **SPRINT 2: Uploads y Archivos (P1)** ✅ COMPLETADO
+**Duración**: 2-3 días  
+**Commit**: f242cb0
 
-- [ ] **Tarea 2.1**: Refactor `CoverImageUpload` - No subir automáticamente
+- [x] **Tarea 2.1**: Refactor `CoverImageUpload` - No subir automáticamente
   - Archivo: `src/components/common/CoverImageUpload.tsx`
   - Remover auto-upload en `handleFileSelect`
   - Solo subir cuando `uploadImage()` se llame explícitamente
   - Mantener preview sin upload
+  - ✅ COMPLETADO: Refactorizado con forwardRef + triggerUpload() method
 
-- [ ] **Tarea 2.2**: Refactor `speaker-uploads.ts` - Upload manual
+- [x] **Tarea 2.2**: Refactor `speaker-uploads.ts` - Upload manual
   - Archivo: `src/lib/speaker-uploads.ts`
   - Crear función `prepareSpeakerPhoto()` - solo valida y preview
   - Crear función `commitSpeakerPhoto()` - sube a S3
   - Mantener backward compatibility
+  - ✅ COMPLETADO: Patrón prepare/commit implementado
 
-- [ ] **Tarea 2.3**: Actualizar `UnifiedSpeakerProposalForm`
+- [x] **Tarea 2.3**: Actualizar `UnifiedSpeakerProposalForm`
   - Archivo: `src/components/speaker/UnifiedSpeakerProposalForm.tsx`
   - Preparar archivos en selección
   - Subir en `handleSubmit` solo si valida
   - Rollback si falla submit
+  - ✅ COMPLETADO: Archivos se suben solo al confirmar formulario
 
-- [ ] **Tarea 2.4**: Fix `EventCreationWizard` - Guardar cover image
+- [x] **Tarea 2.4**: Fix `EventCreationWizard` - Guardar cover image
   - Archivo: `src/components/admin/EventCreationWizard.tsx`
   - Asegurar `coverImageUrl` en payload
   - Actualizar API route para aceptar cover
   - Testing completo
+  - ✅ COMPLETADO: Ya funcionaba desde Sprint 1
+
+- [x] **BONUS**: Actualizar validación form-validation.ts
+  - Reconoce archivos preparados (cvFile/photoFile) como válidos
+  - No requiere que estén subidos para pasar validación
 
 **Criterios de éxito**:
 - ✅ Archivos solo se suben al confirmar formulario
 - ✅ Si falla submit, no hay archivos huérfanos
 - ✅ Wizard guarda cover image correctamente
+- ✅ Validación funciona con archivos preparados
 
 ---
 
-### **SPRINT 3: Limpieza de Archivos (P2)**
-**Duración**: 1-2 días
+### **SPRINT 3: Limpieza de Archivos (P2)** ⚠️ PARCIAL
+**Duración**: 1-2 días  
+**Commit**: f242cb0 (Tareas 3.1 y 3.2)
 
-- [ ] **Tarea 3.1**: Implementar `deleteFile()` en uploads
+- [x] **Tarea 3.1**: Implementar `deleteFile()` en uploads
   - Archivo: `src/lib/speaker-uploads.ts`
   - Usar `remove()` de Amplify Storage
   - Manejar errores de borrado
+  - ✅ COMPLETADO: deleteSpeakerFile() implementado
 
-- [ ] **Tarea 3.2**: Track archivos anteriores
+- [x] **Tarea 3.2**: Track archivos anteriores
   - En todos los formularios
   - Guardar `oldPhotoKey`, `oldCvKey`, etc.
   - Borrar al reemplazar
+  - ✅ COMPLETADO: Todos los formularios borran archivo viejo antes de subir nuevo
 
 - [ ] **Tarea 3.3**: Script de limpieza de huérfanos
   - Crear script para detectar archivos sin referencia
@@ -415,8 +428,8 @@ return isSameDay(eventDate, thursday); // ❌ isSameDay no está funcionando por
 
 **Criterios de éxito**:
 - ✅ Al reemplazar foto, la vieja se borra
-- ✅ No hay archivos huérfanos en S3
-- ✅ Script detecta y limpia huérfanos
+- ✅ No hay archivos huérfanos en S3 (nuevos)
+- ⏳ Script detecta y limpia huérfanos (pendiente)
 
 ---
 
