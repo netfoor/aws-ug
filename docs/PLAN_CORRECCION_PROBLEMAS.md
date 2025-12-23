@@ -314,33 +314,49 @@ return isSameDay(eventDate, thursday); // ❌ isSameDay no está funcionando por
 
 ## 🎯 PLAN DE ACCIÓN PROPUESTO
 
-### **SPRINT 1: Problemas Críticos de Fechas (P0)**
-**Duración**: 1-2 días
+### **SPRINT 1: Problemas Críticos de Fechas (P0)** ✅ COMPLETADO
+**Duración**: 1-2 días  
+**Commit**: da3ebca
 
-- [ ] **Tarea 1.1**: Corregir `getLastThursdayOfMonth()` para usar UTC
+- [x] **Tarea 1.1**: Corregir `getLastThursdayOfMonth()` para usar UTC
   - Archivo: `src/lib/date-utils.ts`
   - Cambiar `setHours()` por `Date.UTC()`
   - Testing exhaustivo con múltiples meses
+  - ✅ COMPLETADO: Usa Date.UTC() para evitar conversión de zona horaria
 
-- [ ] **Tarea 1.2**: Corregir función `isSameDay()`
+- [x] **Tarea 1.2**: Corregir función `isSameDay()`
   - Archivo: `src/lib/date-utils.ts`
   - Comparar solo fecha, ignorar hora
   - Normalizar a UTC antes de comparar
+  - ✅ COMPLETADO: Compara ISO strings sin componente de tiempo
 
-- [ ] **Tarea 1.3**: Fix validación en `DateSelector`
+- [x] **Tarea 1.3**: Fix validación en `DateSelector`
   - Archivo: `src/components/common/DateSelector.tsx`
   - Agregar logs para debug
   - Validar contra eventos Y propuestas correctamente
+  - ✅ COMPLETADO: Valida Events + TalkProposals (excluye EVENT_CREATED) + SpeakerApplications
 
-- [ ] **Tarea 1.4**: Corregir Error 403 en imágenes
+- [x] **Tarea 1.4**: Corregir Error 403 en imágenes
   - Archivo: `amplify/storage/resource.ts`
   - Configurar acceso público o signed URLs
   - Testing con imágenes reales
+  - ✅ COMPLETADO: Configurado allow.guest.to(['read']) para acceso público
+
+- [x] **BONUS**: Fix doble fecha bug
+  - TalkProposal.proposedDate ahora se actualiza cuando admin cambia fecha
+  - DateSelector excluye TalkProposals con EVENT_CREATED
+  - Documentado en ANALISIS_BUG_DOBLE_FECHA.md
+
+- [x] **BONUS**: Fix timezone en display de fechas
+  - UnifiedApplicationCard y SpeakerApplicationDetail usan formatProposedDateUTC()
+  - Evita mostrar día anterior (25 en lugar de 26)
 
 **Criterios de éxito**:
 - ✅ Jueves 29 Enero no se convierte en Viernes 30
 - ✅ Fechas ocupadas se muestran correctamente
 - ✅ Imágenes se cargan sin error 403
+- ✅ Bug de doble fecha resuelto
+- ✅ Display de fechas muestra día correcto
 
 ---
 

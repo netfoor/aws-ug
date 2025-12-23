@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import DateSelector from '@/components/common/DateSelector';
-import { uploadSpeakerPhoto, uploadSpeakerCV, EXPERTISE_AREAS, formatFileSize } from '@/lib/speaker-uploads';
+import { uploadSpeakerPhoto, uploadSpeakerCV, EXPERTISE_AREAS, formatFileSize, prepareSpeakerPhoto, prepareSpeakerCV, commitSpeakerPhoto, commitSpeakerCV, deleteSpeakerFile, type PreparedFile } from '@/lib/speaker-uploads';
 import {
   validateFormSection,
   validateCompleteForm,
@@ -105,11 +105,15 @@ export default function UnifiedSpeakerProposalForm({
   const [photoProgress, setPhotoProgress] = useState(0);
   const [cvUploading, setCvUploading] = useState(false);
   const [cvProgress, setCvProgress] = useState(0);
+  
+  // Sprint 2: Prepared files (NO subidos aún)
+  const [preparedPhoto, setPreparedPhoto] = useState<PreparedFile | null>(null);
+  const [preparedCV, setPreparedCV] = useState<PreparedFile | null>(null);
 
   // Topic input
   const [topicInput, setTopicInput] = useState('');
 
-  // Handle photo selection
+  // Handle photo selection (NUEVO: solo prepara, NO sube)
   async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -123,43 +127,33 @@ export default function UnifiedSpeakerProposalForm({
     };
     reader.readAsDataURL(file);
 
-    // Upload
-    setPhotoUploading(true);
-    setPhotoProgress(0);
+    // NUEVO: Preparar archivo (validar, NO subir)
+    const result = prepareSpeakerPhoto(userId, file);
 
-    const result = await uploadSpeakerPhoto(userId, file, (progress) => {
-      setPhotoProgress(progress);
-    });
-
-    setPhotoUploading(false);
-
-    if (result.success && result.key) {
-      setFormData(prev => ({ ...prev, photoFile: file, photoKey: result.key || null }));
+    if (result.success) {
+      setPreparedPhoto(result.prepared);
+      setFormData(prev => ({ ...prev, photoFile: file }));
     } else {
-      setError(result.error || 'Error al subir la foto');
+      setError(result.error);
       setPhotoPreview(null);
     }
   }
 
-  // Handle CV selection
+  // Handle CV selection (NUEVO: solo prepara, NO sube)
   async function handleCvSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setError(null);
-    setCvUploading(true);
-    setCvProgress(0);
 
-    const result = await uploadSpeakerCV(userId, file, (progress) => {
-      setCvProgress(progress);
-    });
+    // NUEVO: Preparar archivo (validar, NO subir)
+    const result = prepareSpeakerCV(userId, file);
 
-    setCvUploading(false);
-
-    if (result.success && result.key) {
-      setFormData(prev => ({ ...prev, cvFile: file, cvKey: result.key || null }));
+    if (result.success) {
+      setPreparedCV(result.prepared);
+      setFormData(prev => ({ ...prev, cvFile: file }));
     } else {
-      setError(result.error || 'Error al subir el CV');
+      setError(result.error);
     }
   }
 
@@ -282,10 +276,65 @@ export default function UnifiedSpeakerProposalForm({
     setError(null);
 
     try {
-      await onSubmit(formData);
+      // NUEVO (Sprint 2): Subir archivos preparados ANTES de enviar formulario
+      let uploadedPhotoKey: string | null = null;
+      let uploadedCVKey: string | null = null;
+
+      // Subir foto si está preparada
+      if (preparedPhoto) {
+        // Sprint 2 - Tarea 3.2: Borrar foto vieja si existe
+        if (formData.photoKey) {
+          console.log('🗑️ Borrando foto vieja antes de subir nueva...');
+          await deleteSpeakerFile(formData.photoKey);
+        }
+
+        setPhotoUploading(true);
+        setPhotoProgress(0);
+        const photoResult = await commitSpeakerPhoto(preparedPhoto, (progress) => {
+          setPhotoProgress(progress);
+        });
+        setPhotoUploading(false);
+
+        if (!photoResult.success) {
+          throw new Error(photoResult.error || 'Error al subir la foto');
+        }
+        uploadedPhotoKey = photoResult.key || null;
+      }
+
+      // Subir CV si está preparado
+      if (preparedCV) {
+        // Sprint 2 - Tarea 3.2: Borrar CV viejo si existe
+        if (formData.cvKey) {
+          console.log('🗑️ Borrando CV viejo antes de subir nuevo...');
+          await deleteSpeakerFile(formData.cvKey);
+        }
+
+        setCvUploading(true);
+        setCvProgress(0);
+        const cvResult = await commitSpeakerCV(preparedCV, (progress) => {
+          setCvProgress(progress);
+        });
+        setCvUploading(false);
+
+        if (!cvResult.success) {
+          throw new Error(cvResult.error || 'Error al subir el CV');
+        }
+        uploadedCVKey = cvResult.key || null;
+      }
+
+      // Actualizar formData con las keys de S3
+      const submissionData = {
+        ...formData,
+        photoKey: uploadedPhotoKey || formData.photoKey,
+        cvKey: uploadedCVKey || formData.cvKey,
+      };
+
+      await onSubmit(submissionData);
     } catch (err) {
       console.error('Error submitting form:', err);
-      setError('Error al enviar el formulario. Por favor intenta de nuevo.');
+      setError(err instanceof Error ? err.message : 'Error al enviar el formulario. Por favor intenta de nuevo.');
+      setPhotoUploading(false);
+      setCvUploading(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -510,10 +559,15 @@ export default function UnifiedSpeakerProposalForm({
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       <span className="text-sm">Subiendo... {photoProgress}%</span>
                       </>
+                    ) : preparedPhoto ? (
+                      <>
+                      <Check className="w-4 h-4 mr-2 text-blue-600" />
+                      <span className="text-sm">Foto lista ✓</span>
+                      </>
                     ) : formData.photoKey ? (
                       <>
                       <Check className="w-4 h-4 mr-2 text-green-600" />
-                      <span className="text-sm">Foto cargada</span>
+                      <span className="text-sm">Foto subida</span>
                       </>
                     ) : (
                       <>
@@ -576,6 +630,11 @@ export default function UnifiedSpeakerProposalForm({
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Subiendo... {cvProgress}%
+                  </>
+                ) : preparedCV ? (
+                  <>
+                    <FileText className="w-4 h-4 mr-2 text-blue-600" />
+                    {preparedCV.file.name} - Listo ✓
                   </>
                 ) : formData.cvKey ? (
                   <>
@@ -873,6 +932,23 @@ export default function UnifiedSpeakerProposalForm({
               )}
               <p className="text-xs text-text-secondary mt-1">
                 Opcional - Nos ayuda a sugerir temas futuros y conectarte con otros speakers
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Info sobre archivos preparados */}
+      {currentSection === 6 && (preparedPhoto || preparedCV) && (
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-start gap-2">
+            <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
+              <p className="font-medium">Archivos listos para subir</p>
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                {preparedPhoto && preparedCV && 'Tu foto y CV se subirán al enviar el formulario'}
+                {preparedPhoto && !preparedCV && 'Tu foto se subirá al enviar el formulario'}
+                {!preparedPhoto && preparedCV && 'Tu CV se subirá al enviar el formulario'}
               </p>
             </div>
           </div>

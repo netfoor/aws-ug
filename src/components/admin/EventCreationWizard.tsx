@@ -305,7 +305,7 @@ export function EventCreationWizard({
               }}
               onError={(error) => setError(error)}
               disabled={loading}
-              autoUpload={true}
+              autoUpload={true} // OK aquí: admin confirma inmediatamente en wizard
               compact={true}
             />
             <p className="text-xs text-text-secondary mt-2">

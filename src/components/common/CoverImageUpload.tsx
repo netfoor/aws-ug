@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { uploadData } from 'aws-amplify/storage';
 import { optimizeImage, validateImageFile, createImagePreview, revokeImagePreview } from '@/lib/image-optimizer';
@@ -14,21 +14,37 @@ import { Label } from '@/components/ui/Label';
  * - Validación de archivos (tipo, tamaño)
  * - Optimización automática a WebP
  * - Preview en tiempo real
- * - Upload a S3 con Amplify Storage
+ * - Upload a S3 con Amplify Storage (MANUAL)
  * - Estados de loading y error
  * - Responsive y dark mode
  * 
+ * NUEVO FLUJO (Sprint 2):
+ * 1. Usuario selecciona archivo → Preview
+ * 2. Usuario confirma formulario → Llamar ref.triggerUpload()
+ * 3. Upload a S3 → onImageUploaded callback
+ * 
  * Uso:
  * ```tsx
+ * const uploadRef = useRef<CoverImageUploadRef>(null);
+ * 
  * <CoverImageUpload
+ *   ref={uploadRef}
  *   eventId={eventId}
- *   currentImageUrl={existingUrl}
- *   onImageUploaded={(url) => console.log('Uploaded:', url)}
- *   onError={(error) => console.error(error)}
- *   disabled={isSubmitting}
+ *   onImageSelected={(file, preview) => setHasImage(true)}
  * />
+ * 
+ * // Al enviar formulario:
+ * const imageUrl = await uploadRef.current?.triggerUpload();
  * ```
  */
+
+// Métodos expuestos por el componente
+export interface CoverImageUploadRef {
+  triggerUpload: () => Promise<string | null>;
+  getSelectedFile: () => File | null;
+  hasSelection: () => boolean;
+  reset: () => void;
+}
 
 interface CoverImageUploadProps {
   // ID del evento (para construir el path en S3)
@@ -45,7 +61,7 @@ interface CoverImageUploadProps {
   
   // Configuración
   disabled?: boolean;
-  autoUpload?: boolean; // Si true, sube automáticamente al seleccionar
+  autoUpload?: boolean; // DEPRECATED: Mantener false. Usar triggerUpload() en su lugar
   maxSizeMB?: number; // Tamaño máximo en MB
   compact?: boolean; // Modo compacto para espacios pequeños
   
@@ -55,7 +71,7 @@ interface CoverImageUploadProps {
   quality?: number;
 }
 
-export default function CoverImageUpload({
+const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(({
   eventId,
   currentImageUrl,
   onImageUploaded,
@@ -63,19 +79,35 @@ export default function CoverImageUpload({
   onImageRemoved,
   onError,
   disabled = false,
-  autoUpload = false,
+  autoUpload = false, // Default false: upload manual
   maxSizeMB = 10,
   compact = false,
   maxWidth = 1200,
   maxHeight = 800,
   quality = 0.85,
-}: CoverImageUploadProps) {
+}, ref) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Exponer métodos públicos via ref
+  useImperativeHandle(ref, () => ({
+    triggerUpload: async () => {
+      if (!selectedFile) {
+        console.warn('No hay archivo seleccionado para subir');
+        return null;
+      }
+      return await uploadImage(selectedFile);
+    },
+    getSelectedFile: () => selectedFile,
+    hasSelection: () => !!selectedFile,
+    reset: () => {
+      handleRemove();
+    },
+  }));
 
   // Limpiar preview al desmontar
   React.useEffect(() => {
@@ -123,8 +155,10 @@ export default function CoverImageUpload({
       // 4. Callback de selección
       onImageSelected?.(optimized, preview);
 
-      // 5. Auto-upload si está habilitado y tenemos eventId
+      // 5. Auto-upload DEPRECATED - mantener para backward compatibility
+      // Nuevo flujo: llamar triggerUpload() manualmente desde el componente padre
       if (autoUpload && eventId) {
+        console.warn('⚠️ autoUpload está deprecated. Usa triggerUpload() en su lugar');
         await uploadImage(optimized);
       }
 
@@ -438,4 +472,8 @@ export default function CoverImageUpload({
       )}
     </div>
   );
-}
+});
+
+CoverImageUpload.displayName = 'CoverImageUpload';
+
+export default CoverImageUpload;

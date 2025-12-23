@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import {
   uploadSpeakerPhoto,
   uploadSpeakerCV,
+  deleteSpeakerFile,
   validateLinkedInUrl,
   formatFileSize,
   EXPERTISE_AREAS,
@@ -75,6 +76,12 @@ export default function ProfessionalProfileForm({
     };
     reader.readAsDataURL(file);
 
+    // Borrar foto vieja si existe (Sprint 2 - Tarea 3.2)
+    if (photoKey) {
+      console.log('🗑️ Borrando foto vieja antes de subir nueva...');
+      await deleteSpeakerFile(photoKey);
+    }
+
     // Upload automático
     setPhotoUploading(true);
     setPhotoProgress(0);
@@ -101,6 +108,12 @@ export default function ProfessionalProfileForm({
 
     setError(null);
     setCvFile(file);
+
+    // Borrar CV viejo si existe (Sprint 2 - Tarea 3.2)
+    if (cvKey) {
+      console.log('🗑️ Borrando CV viejo antes de subir nuevo...');
+      await deleteSpeakerFile(cvKey);
+    }
 
     // Upload automático
     setCvUploading(true);

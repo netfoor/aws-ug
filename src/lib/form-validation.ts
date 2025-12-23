@@ -434,11 +434,14 @@ export function validateFormSection(
 
     case 2: // Professional Profile
       {
-        // Either CV or LinkedIn is required for professional profile completion
-        if (!formData.cvKey && !formData.linkedInUrl) {
+        // Either CV (uploaded OR selected) or LinkedIn is required for professional profile completion
+        // Sprint 2: cvFile ahora significa "preparado para subir", no necesariamente subido
+        const hasCVorLinkedIn = formData.cvKey || formData.cvFile || formData.linkedInUrl;
+        
+        if (!hasCVorLinkedIn) {
           errors.push('Debes proporcionar tu CV o tu perfil de LinkedIn para completar tu perfil profesional');
         } else {
-          // Validate CV if provided
+          // Validate CV if provided (either uploaded or selected)
           if (formData.cvFile || formData.cvKey) {
             const cvValidation = validateFileUpload(formData.cvFile, 'cv', !formData.cvKey);
             errors.push(...cvValidation.errors);
@@ -593,7 +596,7 @@ export function validateCompleteForm(formData: UnifiedFormData): ValidationResul
 
   // Ensure professional profile is complete before allowing talk proposal
   const hasPhoto = formData.photoKey || formData.photoFile;
-  const hasProfessionalInfo = formData.cvKey || formData.linkedInUrl;
+  const hasProfessionalInfo = formData.cvKey || formData.cvFile || formData.linkedInUrl; // Sprint 2: incluir cvFile
 
   if (!hasPhoto || !hasProfessionalInfo) {
     errors.push('Debes completar tu perfil profesional (foto y CV/LinkedIn) antes de proponer una charla');
@@ -626,8 +629,9 @@ export function validateProfessionalProfileCompletion(formData: UnifiedFormData)
     errors.push('La foto profesional es requerida para completar tu perfil');
   }
 
-  // Either CV or LinkedIn is required (Requirement 4.2)
-  if (!formData.cvKey && !formData.linkedInUrl) {
+  // Either CV (uploaded OR selected) or LinkedIn is required (Requirement 4.2)
+  // Sprint 2: cvFile significa "preparado para subir"
+  if (!formData.cvKey && !formData.cvFile && !formData.linkedInUrl) {
     errors.push('Debes proporcionar tu CV o perfil de LinkedIn para completar tu perfil profesional');
   }
 

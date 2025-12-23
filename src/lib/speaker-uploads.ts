@@ -6,9 +6,31 @@
  * - CVs (PDF)
  * - Validación de tamaño y tipo
  * - Generación de keys únicos en S3
+ * - Borrado de archivos viejos (Sprint 2)
+ * 
+ * NUEVO FLUJO (Sprint 2):
+ * 1. prepareSpeakerPhoto/CV() - Valida archivo, retorna File listo
+ * 2. Usuario confirma formulario
+ * 3. commitSpeakerPhoto/CV() - Sube a S3
+ * 4. deleteSpeakerFile() - Borra archivo viejo si existe
+ * 
+ * Funciones legacy (uploadSpeakerPhoto/CV) mantienen backward compatibility
  */
 
-import { uploadData } from 'aws-amplify/storage';
+import { uploadData, remove } from 'aws-amplify/storage';
+
+export interface PreparedFile {
+  file: File;
+  path: string;
+  userId: string;
+}
+
+export interface CommitResult {
+  success: boolean;
+  key?: string;
+  url?: string;
+  error?: string;
+}
 
 // Límites de archivos
 export const FILE_LIMITS = {
@@ -87,8 +109,187 @@ function generateFilePath(
   return `${type}/${timestamp}-${sanitizedFilename}`;
 }
 
+// ========================================
+// NUEVO FLUJO: Prepare/Commit Pattern
+// ========================================
+
 /**
- * Sube foto profesional de speaker a S3
+ * 🎯 PASO 1: Prepara foto de speaker (solo valida, NO sube)
+ * Usar esto cuando el usuario SELECCIONA el archivo
+ */
+export function prepareSpeakerPhoto(
+  userId: string,
+  file: File
+): { success: true; prepared: PreparedFile } | { success: false; error: string } {
+  // Validar archivo
+  const validation = validateFile(file, 'PHOTO');
+  if (!validation.valid) {
+    return {
+      success: false,
+      error: validation.error || 'Foto no válida',
+    };
+  }
+
+  // Generar path (sin subir aún)
+  const filePath = generateFilePath(file, 'photo');
+  const fullPath = `speakers/${userId}/${filePath}`;
+
+  return {
+    success: true,
+    prepared: {
+      file,
+      path: fullPath,
+      userId,
+    },
+  };
+}
+
+/**
+ * 🚀 PASO 2: Sube foto de speaker a S3
+ * Usar esto cuando el usuario CONFIRMA el formulario
+ */
+export async function commitSpeakerPhoto(
+  prepared: PreparedFile,
+  onProgress?: (progress: number) => void
+): Promise<CommitResult> {
+  try {
+    // Subir a S3
+    const result = await uploadData({
+      path: prepared.path,
+      data: prepared.file,
+      options: {
+        contentType: prepared.file.type,
+        onProgress: ({ transferredBytes, totalBytes }) => {
+          if (onProgress && totalBytes) {
+            const progress = Math.round((transferredBytes / totalBytes) * 100);
+            onProgress(progress);
+          }
+        },
+      },
+    }).result;
+
+    return {
+      success: true,
+      key: prepared.path,
+      url: result.path,
+    };
+  } catch (error) {
+    console.error('Error committing speaker photo:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al subir la foto',
+    };
+  }
+}
+
+/**
+ * 🎯 PASO 1: Prepara CV de speaker (solo valida, NO sube)
+ * Usar esto cuando el usuario SELECCIONA el archivo
+ */
+export function prepareSpeakerCV(
+  userId: string,
+  file: File
+): { success: true; prepared: PreparedFile } | { success: false; error: string } {
+  // Validar archivo
+  const validation = validateFile(file, 'CV');
+  if (!validation.valid) {
+    return {
+      success: false,
+      error: validation.error || 'CV no válido',
+    };
+  }
+
+  // Generar path (sin subir aún)
+  const filePath = generateFilePath(file, 'cv');
+  const fullPath = `speakers/${userId}/${filePath}`;
+
+  return {
+    success: true,
+    prepared: {
+      file,
+      path: fullPath,
+      userId,
+    },
+  };
+}
+
+/**
+ * 🚀 PASO 2: Sube CV de speaker a S3
+ * Usar esto cuando el usuario CONFIRMA el formulario
+ */
+export async function commitSpeakerCV(
+  prepared: PreparedFile,
+  onProgress?: (progress: number) => void
+): Promise<CommitResult> {
+  try {
+    // Subir a S3
+    const result = await uploadData({
+      path: prepared.path,
+      data: prepared.file,
+      options: {
+        contentType: 'application/pdf',
+        onProgress: ({ transferredBytes, totalBytes }) => {
+          if (onProgress && totalBytes) {
+            const progress = Math.round((transferredBytes / totalBytes) * 100);
+            onProgress(progress);
+          }
+        },
+      },
+    }).result;
+
+    return {
+      success: true,
+      key: prepared.path,
+      url: result.path,
+    };
+  } catch (error) {
+    console.error('Error committing speaker CV:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al subir el CV',
+    };
+  }
+}
+
+// ========================================
+// LIMPIEZA: Borrado de archivos viejos
+// Sprint 2 - Tarea 3.1
+// ========================================
+
+/**
+ * 🗑️ Borra un archivo de speaker de S3
+ * Usar antes de subir un nuevo archivo para evitar archivos huérfanos
+ * 
+ * @param path - Path completo del archivo en S3 (ej: "speakers/userId/photo/123-foto.jpg")
+ * @returns true si se borró exitosamente, false si hubo error
+ */
+export async function deleteSpeakerFile(path: string): Promise<boolean> {
+  if (!path || path.trim().length === 0) {
+    console.warn('Path vacío, no hay nada que borrar');
+    return true; // No es error, simplemente no hay nada que borrar
+  }
+
+  try {
+    console.log('🗑️ Borrando archivo viejo:', path);
+    await remove({ path });
+    console.log('✅ Archivo borrado exitosamente');
+    return true;
+  } catch (error) {
+    console.error('❌ Error borrando archivo:', error);
+    // No lanzamos error para no bloquear el flujo
+    // Si no se puede borrar, al menos el nuevo archivo se sube
+    return false;
+  }
+}
+
+// ========================================
+// LEGACY: Funciones con auto-upload
+// Mantener para backward compatibility
+// ========================================
+
+/**
+ * @deprecated Usar prepareSpeakerPhoto() + commitSpeakerPhoto() en su lugar
+ * Sube foto profesional de speaker a S3 (auto-upload)
  */
 export async function uploadSpeakerPhoto(
   userId: string,
@@ -141,7 +342,8 @@ export async function uploadSpeakerPhoto(
 }
 
 /**
- * Sube CV de speaker a S3
+ * @deprecated Usar prepareSpeakerCV() + commitSpeakerCV() en su lugar
+ * Sube CV de speaker a S3 (auto-upload)
  */
 export async function uploadSpeakerCV(
   userId: string,
