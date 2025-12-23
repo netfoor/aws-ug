@@ -562,7 +562,7 @@ export default function UnifiedSpeakerProposalForm({
                     ) : preparedPhoto ? (
                       <>
                       <Check className="w-4 h-4 mr-2 text-blue-600" />
-                      <span className="text-sm">Foto lista ✓</span>
+                      <span className="text-sm">Foto lista</span>
                       </>
                     ) : formData.photoKey ? (
                       <>
@@ -634,7 +634,7 @@ export default function UnifiedSpeakerProposalForm({
                 ) : preparedCV ? (
                   <>
                     <FileText className="w-4 h-4 mr-2 text-blue-600" />
-                    {preparedCV.file.name} - Listo ✓
+                    <p className='text-sm e m-2 text-blue-600'>{preparedCV.file.name} - Listo  </p>
                   </>
                 ) : formData.cvKey ? (
                   <>
@@ -934,6 +934,9 @@ export default function UnifiedSpeakerProposalForm({
         <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <div className="flex items-start gap-2">
             <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            
+
+            {/*
             <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
               <p className="font-medium">Archivos listos para subir</p>
               <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
@@ -942,6 +945,7 @@ export default function UnifiedSpeakerProposalForm({
                 {!preparedPhoto && preparedCV && 'Tu CV se subirá al enviar el formulario'}
               </p>
             </div>
+            */}
           </div>
         </div>
       )}

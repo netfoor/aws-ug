@@ -59,8 +59,23 @@ node_modules
 amplify_outputs*
 amplifyconfiguration*
 
+
+# kiro
+kiro-output/
+kiro-state.json
+kiro-logs/
+.kiro/specs
+.kiro
+
+# diagrams
 /generated-diagrams
 chat.md
 awspuebla-connect-roadmap',_show=false).png
 
-/.kiro
+# docs
+docs/
+
+# testing Jest
+jest.config.js
+jest.setup.js
+jest-setup.ts

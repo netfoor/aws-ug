@@ -323,7 +323,7 @@ export default function SpeakerProfileEditor({
             )}
             {!photoFile && currentData.speakerPhotoKey && (
               <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                ✓ Foto actual cargada
+                Foto actual cargada
               </p>
             )}
           </div>
@@ -383,7 +383,7 @@ export default function SpeakerProfileEditor({
             </label>
             {!cvFile && currentData.speakerCvKey && (
               <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                ✓ CV actual cargado
+                CV actual cargado
               </p>
             )}
           </div>
@@ -406,7 +406,7 @@ export default function SpeakerProfileEditor({
             </div>
             {linkedInUrl && (
               <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                ✓ LinkedIn configurado
+                LinkedIn configurado
               </p>
             )}
           </div>
