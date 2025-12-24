@@ -26,10 +26,10 @@ const client = generateClient<Schema>();
 export default function ProposeTalkPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const { userData, isLoading: userDataLoading } = useUserData();
+  const { userData } = useUserData();
   const { profile, loading: profileLoading } = useUserProfile();
   
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSpeaker, setIsSpeaker] = useState<boolean | null>(null);

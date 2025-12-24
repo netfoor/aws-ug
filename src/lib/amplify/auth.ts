@@ -6,7 +6,6 @@
  */
 import { fetchAuthSession, signOut, signInWithRedirect, getCurrentUser as amplifyGetCurrentUser } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
-import type { AuthUser } from 'aws-amplify/auth';
 
 /**
  * Verifica si hay tokens de autenticación válidos
@@ -57,7 +56,7 @@ export async function verifyTokens(): Promise<{
             };
           }
         }
-      } catch (tokenInfoError) {
+      } catch {
         // Error getting token info, continue with the existing tokens
       }
       
@@ -127,7 +126,7 @@ export { signOut };
 export async function getCurrentUser() {
   try {
     return await amplifyGetCurrentUser();
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -162,21 +161,21 @@ export function createAuthListener(callback: (event: string, data: unknown) => v
 }
 
 // Helper functions for auth context
-async function checkIsUserAdmin(user: AuthUser): Promise<boolean> {
+async function checkIsUserAdmin(): Promise<boolean> {
   try {
     const session = await fetchAuthSession();
     const groups = session.tokens?.accessToken?.payload['cognito:groups'] || [];
     return Array.isArray(groups) && groups.includes('ADMINS');
-  } catch (error) {
+  } catch {
     return false;
   }
 }
 
-async function getUserAttributes(user: AuthUser): Promise<Record<string, unknown> | null> {
+async function getUserAttributes(): Promise<Record<string, unknown> | null> {
   try {
     const session = await fetchAuthSession();
     return session.tokens?.idToken?.payload || null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -191,10 +190,9 @@ async function getUserAttributes(user: AuthUser): Promise<Record<string, unknown
  * 
  * IMPORTANTE: El orden importa (ADMIN tiene prioridad sobre SPEAKER)
  * 
- * @param user Usuario autenticado (opcional, se puede llamar sin parámetro)
  * @returns El role del usuario: 'ADMIN' | 'SPEAKER' | 'MEMBER'
  */
-export async function getUserRoleFromCognito(user?: AuthUser): Promise<'ADMIN' | 'SPEAKER' | 'MEMBER'> {
+export async function getUserRoleFromCognito(): Promise<'ADMIN' | 'SPEAKER' | 'MEMBER'> {
   try {
     const session = await fetchAuthSession();
     const groups = (session.tokens?.accessToken?.payload['cognito:groups'] || []) as string[];

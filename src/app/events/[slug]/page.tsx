@@ -54,6 +54,7 @@ export default function EventDetailsPage() {
       loadEventDetails();
       loadAdmins();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   // Recargar evento cuando la página vuelve a tener foco (después de registro)
@@ -66,6 +67,7 @@ export default function EventDetailsPage() {
     
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, isLoading]);
 
   async function loadEventDetails() {

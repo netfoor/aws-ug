@@ -185,15 +185,15 @@ export function EventCreationWizard({
   // Paso 1: Detalles del evento
   if (step === 'event-details') {
     return (
-      <div className="mt-4 p-4 sm:p-5 border-t border-border bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-lg theme-transition">
+      <div className="mt-4 p-3 sm:p-5 border-t border-border bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-lg theme-transition">
         {/* Header con icono */}
-        <div className="flex items-start gap-3 mb-4">
-          <div className="flex-shrink-0 p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+        <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex-shrink-0 p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />
           </div>
-          <div className="flex-1">
-            <h4 className="font-semibold text-text-primary text-base">Speaker Aprobado</h4>
-            <p className="text-sm text-text-secondary mt-0.5">Completa los detalles para aprobar la propuesta y crear el evento</p>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-text-primary text-sm sm:text-base">Speaker Aprobado</h4>
+            <p className="text-xs sm:text-sm text-text-secondary mt-0.5 leading-tight">Completa los detalles para aprobar la propuesta y crear el evento</p>
           </div>
         </div>
 
@@ -205,11 +205,11 @@ export function EventCreationWizard({
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* Talk Title (readonly) */}
-          <div className="p-3 bg-accent/5 border border-accent/20 rounded-lg">
+          <div className="p-2.5 sm:p-3 bg-accent/5 border border-accent/20 rounded-lg">
             <label className="text-xs font-medium text-text-secondary block mb-1">Charla</label>
-            <p className="text-sm font-semibold text-text-primary">{talkTitle}</p>
+            <p className="text-xs sm:text-sm font-semibold text-text-primary break-words">{talkTitle}</p>
           </div>
 
           {/* Date & Time Selector - Deshabilita fechas ocupadas */}
@@ -226,7 +226,7 @@ export function EventCreationWizard({
 
           {/* End Time */}
           <div>
-            <label htmlFor="endTime" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-2">
+            <label htmlFor="endTime" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-1.5 sm:mb-2">
               <Clock className="w-3.5 h-3.5 text-accent" />
               Hora de fin
             </label>
@@ -235,16 +235,16 @@ export function EventCreationWizard({
               type="time"
               value={formData.eventEndTime}
               onChange={(e) => setFormData(prev => ({ ...prev, eventEndTime: e.target.value }))}
-              className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
+              className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
             />
-            <p className="text-xs text-text-secondary mt-1.5">
+            <p className="text-xs text-text-secondary mt-1">
               ⏰ {formData.eventTime} - {formData.eventEndTime}
             </p>
           </div>
 
           {/* Location */}
           <div>
-            <label htmlFor="location" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-2">
+            <label htmlFor="location" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-1.5 sm:mb-2">
               <MapPin className="w-3.5 h-3.5 text-accent" />
               Ubicación
             </label>
@@ -255,14 +255,14 @@ export function EventCreationWizard({
               onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
               placeholder="Ej: Auditorio Principal"
               required
-              className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
+              className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
             />
           </div>
 
           {/* Capacity & Deadline */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label htmlFor="capacity" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-2">
+              <label htmlFor="capacity" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-1.5 sm:mb-2">
                 <Users className="w-3.5 h-3.5 text-accent" />
                 Capacidad
               </label>
@@ -272,7 +272,7 @@ export function EventCreationWizard({
                 min="1"
                 value={formData.capacity}
                 onChange={(e) => setFormData(prev => ({ ...prev, capacity: parseInt(e.target.value) || 50 }))}
-                className="w-full px-3 py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
+                className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
               />
             </div>
             <div>
@@ -295,7 +295,7 @@ export function EventCreationWizard({
           </div>
 
           {/* Cover Image Upload - Agregado en Fase 2 */}
-          <div className="border-t border-border pt-4">
+          <div className="border-t border-border pt-3 sm:pt-4">
             <CoverImageUpload
               eventId={createdEventId || talkProposalId} // Usar talkProposalId como fallback
               onImageUploaded={(imageUrl) => {
@@ -308,17 +308,17 @@ export function EventCreationWizard({
               autoUpload={true} // OK aquí: admin confirma inmediatamente en wizard
               compact={true}
             />
-            <p className="text-xs text-text-secondary mt-2">
+            <p className="text-xs text-text-secondary mt-1.5 sm:mt-2">
               Opcional: Agrega una imagen de portada para el evento
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+          <div className="flex flex-col gap-2 pt-2">
             <Button
               onClick={() => handleCreateEvent(true)}
               disabled={loading || !formData.eventDate || !formData.eventTime || !formData.location}
-              className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold"
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold text-sm sm:text-base py-2.5 sm:py-3"
             >
               {loading ? (
                 <>
@@ -337,22 +337,22 @@ export function EventCreationWizard({
               onClick={() => handleCreateEvent(false)}
               disabled={loading || !formData.eventDate || !formData.eventTime || !formData.location}
               variant="outline"
-              className="flex-1"
+              className="w-full text-sm sm:text-base py-2.5 sm:py-3"
             >
               <FileText className="w-4 h-4 mr-2" />
               Solo Borrador
             </Button>
+            
+            <Button
+              onClick={onCancel}
+              variant="ghost"
+              size="sm"
+              className="w-full text-xs sm:text-sm"
+              disabled={loading}
+            >
+              Cancelar
+            </Button>
           </div>
-
-          <Button
-            onClick={onCancel}
-            variant="ghost"
-            size="sm"
-            className="w-full text-xs"
-            disabled={loading}
-          >
-            Cancelar
-          </Button>
         </div>
       </div>
     );
@@ -361,15 +361,15 @@ export function EventCreationWizard({
   // Paso 2: Preguntas de registro
   if (step === 'questions') {
     return (
-      <div className="mt-4 p-4 sm:p-5 border-t border-border bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-lg theme-transition">
+      <div className="mt-4 p-3 sm:p-5 border-t border-border bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-lg theme-transition">
         {/* Header */}
-        <div className="flex items-start gap-3 mb-4">
-          <div className="flex-shrink-0 p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-            <HelpCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex-shrink-0 p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className="flex-1">
-            <h4 className="font-semibold text-text-primary text-base">¿Agregar Preguntas de Registro?</h4>
-            <p className="text-sm text-text-secondary mt-0.5">
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-text-primary text-sm sm:text-base">¿Agregar Preguntas de Registro?</h4>
+            <p className="text-xs sm:text-sm text-text-secondary mt-0.5 leading-tight">
               Estas preguntas aparecerán cuando los usuarios se registren al evento
             </p>
           </div>
@@ -384,43 +384,43 @@ export function EventCreationWizard({
         )}
 
         {/* Preguntas por defecto - Preview */}
-        <div className="space-y-3 mb-4">
+        <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
           <p className="text-xs font-semibold text-text-primary mb-2">📋 Preguntas por defecto:</p>
           
           <div className="space-y-2">
-            <div className="p-3 bg-surface border border-border rounded-lg">
-              <p className="text-sm font-medium text-text-primary mb-1">1. ¿Qué te motivó a asistir? <span className="text-red-500">*</span></p>
-              <p className="text-xs text-text-secondary">Múltiple selección: Aprender AWS, Networking, Desarrollar habilidades, Quiero ser speaker, etc.</p>
+            <div className="p-2.5 sm:p-3 bg-surface border border-border rounded-lg">
+              <p className="text-xs sm:text-sm font-medium text-text-primary mb-1">1. ¿Qué te motivó a asistir? <span className="text-red-500">*</span></p>
+              <p className="text-xs text-text-secondary leading-tight">Múltiple selección: Aprender AWS, Networking, Desarrollar habilidades, Quiero ser speaker, etc.</p>
             </div>
 
-            <div className="p-3 bg-surface border border-border rounded-lg">
-              <p className="text-sm font-medium text-text-primary mb-1">2. ¿Es tu primera vez en AWS UG Puebla? <span className="text-red-500">*</span></p>
-              <p className="text-xs text-text-secondary">Selección única: Sí / No</p>
+            <div className="p-2.5 sm:p-3 bg-surface border border-border rounded-lg">
+              <p className="text-xs sm:text-sm font-medium text-text-primary mb-1">2. ¿Es tu primera vez en AWS UG Puebla? <span className="text-red-500">*</span></p>
+              <p className="text-xs text-text-secondary leading-tight">Selección única: Sí / No</p>
             </div>
 
-            <div className="p-3 bg-surface border border-border rounded-lg">
-              <p className="text-sm font-medium text-text-primary mb-1">3. ¿Cómo te enteraste del evento?</p>
-              <p className="text-xs text-text-secondary">Múltiple selección: Redes sociales, Amigos, Email, etc. (Opcional)</p>
+            <div className="p-2.5 sm:p-3 bg-surface border border-border rounded-lg">
+              <p className="text-xs sm:text-sm font-medium text-text-primary mb-1">3. ¿Cómo te enteraste del evento?</p>
+              <p className="text-xs text-text-secondary leading-tight">Múltiple selección: Redes sociales, Amigos, Email, etc. (Opcional)</p>
             </div>
           </div>
         </div>
 
         {/* Info helper */}
-        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
+        <div className="p-2.5 sm:p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-3 sm:mb-4">
           <div className="flex items-start gap-2">
             <Edit3 className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-blue-800 dark:text-blue-800">
+            <p className="text-xs text-blue-800 dark:text-blue-400 leading-tight">
               Puedes personalizar, agregar o eliminar preguntas después en la sección de gestión del evento
             </p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col gap-2">
           <Button
             onClick={handleAddDefaultQuestions}
             disabled={loading}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm sm:text-base py-2.5 sm:py-3"
           >
             {loading ? (
               <>
@@ -439,7 +439,7 @@ export function EventCreationWizard({
             onClick={handleSkipQuestions}
             disabled={loading}
             variant="outline"
-            className="flex-1"
+            className="w-full text-sm sm:text-base py-2.5 sm:py-3"
           >
             Ahora No
           </Button>

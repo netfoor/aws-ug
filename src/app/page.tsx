@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { ChevronRight, Calendar, CalendarDays, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { Calendar, CalendarDays, Clock } from 'lucide-react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/../../amplify/data/resource';
 import EventCardMinimal from '@/components/events/EventCardMinimal';
@@ -228,10 +229,13 @@ export default function Home() {
           <div className="container mx-auto text-center relative z-10">
             <div className="flex justify-center mb-8 mt-12 animate-fade-in">
               <div className="relative group cursor-pointer">
-                <img 
+                <Image 
                   src="/Logo.png" 
                   alt="AWS User Group Puebla" 
+                  width={192}
+                  height={192}
                   className="h-32 md:h-48 w-auto transition-all duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-4 group-hover:drop-shadow-2xl animate-bounce-slow"
+                  priority
                 />
                 <div className="absolute inset-0 bg-accent/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>

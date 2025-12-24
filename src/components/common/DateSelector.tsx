@@ -73,6 +73,7 @@ export default function DateSelector({
 
   useEffect(() => {
     loadAvailableDates();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentProposalId]);
 
   async function loadAvailableDates() {
@@ -436,11 +437,15 @@ export default function DateSelector({
 
       {/* Fecha seleccionada */}
       {selectedDate && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg theme-transition">
-          <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-            ✅ Fecha seleccionada:
-          </p>
-          <p className="text-blue-700 dark:text-blue-300 mt-1">
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg theme-transition ">
+          <div className='flex items-center gap-2'>
+            <Check className="w-3 h-3 text-green-700" /> <p className="text-sm font-semibold text-text-primary">
+             Fecha seleccionada:
+          </p> 
+
+          </div>
+          
+          <p className=" text-text-primary mt-1">
             {formatEventDate(selectedDate)} • 6:30-7:30 PM
           </p>
         </div>

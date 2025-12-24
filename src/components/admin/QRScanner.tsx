@@ -419,7 +419,7 @@ export default function QRScanner({
                   key={index}
                   className={`flex items-start gap-2 p-2 rounded-lg text-sm ${
                     result.type === 'success'
-                      ? 'bg-green-50 dark:bg-green-900/20'
+                      ? 'bg-green-50 dark:bg-green-900/20' 
                       : result.type === 'warning'
                       ? 'bg-amber-50 dark:bg-amber-900/20'
                       : 'bg-red-50 dark:bg-red-900/20'
@@ -427,22 +427,22 @@ export default function QRScanner({
                 >
                   <div className="flex-shrink-0 mt-0.5">
                     {result.type === 'success' && (
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <CheckCircle className="w-4 h-4 text-green-700 dark:text-green-400" />
                     )}
                     {result.type === 'warning' && (
-                      <AlertTriangle className="w-4 h-4 text-amber-600" />
+                      <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                     )}
                     {result.type === 'error' && (
-                      <XCircle className="w-4 h-4 text-red-600" />
+                      <XCircle className="w-4 h-4 text-red-700 dark:text-red-400" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={`font-medium ${
                       result.type === 'success'
-                        ? 'text-green-800 dark:text-green-200'
+                        ? 'text-green-700 dark:text-green-400'
                         : result.type === 'warning'
-                        ? 'text-amber-800 dark:text-amber-200'
-                        : 'text-red-800 dark:text-red-200'
+                        ? 'text-amber-700 dark:text-amber-400'
+                        : 'text-red-700 dark:text-red-400'
                     }`}>
                       {result.message}
                     </p>

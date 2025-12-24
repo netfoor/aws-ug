@@ -185,6 +185,7 @@ export function useSpeakerApplicationProgress(userId: string) {
       clearProgress(); // Clear corrupted data
       return null;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLocalStorageAvailable, validateProgress, isExpired, STORAGE_KEY]);
 
   /**

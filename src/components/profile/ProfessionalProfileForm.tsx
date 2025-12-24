@@ -210,6 +210,7 @@ export default function ProfessionalProfileForm({
           <div className="flex-shrink-0 mx-auto sm:mx-0">
             {photoPreview ? (
               <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-accent">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photoPreview}
                   alt="Preview"

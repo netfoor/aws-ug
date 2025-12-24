@@ -257,6 +257,7 @@ export default function SpeakerProfileEditor({
           <div className="flex-shrink-0 mx-auto sm:mx-0">
             {photoPreview || (photoKey && currentData.speakerPhotoKey) ? (
               <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-accent">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photoPreview || `/api/s3-proxy?key=${currentData.speakerPhotoKey}`}
                   alt="Foto actual"

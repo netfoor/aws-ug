@@ -16,10 +16,9 @@ interface NavigationProps {
 
 export function Navigation({ className }: NavigationProps) {
   const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated, user, logout, isAdmin } = useAuth();
+  const { isAuthenticated, logout, isAdmin } = useAuth();
   const { userData } = useUserData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Bloquear scroll del body cuando el menú está abierto
   React.useEffect(() => {

@@ -318,7 +318,7 @@ export default function EventCheckInPage() {
                     <div className="text-xl font-bold text-green-600 mb-1 md:text-2xl">
                       {stats.checkedIn}
                     </div>
-                    <div className="text-xs text-green-700 dark:text-green-300">
+                    <div className="text-xs text-green-700 dark:text-green-400">
                       Check-ins
                     </div>
                   </div>
@@ -358,9 +358,10 @@ export default function EventCheckInPage() {
                       className="flex items-center gap-3 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg"
                     >
                       <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-green-800 dark:text-green-200 truncate">
+                      <span className="text-sm text-green-700 dark:text-green-400 truncate">
                         {name}
                       </span>
+                      {/** variant="success" */}
                       <Badge variant="success" size="sm" className="ml-auto">
                         <Clock className="w-3 h-3 mr-1" />
                         Ahora

@@ -81,6 +81,7 @@ export function NotificationBell() {
     }, 30000); // 30 segundos
 
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user]);
 
   // Marcar notificación como leída

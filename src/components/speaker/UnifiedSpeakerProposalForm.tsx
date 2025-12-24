@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import DateSelector from '@/components/common/DateSelector';
-import { uploadSpeakerPhoto, uploadSpeakerCV, EXPERTISE_AREAS, formatFileSize, prepareSpeakerPhoto, prepareSpeakerCV, commitSpeakerPhoto, commitSpeakerCV, deleteSpeakerFile, type PreparedFile } from '@/lib/speaker-uploads';
+import { EXPERTISE_AREAS, formatFileSize, prepareSpeakerPhoto, prepareSpeakerCV, commitSpeakerPhoto, commitSpeakerCV, deleteSpeakerFile, type PreparedFile } from '@/lib/speaker-uploads';
 import {
   validateFormSection,
   validateCompleteForm,
@@ -73,7 +73,6 @@ export default function UnifiedSpeakerProposalForm({
   const [currentSection, setCurrentSection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
 
   // Form data - pre-fill from User table
   const [formData, setFormData] = useState<UnifiedFormData>({
@@ -196,7 +195,6 @@ export default function UnifiedSpeakerProposalForm({
   // Enhanced validation using the comprehensive validation system
   function validateSection(section: number): boolean {
     setError(null);
-    setValidationWarnings([]);
 
     const validation = validateFormSection(formData as ValidationFormData, section);
 
@@ -205,11 +203,6 @@ export default function UnifiedSpeakerProposalForm({
       // Scroll to top to show error message
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return false;
-    }
-
-    // Set warnings if any
-    if (validation.warnings && validation.warnings.length > 0) {
-      setValidationWarnings(validation.warnings);
     }
 
     // Additional validation for professional profile completion before talk proposal
@@ -524,6 +517,7 @@ export default function UnifiedSpeakerProposalForm({
             <div className="flex items-start gap-4">
               {photoPreview ? (
                 <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-accent">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
                   {photoUploading && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -582,7 +576,8 @@ export default function UnifiedSpeakerProposalForm({
                 </p>
                 {formData.photoFile && (
                   <p className="text-xs text-green-600 mt-1">
-                    ✓ {formData.photoFile.name} ({formatFileSize(formData.photoFile.size)})
+                    
+                    <Check className="w-3 h-3" /> {formData.photoFile.name} ({formatFileSize(formData.photoFile.size)})
                   </p>
                 )}
               </div>
@@ -929,14 +924,17 @@ export default function UnifiedSpeakerProposalForm({
         </div>
       )}
 
-      {/* Info sobre archivos preparados */}
+      {/* Info sobre archivos preparados 
       {currentSection === 6 && (preparedPhoto || preparedCV) && (
+        
         <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          {/*
           <div className="flex items-start gap-2">
+            
             <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
             
 
-            {/*
+            
             <div className="flex-1 text-sm text-blue-900 dark:text-blue-100">
               <p className="font-medium">Archivos listos para subir</p>
               <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
@@ -945,10 +943,12 @@ export default function UnifiedSpeakerProposalForm({
                 {!preparedPhoto && preparedCV && 'Tu CV se subirá al enviar el formulario'}
               </p>
             </div>
-            */}
+            
           </div>
+          
         </div>
       )}
+      */}
 
       {/* Navigation buttons */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8">

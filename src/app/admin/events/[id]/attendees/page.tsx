@@ -6,7 +6,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
-import { Loader2, UserPlus, Search, CheckCircle, XCircle, Clock, Mail, Shield, Mic } from 'lucide-react';
+import { Loader2, UserPlus, Search, CheckCircle, XCircle, Clock, Mail, Shield, Mic, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
@@ -48,6 +48,7 @@ export default function AttendeesPage() {
     if (eventId && isAdmin) {
       loadEventAndAttendees();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, isAdmin]);
 
   async function loadEventAndAttendees() {
@@ -424,7 +425,7 @@ export default function AttendeesPage() {
                     {getStatusBadge(attendee.registration.status)}
                     {attendee.registration.checkedIn && (
                       <Badge variant="success" size="sm">
-                        ✓ Check-in
+                        <Check className="w-3 h-3" /> Check-in
                       </Badge>
                     )}
                     <a

@@ -247,6 +247,7 @@ const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(
       <div className="space-y-3">
         {hasPreview ? (
           <div className="relative group">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
               alt="Preview"
@@ -380,6 +381,7 @@ const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(
         </div>
       ) : (
         <div className="relative group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={previewUrl}
             alt="Cover preview"

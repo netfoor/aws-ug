@@ -82,6 +82,7 @@ export function SpeakerPhotoPreview({
   // Photo loaded successfully
   return (
     <div className={`${sizeClasses[size]} rounded-full overflow-hidden border-2 border-accent shadow-lg`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photoUrl}
         alt={`Foto de ${speakerName}`}

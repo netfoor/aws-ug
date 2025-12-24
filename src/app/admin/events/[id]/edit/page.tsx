@@ -81,6 +81,7 @@ export default function EditEventPage() {
     if (eventId && isAdmin) {
       loadEvent();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, isAdmin]);
 
   async function loadEvent() {

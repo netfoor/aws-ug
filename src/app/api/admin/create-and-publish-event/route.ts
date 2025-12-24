@@ -48,7 +48,6 @@ export async function POST(request: NextRequest) {
       eventTime,
       location,
       capacity,
-      registrationDeadline,
       coverImageUrl, // Cover image path de S3
       publish = false, // Si es true, crea como PUBLISHED, sino DRAFT
     } = body;

@@ -50,6 +50,7 @@ export default function RegistrationQuestionsPage() {
     if (eventId && isAdmin) {
       loadEvent();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, isAdmin]);
 
   async function loadEvent() {
@@ -487,7 +488,7 @@ export default function RegistrationQuestionsPage() {
             </p>
 
             <div className="space-y-4 bg-background p-6 rounded-lg">
-              {questions.map((question, index) => (
+              {questions.map((question) => (
                 <div key={question.id}>
                   <label className="block text-sm font-medium text-text-primary mb-2">
                     {question.label}

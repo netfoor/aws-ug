@@ -49,6 +49,7 @@ export function AdminDateSelector({
 
   useEffect(() => {
     loadAvailableDates();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentProposalId]);
 
   async function loadAvailableDates() {

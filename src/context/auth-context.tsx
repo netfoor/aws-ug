@@ -81,9 +81,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         if (user) {
           // Extract user info with enhanced role management
-          const isAdmin = await checkIsUserAdmin(user);
-          const attributes = await getUserAttributes(user);
-          const role = await getUserRoleFromCognito(user);
+          const isAdmin = await checkIsUserAdmin();
+          const attributes = await getUserAttributes();
+          const role = await getUserRoleFromCognito();
           
           // Enhanced logging for role management debugging
           console.log('🔐 Role Management Debug:', {

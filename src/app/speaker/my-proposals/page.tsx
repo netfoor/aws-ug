@@ -39,6 +39,7 @@ function MyProposalsPageContent() {
     if (!authLoading && isAuthenticated && user) {
       loadProposals();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, isAuthenticated, user]);
 
   const loadProposals = async () => {

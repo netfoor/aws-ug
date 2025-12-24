@@ -57,6 +57,7 @@ export function useDialog() {
       dialogState.resolve(false);
     }
     setDialogState((prev) => ({ ...prev, isOpen: false }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialogState.resolve]);
 
   const handleConfirm = useCallback(() => {
@@ -64,6 +65,7 @@ export function useDialog() {
       dialogState.resolve(true);
     }
     setDialogState((prev) => ({ ...prev, isOpen: false }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialogState.resolve]);
 
   return {

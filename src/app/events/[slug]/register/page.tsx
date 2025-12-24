@@ -6,10 +6,9 @@ import { generateClient } from 'aws-amplify/data';
 import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '@/../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { QRTokenUtils } from '@/lib/qr-config';
 import Image from 'next/image';
 
 const client = generateClient<Schema>();
@@ -314,15 +313,15 @@ export default function EventRegistrationPage() {
             <h3 className="font-semibold text-text-primary mb-4">¿Qué sigue?</h3>
             <ul className="space-y-3 text-sm text-text-secondary">
               <li className="flex items-start gap-2">
-                <span className="text-accent mt-0.5">✓</span>
+                <span className="text-accent mt-0.5"><Check className="w-3 h-3" /></span>
                 <span>Recibirás un email de confirmación con los detalles del evento</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-accent mt-0.5">✓</span>
+                <span className="text-accent mt-0.5"><Check className="w-3 h-3" /></span>
                 <span>Tu código QR para check-in estará disponible en tu perfil</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-accent mt-0.5">✓</span>
+                <span className="text-accent mt-0.5"><Check className="w-3 h-3" /></span>
                 <span>Te notificaremos cualquier actualización del evento</span>
               </li>
             </ul>
