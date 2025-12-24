@@ -45,16 +45,14 @@ export default function CreateEventPage() {
   
   // Fecha y ubicación
   const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('19:00');
-  const [duration, setDuration] = useState(60);
-  const [location, setLocation] = useState('');
-  const [locationAddress, setLocationAddress] = useState('');
+  const [startTime, setStartTime] = useState('18:30');
+  const [duration, setDuration] = useState(45);
+  const [location, setLocation] = useState('Oficinas de AWS User Group Puebla');
   const [isVirtual, setIsVirtual] = useState(false);
   const [virtualLink, setVirtualLink] = useState('');
   
   // Capacidad
   const [maxAttendees, setMaxAttendees] = useState<number>(50);
-  const [isUnlimited, setIsUnlimited] = useState(false);
   
   // Speaker
   const [speakers, setSpeakers] = useState<SpeakerApplication[]>([]);
@@ -63,6 +61,8 @@ export default function CreateEventPage() {
   
   // Cover image - simplificado con el componente
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   
   // Estado
   const [status, setStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
@@ -155,107 +155,71 @@ export default function CreateEventPage() {
     setError(null);
 
     try {
-      // Construir datetime ISO
-      const startDateTime = new Date(`${startDate}T${startTime}:00`);
-      const endDateTime = new Date(startDateTime.getTime() + duration * 60000);
-
-      // Crear slug
-      const slug = title
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        + `-${Date.now()}`;
-
-      // Buscar datos del speaker seleccionado desde SpeakerApplication
-      const speakerApp = speakers.find(s => s.id === selectedSpeakerId);
-      if (!speakerApp || !speakerApp.userId) {
-        setError('Speaker no encontrado');
-        setIsProcessing(false);
-        return;
-      }
-
-      // ✅ Cargar datos del speaker desde User table (fuente única de verdad)
-      const { data: speakerUser } = await client.models.User.get({ id: speakerApp.userId });
-      if (!speakerUser) {
-        setError('Datos del speaker no encontrados');
-        setIsProcessing(false);
-        return;
-      }
-
-      const speakerName = getFullName(speakerUser);
-
-      // 1. Crear evento (sin cover image primero)
-      // Nota: Ahora obtenemos datos reales del User table
-      const { data: createdEvent, errors } = await client.models.Event.create({
-        title: title.trim(),
-        description: description.trim(),
-        slug,
-        speakerId: speakerApp.userId, // userId from SpeakerApplication
-        speakerName, // ✅ Nombre real desde User table
-        speakerEmail: speakerUser.email,
-        speakerBio: speakerUser.bio || speakerApp.motivation || undefined,
-        speakerAvatar: speakerUser.avatarUrl || undefined,
-        eventType,
-        topics,
-        startDate: startDateTime.toISOString(),
-        endDate: endDateTime.toISOString(),
-        timezone: 'America/Mexico_City',
-        location: isVirtual ? 'Virtual' : location.trim(),
-        locationAddress: isVirtual ? undefined : locationAddress.trim() || undefined,
-        isVirtual,
-        virtualLink: isVirtual ? virtualLink.trim() : undefined,
-        maxAttendees: isUnlimited ? null : maxAttendees,
-        isUnlimited,
-        status,
-        isPublic: true,
-        requiresApproval: false,
-        createdBy: user.userId,
-        createdAt: new Date().toISOString(),
-        publishedAt: status === 'PUBLISHED' ? new Date().toISOString() : undefined,
-        goingCount: 0,
-        checkedInCount: 0,
-        invitedCount: 0,
-        notGoingCount: 0,
-        coverImageUrl: coverImageUrl || undefined, // Cover image si existe
+      // PASO 1: Crear evento usando el endpoint
+      const response = await fetch('/api/admin/create-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title.trim(),
+          description: description.trim(),
+          eventType,
+          topics,
+          eventDate: startDate,
+          eventTime: startTime,
+          duration,
+          location: location.trim(),
+          isVirtual,
+          virtualLink: isVirtual ? virtualLink.trim() : undefined,
+          maxAttendees,
+          selectedSpeakerId,
+          status,
+        }),
       });
 
-      if (errors || !createdEvent) {
-        console.error('Error creando evento:', errors);
-        setError('Error al crear el evento');
-        setIsProcessing(false);
-        return;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al crear evento');
       }
 
-      // Notificar al speaker
-      if (speakerApp.userId) {
+      console.log('✅ Evento creado:', result.event);
+
+      // PASO 2: Si hay imagen, subirla ahora con el eventId real
+      if (selectedImageFile && result.event.id) {
+        console.log('📸 Subiendo imagen con eventId:', result.event.id);
         try {
-          await client.models.Notification.create({
-            userId: speakerApp.userId,
-          type: 'NEW_EVENT',
-          title: '🎉 Nuevo evento creado',
-          message: `Se ha creado el evento "${title}" con tu participación como speaker.`,
-          read: false,
-          link: `/events/${slug}`,
-          icon: '📅',
-          createdAt: new Date().toISOString(),
-            owner: speakerApp.userId,
+          const { uploadData } = await import('aws-amplify/storage');
+          const fileName = `events/${result.event.id}/cover-${Date.now()}.webp`;
+          
+          const uploadResult = await uploadData({
+            path: fileName,
+            data: selectedImageFile,
+            options: {
+              contentType: 'image/webp',
+            }
+          }).result;
+          
+          console.log('✅ Imagen subida:', uploadResult.path);
+          
+          // PASO 3: Actualizar evento con la coverImageUrl
+          await client.models.Event.update({
+            id: result.event.id,
+            coverImageUrl: uploadResult.path,
           });
-        } catch {
-          // No bloquear si falla la notificación
+
+          console.log('✅ Evento actualizado con imagen');
+        } catch (uploadError) {
+          console.error('Error subiendo imagen:', uploadError);
+          // No bloquear si falla la imagen
         }
       }
 
-      // 4. Actualizar TalkProposal si existe
-      // (Por ahora no aplica, este form es para eventos sin propuesta)
-
-      // Éxito - redirigir a la página del evento
-      router.push(`/events/${slug}`);
+      // Redirigir al evento creado
+      router.push(`/events/${result.event.slug}`);
 
     } catch (err) {
       console.error('Error creando evento:', err);
-      setError('Error al crear el evento. Intenta de nuevo.');
+      setError(err instanceof Error ? err.message : 'Error al crear el evento');
       setIsProcessing(false);
     }
   };
@@ -464,6 +428,7 @@ export default function CreateEventPage() {
               selectedTime={startTime}
               onDateChange={setStartDate}
               onTimeChange={setStartTime}
+              currentProposalId="new-event"
               disabled={isProcessing}
               showTimeInput={true}
             />
@@ -527,17 +492,6 @@ export default function CreateEventPage() {
                     required={!isVirtual}
                   />
                 </div>
-                
-                <div>
-                  <Label htmlFor="locationAddress">Dirección completa</Label>
-                  <Input
-                    id="locationAddress"
-                    type="text"
-                    value={locationAddress}
-                    onChange={(e) => setLocationAddress(e.target.value)}
-                    placeholder="Calle, número, colonia, ciudad"
-                  />
-                </div>
               </>
             )}
           </div>
@@ -546,30 +500,17 @@ export default function CreateEventPage() {
           <div className="bg-surface rounded-lg p-6 border border-border space-y-4">
             <h2 className="text-xl font-semibold text-text-primary mb-4">Capacidad</h2>
             
-            <div className="flex items-center gap-2">
-              <input
-                id="isUnlimited"
-                type="checkbox"
-                checked={isUnlimited}
-                onChange={(e) => setIsUnlimited(e.target.checked)}
-                className="w-4 h-4 text-primary focus:ring-primary border-border rounded"
+            <div>
+              <Label htmlFor="maxAttendees">Máximo de asistentes *</Label>
+              <Input
+                id="maxAttendees"
+                type="number"
+                value={maxAttendees}
+                onChange={(e) => setMaxAttendees(Number(e.target.value))}
+                min={1}
+                required
               />
-              <Label htmlFor="isUnlimited" className="mb-0">Capacidad ilimitada</Label>
             </div>
-
-            {!isUnlimited && (
-              <div>
-                <Label htmlFor="maxAttendees">Máximo de asistentes</Label>
-                <Input
-                  id="maxAttendees"
-                  type="number"
-                  value={maxAttendees}
-                  onChange={(e) => setMaxAttendees(Number(e.target.value))}
-                  min={1}
-                  required={!isUnlimited}
-                />
-              </div>
-            )}
           </div>
 
           {/* Cover Image - Ahora usa el componente unificado */}
@@ -577,21 +518,32 @@ export default function CreateEventPage() {
             <h2 className="text-xl font-semibold text-text-primary mb-4">Imagen de portada</h2>
             
             <CoverImageUpload
-              onImageUploaded={(imageUrl) => {
-                setCoverImageUrl(imageUrl);
-              }}
               onImageSelected={(file, previewUrl) => {
-                // Guardar temporalmente el preview URL
-                setCoverImageUrl(previewUrl);
+                console.log('📸 Imagen seleccionada:', file.name);
+                setSelectedImageFile(file);
+                setImagePreviewUrl(previewUrl);
               }}
               onImageRemoved={() => {
-                setCoverImageUrl(null);
+                console.log('🗑️ Imagen removida');
+                setSelectedImageFile(null);
+                setImagePreviewUrl(null);
               }}
-              onError={(error) => setError(error)}
+              onError={(error) => {
+                console.error('❌ Error:', error);
+                setError(error);
+              }}
               disabled={isProcessing}
               autoUpload={false}
               compact={false}
             />
+            <p className="text-xs text-text-secondary mt-2">
+              La imagen se optimizará y subirá automáticamente cuando crees el evento
+            </p>
+            {imagePreviewUrl && (
+              <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                ✓ Imagen lista para subir
+              </p>
+            )}
           </div>
 
           {/* Estado */}

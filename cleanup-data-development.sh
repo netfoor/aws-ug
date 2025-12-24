@@ -18,10 +18,9 @@ echo "🔍 Verificando credenciales AWS..."
 aws sts get-caller-identity > /dev/null
 echo "✅ Credenciales válidas"
 
+# Estas variables se sobrescribirán con el contenido de amplify_outputs.json si existe
 REGION="us-east-1"
-PROFILE="default"
-USER_POOL_ID="us-east-1_XXXXXXX"
-
+USER_POOL_ID=""
 
 if [[ ! -f amplify_outputs.json ]]; then
   echo "❌ No se encontró amplify_outputs.json"
@@ -34,8 +33,8 @@ if ! command -v jq &> /dev/null; then
   echo "Instálalo con: sudo apt install jq"
   exit 1
 fi
-echo "🔍 Obteniendo User Pool ID con el nombre amplify_outputs.json..."
 
+echo "🔍 Obteniendo User Pool ID desde amplify_outputs.json..."
 USER_POOL_ID=$(jq -r '.auth.user_pool_id' amplify_outputs.json)
 
 if [[ -z "$USER_POOL_ID" || "$USER_POOL_ID" == "null" ]]; then
@@ -45,7 +44,36 @@ fi
 
 echo "✅ Cognito User Pool detectado: $USER_POOL_ID"
 
-aws cognito-idp list-users \
+# Obtenemos Username y Email. El "|" al final de Attributes asegura que devuelva null si no hay email.
+USERS_DATA=$(aws cognito-idp list-users \
   --user-pool-id "$USER_POOL_ID" \
-  --query "Users[].Attributes[?Name=='email'].Value" \
-  --output text 
+  --query "Users[].[Username, Attributes[?Name=='email'].Value | [0]]" \
+  --output text)
+
+if [[ -z "$USERS_DATA" || "$USERS_DATA" == "None" ]]; then
+  echo "✅ No se encontraron usuarios para eliminar."
+else
+  echo "Usuarios encontrados para eliminar:"
+  # Mostramos la lista formateada (Username - Email)
+  echo "$USERS_DATA" | awk '{printf "   - ID: %-40s | Email: %s\n", $1, $2}'
+
+  echo
+  read -p "¿Deseas continuar con la eliminación de TODOS estos usuarios? (s/n): " CONFIRMATION
+  if [[ "$CONFIRMATION" != "s" ]]; then
+    echo "❌ Operación cancelada por el usuario."
+    exit 0
+  else
+    echo "🗑️ Eliminando usuarios de Cognito..."
+    # Usamos un while para leer línea por línea y separar Username de Email
+    while read -r USERNAME EMAIL; do
+      if [[ -n "$USERNAME" ]]; then
+        echo "   - Eliminando: $EMAIL ($USERNAME)..."
+        aws cognito-idp admin-delete-user \
+          --user-pool-id "$USER_POOL_ID" \
+          --username "$USERNAME"
+      fi
+    done <<< "$USERS_DATA"
+    echo "✅ Limpieza completada exitosamente."
+  fi
+fi
+

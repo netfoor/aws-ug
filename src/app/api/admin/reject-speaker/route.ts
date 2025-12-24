@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
 
     // 3️⃣ Invocar Lambda reject-speaker-application
     // El nombre viene de amplify_outputs.json (generado por Amplify)
-    const outputs = await import('../../../../../amplify_outputs.json') as { custom?: { manualRejectLambdaName?: string } };
-    const lambdaFunctionName = outputs.custom?.manualRejectLambdaName;
+    const outputs = await import('../../../../../amplify_outputs.json') as { custom?: { rejectSpeakerLambdaName?: string } };
+    const lambdaFunctionName = outputs.custom?.rejectSpeakerLambdaName;
     
     if (!lambdaFunctionName) {
       return NextResponse.json(

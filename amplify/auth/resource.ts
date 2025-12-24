@@ -20,13 +20,13 @@ export const auth = defineAuth({
         'http://localhost:3000/auth/callback',
         'https://awspuebla.com/auth/callback',
         'https://www.awspuebla.com/auth/callback',
-        'https://colony-treaty-focusing-museums.trycloudflare.com/auth/callback'
+        'https://town-authorization-rely-extras.trycloudflare.com/auth/callback'
       ],
       logoutUrls: [
         'http://localhost:3000/',
         'https://awspuebla.com/',
         'https://www.awspuebla.com/',
-        'https://colony-treaty-focusing-museums.trycloudflare.com/'
+        'https://town-authorization-rely-extras.trycloudflare.com/'
       ],
     }
   },

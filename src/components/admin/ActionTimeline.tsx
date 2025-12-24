@@ -261,50 +261,52 @@ export function ActionTimeline({
           return (
             <div
               key={`event-${event.id}-${index}`}
-              className="bg-surface rounded-lg p-6 shadow-sm hover:shadow-md transition-all theme-transition border border-border"
+              className="bg-surface rounded-lg p-3 sm:p-6 shadow-sm hover:shadow-md transition-all theme-transition border border-border"
             >
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex-shrink-0">
-                  <Calendar className="w-6 h-6 text-orange-700 dark:text-orange-400" />
+              <div className="flex items-start gap-2 sm:gap-4">
+                <div className="p-2 sm:p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex-shrink-0">
+                  <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-orange-700 dark:text-orange-400" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200 text-xs font-bold rounded-full">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200 text-xs font-bold rounded-full flex-shrink-0">
                           BORRADOR
                         </span>
-                        <h3 className="text-lg font-semibold text-text-primary">
+                        <h3 className="text-sm sm:text-lg font-semibold text-text-primary break-words min-w-0">
                           {event.title}
                         </h3>
                       </div>
-                      <div className="flex items-center gap-3 text-sm text-text-secondary mb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs sm:text-sm text-text-secondary mb-2">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {new Date(event.startDate || '').toLocaleDateString('es-MX', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
+                          <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="truncate">
+                            {new Date(event.startDate || '').toLocaleDateString('es-MX', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </span>
                         </span>
-                        <span>•</span>
-                        <span>{event.speakerName}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="truncate">{event.speakerName}</span>
                       </div>
-                      <p className="text-sm text-text-secondary line-clamp-2">
+                      <p className="text-xs sm:text-sm text-text-secondary line-clamp-2 leading-tight">
                         {event.description}
                       </p>
                     </div>
                     
-                    <span className="text-xs text-text-secondary whitespace-nowrap">
+                    <span className="text-xs text-text-secondary whitespace-nowrap self-start">
                       {formatTimeAgo(item.date)}
                     </span>
                   </div>
                   
-                  <Link href="/admin/events">
-                    <Button variant="outline" size="sm" className="text-sm mt-3">
+                  <Link href="/admin/events" className="block">
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm mt-2 sm:mt-3 w-full sm:w-auto">
                       Publicar Evento
-                      <ArrowRight className="w-4 h-4 ml-1" />
+                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                     </Button>
                   </Link>
                 </div>
