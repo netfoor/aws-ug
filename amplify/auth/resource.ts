@@ -17,16 +17,12 @@ export const auth = defineAuth({
         },
       },
       callbackUrls: [
-        'http://localhost:3000/auth/callback',
-        'https://awspuebla.com/auth/callback',
-        'https://www.awspuebla.com/auth/callback',
-        'https://town-authorization-rely-extras.trycloudflare.com/auth/callback'
+        'https://sandbox.foor.dev/auth/callback',
+        'https://awspuebla.com/auth/callback'
       ],
       logoutUrls: [
-        'http://localhost:3000/',
-        'https://awspuebla.com/',
-        'https://www.awspuebla.com/',
-        'https://town-authorization-rely-extras.trycloudflare.com/'
+        'https://sandbox.foor.dev/',
+        'https://awspuebla.com/'
       ],
     }
   },

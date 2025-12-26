@@ -1,101 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Rutas protegidas que requieren autenticación
 const PROTECTED_ROUTES = ['/profile', '/dashboard', '/admin'];
-
-// Rutas que requieren permisos de administrador
 const ADMIN_ROUTES = ['/admin'];
-
-// Rutas públicas (no requieren autenticación)
 const PUBLIC_ROUTES = ['/', '/login', '/auth/callback', '/access-denied', '/onboarding'];
 
-/**
- * Verifica si una ruta comienza con alguno de los prefijos dados
- */
 function isProtectedByPrefix(path: string, prefixes: string[]): boolean {
   return prefixes.some(prefix => path.startsWith(prefix));
 }
 
-/**
- * Middleware de Next.js para autenticación
- * Usa API route para verificación server-side segura
- */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Permitir rutas públicas y archivos estáticos
-  if (PUBLIC_ROUTES.includes(pathname) || 
-      pathname.startsWith('/auth/') ||
-      pathname.startsWith('/api/')) {
+  // 1. Permitir rutas públicas, auth y API
+  if (
+    PUBLIC_ROUTES.includes(pathname) ||
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/api/')
+  ) {
     return NextResponse.next();
   }
 
-  // 2. Verificar autenticación para rutas protegidas
+  // 2. Proteger rutas privadas
   if (isProtectedByPrefix(pathname, PROTECTED_ROUTES)) {
     try {
-      // Llamar al API route para verificar sesión de forma segura
       const sessionUrl = new URL('/api/auth/session', request.url);
+
       const sessionResponse = await fetch(sessionUrl, {
         headers: {
-          cookie: request.headers.get('cookie') || ''
-        }
+          cookie: request.headers.get('cookie') || '',
+        },
       });
 
       if (!sessionResponse.ok) {
-        const loginUrl = new URL(`/login?returnUrl=${encodeURIComponent(pathname)}`, request.url);
-        return NextResponse.redirect(loginUrl);
+        return redirectToLogin(request, pathname);
       }
 
       const { isAuthenticated, groups } = await sessionResponse.json();
 
       if (!isAuthenticated) {
-        const loginUrl = new URL(`/login?returnUrl=${encodeURIComponent(pathname)}`, request.url);
-        return NextResponse.redirect(loginUrl);
+        return redirectToLogin(request, pathname);
       }
 
-      // 3. Verificar permisos de admin si es necesario
+      // 3. Validar permisos de admin
       if (isProtectedByPrefix(pathname, ADMIN_ROUTES)) {
         const isAdmin = Array.isArray(groups) && groups.includes('ADMINS');
-        
+
         if (!isAdmin) {
-          const accessDeniedUrl = new URL('/access-denied', request.url);
-          return NextResponse.redirect(accessDeniedUrl);
+          return NextResponse.redirect(
+            new URL('/access-denied', request.url)
+          );
         }
       }
 
       return NextResponse.next();
-    } catch (error) {
-      console.error('Error en middleware:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        pathname,
-        url: request.url,
-        host: request.headers.get('host')
-      });
-      
-      // DEVELOPMENT ONLY: Handle ngrok testing issues
-      const host = request.headers.get('host') || '';
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      const ngrokMode = process.env.ENABLE_NGROK_MODE === 'true';
-      const isNgrok = host.includes('trycloudflare');
-      const isNetworkError = error instanceof Error && 
-        (error.message.includes('fetch failed') || error.message.includes('timeout'));
-      
-      if (isDevelopment && ngrokMode && (isNgrok || isNetworkError)) {
-        console.log('🔓 DEV: Middleware bypassed for ngrok testing:', pathname);
-        return NextResponse.next();
-      }
-      
-      const loginUrl = new URL('/login?error=session_error', request.url);
-      return NextResponse.redirect(loginUrl);
+    } catch {
+      return redirectToLogin(request, pathname, 'session_error');
     }
   }
 
   return NextResponse.next();
 }
 
-/**
- * Configuración para las rutas que deben pasar por el middleware
- */
+function redirectToLogin(
+  request: NextRequest,
+  pathname: string,
+  error?: string
+) {
+  const loginUrl = new URL('/login', request.url);
+  loginUrl.searchParams.set('returnUrl', pathname);
+
+  if (error) {
+    loginUrl.searchParams.set('error', error);
+  }
+
+  return NextResponse.redirect(loginUrl);
+}
+
 export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
