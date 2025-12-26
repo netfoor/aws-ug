@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
-import { getFullName } from '@/hooks/useUserData';
 import { 
   Loader2, 
   X,
@@ -60,7 +59,6 @@ export default function CreateEventPage() {
   const [loadingSpeakers, setLoadingSpeakers] = useState(true);
   
   // Cover image - simplificado con el componente
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   
@@ -182,11 +180,8 @@ export default function CreateEventPage() {
         throw new Error(result.error || 'Error al crear evento');
       }
 
-      console.log('✅ Evento creado:', result.event);
-
       // PASO 2: Si hay imagen, subirla ahora con el eventId real
       if (selectedImageFile && result.event.id) {
-        console.log('📸 Subiendo imagen con eventId:', result.event.id);
         try {
           const { uploadData } = await import('aws-amplify/storage');
           const fileName = `events/${result.event.id}/cover-${Date.now()}.webp`;
@@ -199,15 +194,11 @@ export default function CreateEventPage() {
             }
           }).result;
           
-          console.log('✅ Imagen subida:', uploadResult.path);
-          
           // PASO 3: Actualizar evento con la coverImageUrl
           await client.models.Event.update({
             id: result.event.id,
             coverImageUrl: uploadResult.path,
           });
-
-          console.log('✅ Evento actualizado con imagen');
         } catch (uploadError) {
           console.error('Error subiendo imagen:', uploadError);
           // No bloquear si falla la imagen
@@ -519,12 +510,10 @@ export default function CreateEventPage() {
             
             <CoverImageUpload
               onImageSelected={(file, previewUrl) => {
-                console.log('📸 Imagen seleccionada:', file.name);
                 setSelectedImageFile(file);
                 setImagePreviewUrl(previewUrl);
               }}
               onImageRemoved={() => {
-                console.log('🗑️ Imagen removida');
                 setSelectedImageFile(null);
                 setImagePreviewUrl(null);
               }}

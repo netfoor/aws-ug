@@ -85,24 +85,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const attributes = await getUserAttributes();
           const role = await getUserRoleFromCognito();
           
-          // Enhanced logging for role management debugging
-          console.log('🔐 Role Management Debug:', {
-            userId: user.userId,
-            isAdmin,
-            roleFromCognito: role,
-            customRoleAttribute: attributes?.['custom:role'],
-            cognitoGroups: 'Check JWT token for cognito:groups'
-          });
-          
           // Override custom:role con el rol de Cognito groups (fuente de verdad)
           const updatedAttributes = attributes ? { ...attributes, 'custom:role': role } : null;
           
-          // Validate role hierarchy consistency
-          if (role === 'ADMIN' && !isAdmin) {
-            console.warn('⚠️ Role inconsistency detected: role=ADMIN but isAdmin=false');
-          }
-          if (isAdmin && role !== 'ADMIN') {
-            console.warn('⚠️ Role inconsistency detected: isAdmin=true but role!=ADMIN');
+          // Validate role hierarchy consistency (solo en desarrollo)
+          if (process.env.NODE_ENV === 'development') {
+            if (role === 'ADMIN' && !isAdmin) {
+              console.warn('⚠️ Role inconsistency detected: role=ADMIN but isAdmin=false');
+            }
+            if (isAdmin && role !== 'ADMIN') {
+              console.warn('⚠️ Role inconsistency detected: isAdmin=true but role!=ADMIN');
+            }
           }
           
           setUser(user);

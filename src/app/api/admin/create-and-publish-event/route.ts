@@ -59,7 +59,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🎯 Creando evento desde propuesta:', { talkProposalId, eventDate, eventTime, publish });
 
     // 1. Obtener datos de la TalkProposal
     const proposalResponse = await client.models.TalkProposal.get({ id: talkProposalId });
@@ -88,7 +87,6 @@ export async function POST(request: NextRequest) {
         status: 'APPROVED',
         updatedAt: new Date().toISOString(),
       });
-      console.log('✅ TalkProposal aprobada (PENDING → APPROVED)');
     }
 
     // 2. Crear el evento con los datos de la propuesta
@@ -126,8 +124,6 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
     };
 
-    console.log('📝 Creando evento con datos:', eventData);
-
     const eventResponse = await client.models.Event.create(eventData);
 
     if (!eventResponse.data) {
@@ -138,7 +134,6 @@ export async function POST(request: NextRequest) {
     }
 
     const event = eventResponse.data;
-    console.log(`✅ Evento ${publish ? 'publicado' : 'creado en borrador'}: ${event.id}`);
 
     // 3. Si se publicó, actualizar status de la propuesta a EVENT_CREATED
     if (publish) {
@@ -149,15 +144,12 @@ export async function POST(request: NextRequest) {
         proposedDate: eventDateTime, // ✅ ACTUALIZAR fecha si cambió
         updatedAt: now,
       });
-      console.log('✅ TalkProposal actualizada a EVENT_CREATED con nueva fecha');
     }
 
     // 4. Actualizar SpeakerApplication.attachedProposal.proposedDate si cambió la fecha
     if (speakerApplicationId) {
-      console.log(`🔄 Intentando actualizar SpeakerApplication ${speakerApplicationId}...`);
       try {
         const appResponse = await client.models.SpeakerApplication.get({ id: speakerApplicationId });
-        console.log('📦 SpeakerApplication encontrada:', appResponse.data?.id);
         
         if (appResponse.data && appResponse.data.attachedProposal) {
           const attachedProposal = typeof appResponse.data.attachedProposal === 'string'
@@ -165,7 +157,6 @@ export async function POST(request: NextRequest) {
             : appResponse.data.attachedProposal;
 
           const originalDate = attachedProposal.proposedDate;
-          console.log('📅 Comparando fechas:', { originalDate, eventDateTime });
           
           if (originalDate !== eventDateTime) {
             // La fecha cambió, actualizar attachedProposal
@@ -174,24 +165,16 @@ export async function POST(request: NextRequest) {
               proposedDate: eventDateTime,
             };
 
-            console.log('💾 Actualizando attachedProposal...');
             await client.models.SpeakerApplication.update({
               id: speakerApplicationId,
               attachedProposal: JSON.stringify(updatedProposal),
             });
-            console.log(`✅ SpeakerApplication actualizada: fecha cambió de ${originalDate} a ${eventDateTime}`);
-          } else {
-            console.log(`ℹ️ SpeakerApplication: fecha NO cambió (${originalDate} = ${eventDateTime})`);
           }
-        } else {
-          console.log('⚠️ SpeakerApplication no tiene attachedProposal');
         }
       } catch (err) {
         console.error('⚠️ Error actualizando SpeakerApplication:', err);
         // No lanzar error, continuar con el flujo
       }
-    } else {
-      console.log('⚠️ No se proporcionó speakerApplicationId, saltando actualización');
     }
 
     return NextResponse.json({

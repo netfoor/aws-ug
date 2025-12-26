@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Camera, CameraOff, CheckCircle, XCircle, AlertTriangle, Loader2, Users, Zap, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useQRScanner } from '@/hooks/useQRScanner';
-import { ScannerState, QRTokenData, CameraUtils } from '@/lib/qr-config';
+import { ScannerState, CameraUtils } from '@/lib/qr-config';
 import { QRValidator } from '@/lib/qr-validation';
 // import { SecurityLogger } from '@/lib/security-logger';
 import { generateClient } from 'aws-amplify/data';
@@ -56,7 +56,6 @@ export default function QRScanner({
     eventId,
     onCheckIn: handleCheckIn,
     onError: handleScanError,
-    onScanSuccess: handleScanSuccess,
   });
 
   // Cargar contador inicial de check-ins
@@ -84,17 +83,12 @@ export default function QRScanner({
     setIsProcessing(true);
     
     try {
-      console.log('🔍 Processing QR token:', tokenString.substring(0, 100) + '...');
-      console.log('📍 Event ID:', eventId);
-      
       // Usar el validador mejorado con seguridad
       const validationResult = await QRValidator.validateToken(
         tokenString, 
         eventId, 
         user?.userId
       );
-
-      console.log('✅ Validation result:', validationResult);
 
       if (!validationResult.isValid) {
         // Reproducir sonido de error
@@ -161,12 +155,6 @@ export default function QRScanner({
     } finally {
       setIsProcessing(false);
     }
-  }
-
-  function handleScanSuccess(token: QRTokenData) {
-    // Este callback se ejecuta cuando se escanea exitosamente un QR
-    // pero antes del check-in. Útil para feedback inmediato.
-    console.log('QR escaneado exitosamente:', token);
   }
 
   function handleScanError(error: string) {
