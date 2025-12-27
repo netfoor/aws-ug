@@ -236,8 +236,8 @@ export default function AdminSpeakersPage() {
           </div>
         )}
 
-        <div className="space-y-8">
-          {/* Dashboard */}
+        <div className="space-y-6">
+          {/* Dashboard - Solo se muestra si no hay postulaciones */}
           <AdminDashboard stats={stats} isLoading={isLoading} />
 
           {/* Lista */}

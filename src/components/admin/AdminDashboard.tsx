@@ -75,55 +75,21 @@ export function AdminDashboard({ stats, isLoading = false }: AdminDashboardProps
     },
   ];
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-text-primary">
-          Dashboard de Speakers
-        </h2>
-        <p className="text-text-secondary mt-1">
-          Resumen de postulaciones y estadísticas
+  // Dashboard simplificado - solo mostrar si no hay postulaciones
+  if (stats.total === 0) {
+    return (
+      <div className="bg-surface rounded-lg p-8 text-center theme-transition">
+        <Users className="w-16 h-16 text-text-secondary mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-text-primary mb-2">
+          No hay postulaciones aún
+        </h3>
+        <p className="text-text-secondary">
+          Las postulaciones de speakers aparecerán aquí cuando los usuarios las envíen.
         </p>
       </div>
+    );
+  }
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        {statCards.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.title}
-              className="bg-surface rounded-lg shadow hover:shadow-lg transition-all theme-transition p-3 md:p-4"
-            >
-              <div className="flex items-center gap-2 md:gap-3">
-                <div className={`${stat.bgColor} w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center flex-shrink-0`}>
-                  <Icon className={`w-5 h-5 md:w-6 md:h-6 ${stat.iconColor}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-[10px] md:text-xs font-medium text-text-secondary truncate">
-                    {stat.title}
-                  </h3>
-                  <p className={`text-xl md:text-2xl lg:text-3xl font-bold ${stat.textColor} leading-tight`}>
-                    {stat.value}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Mensaje si no hay postulaciones */}
-      {stats.total === 0 && (
-        <div className="bg-surface rounded-lg p-8 text-center theme-transition">
-          <Users className="w-16 h-16 text-text-secondary mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-text-primary mb-2">
-            No hay postulaciones aún
-          </h3>
-          <p className="text-text-secondary">
-            Las postulaciones de speakers aparecerán aquí cuando los usuarios las envíen.
-          </p>
-        </div>
-      )}
-    </div>
-  );
+  // Si hay postulaciones, no mostrar dashboard (minimalista)
+  return null;
 }

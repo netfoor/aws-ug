@@ -97,40 +97,34 @@ export function SpeakerApplicationsList({
 
   return (
     <div className="bg-surface rounded-lg shadow theme-transition">
-      {/* Header con filtros */}
-      <div className="p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">
-          Postulaciones de Speakers
-        </h3>
+      {/* Header con filtros minimalistas tipo tabs */}
+      <div className="p-4 sm:p-6 border-b border-border">
+        {/* Tabs horizontales minimalistas */}
+        <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-2 -mx-1 px-1">
+          {(['ALL', 'PENDING', 'APPROVED', 'REJECTED'] as FilterStatus[]).map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                filterStatus === status
+                  ? 'bg-accent text-white shadow-sm'
+                  : 'text-text-secondary hover:bg-secondary/30 hover:text-text-primary'
+              }`}
+            >
+              {status === 'ALL' ? 'Todas' : status === 'PENDING' ? 'Pendientes' : status === 'APPROVED' ? 'Aprobadas' : 'Rechazadas'}
+            </button>
+          ))}
+        </div>
 
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Búsqueda */}
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Buscar por email o motivación..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary theme-transition"
-            />
-          </div>
-
-          {/* Filtros de status */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:flex md:gap-2">
-            {(['ALL', 'PENDING', 'APPROVED', 'REJECTED'] as FilterStatus[]).map((status) => (
-              <button
-                key={status}
-                onClick={() => setFilterStatus(status)}
-                className={`px-2 md:px-4 py-2 rounded-lg text-[10px] sm:text-xs md:text-sm font-medium transition-all theme-transition ${
-                  filterStatus === status
-                    ? 'bg-accent text-white'
-                    : 'bg-background text-text-secondary hover:bg-secondary/30'
-                }`}
-              >
-                {status === 'ALL' ? 'Todas' : status === 'PENDING' ? 'Pendientes' : status === 'APPROVED' ? 'Aprobadas' : 'Rechazadas'}
-              </button>
-            ))}
-          </div>
+        {/* Búsqueda */}
+        <div>
+          <input
+            type="text"
+            placeholder="Buscar por email o motivación..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-3 sm:px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent bg-background text-text-primary theme-transition text-sm"
+          />
         </div>
       </div>
 
