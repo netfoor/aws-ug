@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
       eventDate,
       eventTime,
       location,
+      locationMapsUrl,
+      locationAddress,
       capacity,
       coverImageUrl, // Cover image path de S3
       publish = false, // Si es true, crea como PUBLISHED, sino DRAFT
@@ -112,6 +114,8 @@ export async function POST(request: NextRequest) {
       startDate: eventDateTime,
       endDate: endDate.toISOString(),
       location,
+      locationMapsUrl: locationMapsUrl || undefined,
+      locationAddress: locationAddress || undefined,
       maxAttendees: capacity || 50,
       coverImageUrl: coverImageUrl || undefined, // Cover image si existe
       status: publish ? ('PUBLISHED' as const) : ('DRAFT' as const),

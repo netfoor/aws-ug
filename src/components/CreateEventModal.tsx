@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import DateSelector from '@/components/common/DateSelector';
 import CoverImageUpload from '@/components/common/CoverImageUpload';
+import LocationSelector from '@/components/common/LocationSelector';
 
 const client = generateClient<Schema>();
 
@@ -42,8 +43,15 @@ export default function CreateEventModal({
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('19:00');
   const [duration, setDuration] = useState(proposal.duration || 60);
-  const [location, setLocation] = useState('');
-  const [locationAddress, setLocationAddress] = useState('');
+  const [locationData, setLocationData] = useState<{
+    location: string;
+    locationAddress?: string;
+    locationMapsUrl?: string;
+  }>({
+    location: '',
+    locationAddress: '',
+    locationMapsUrl: undefined,
+  });
   const [maxAttendees, setMaxAttendees] = useState<number | null>(50);
   const [isUnlimited, setIsUnlimited] = useState(false);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
@@ -58,7 +66,7 @@ export default function CreateEventModal({
     if (!user) return;
 
     // Validaciones
-    if (!title.trim() || !description.trim() || !startDate || !location.trim()) {
+    if (!title.trim() || !description.trim() || !startDate || !locationData.location.trim()) {
       setError('Por favor completa todos los campos requeridos');
       return;
     }
@@ -94,8 +102,9 @@ export default function CreateEventModal({
         startDate: startDateTime.toISOString(),
         endDate: endDateTime.toISOString(),
         timezone: 'America/Mexico_City',
-        location: location.trim(),
-        locationAddress: locationAddress.trim() || undefined,
+        location: locationData.location.trim(),
+        locationAddress: locationData.locationAddress?.trim() || undefined,
+        locationMapsUrl: locationData.locationMapsUrl?.trim() || undefined,
         isVirtual: false,
         maxAttendees: isUnlimited ? null : maxAttendees,
         isUnlimited,
@@ -245,32 +254,15 @@ export default function CreateEventModal({
 
           {/* Ubicación */}
           <div>
-            <Label htmlFor="location">Lugar *</Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary pointer-events-none" />
-              <input
-                type="text"
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Ej: Auditorio TechHub Puebla"
-                className="mt-1 w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-text-primary theme-transition"
+            <Label>Ubicación *</Label>
+            <div className="mt-1">
+              <LocationSelector
+                value={locationData}
+                onChange={setLocationData}
                 required
+                disabled={isProcessing}
               />
             </div>
-          </div>
-
-          {/* Dirección */}
-          <div>
-            <Label htmlFor="locationAddress">Dirección (opcional)</Label>
-            <input
-              type="text"
-              id="locationAddress"
-              value={locationAddress}
-              onChange={(e) => setLocationAddress(e.target.value)}
-              placeholder="Calle, número, colonia..."
-              className="mt-1 w-full px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-text-primary theme-transition"
-            />
           </div>
 
           {/* Capacidad */}

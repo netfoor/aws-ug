@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import DateSelector from '@/components/common/DateSelector';
 import CoverImageUpload from '@/components/common/CoverImageUpload';
+import LocationSelector from '@/components/common/LocationSelector';
 
 const client = generateClient<Schema>();
 
@@ -27,6 +28,7 @@ interface EventFormData {
   timezone: string;
   location: string;
   locationAddress: string;
+  locationMapsUrl: string;
   isVirtual: boolean;
   virtualLink: string;
   maxAttendees: number | null;
@@ -50,6 +52,16 @@ export default function EditEventPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [newTopic, setNewTopic] = useState('');
 
+  const [locationData, setLocationData] = useState<{
+    location: string;
+    locationAddress?: string;
+    locationMapsUrl?: string;
+  }>({
+    location: '',
+    locationAddress: '',
+    locationMapsUrl: undefined,
+  });
+
   const [formData, setFormData] = useState<EventFormData>({
     title: '',
     description: '',
@@ -61,6 +73,7 @@ export default function EditEventPage() {
     timezone: 'America/Mexico_City',
     location: '',
     locationAddress: '',
+    locationMapsUrl: '',
     isVirtual: false,
     virtualLink: '',
     maxAttendees: null,
@@ -110,9 +123,17 @@ export default function EditEventPage() {
         timezone: eventData.timezone || 'America/Mexico_City',
         location: eventData.location || '',
         locationAddress: eventData.locationAddress || '',
+        locationMapsUrl: eventData.locationMapsUrl || '',
         isVirtual: eventData.isVirtual || false,
         virtualLink: eventData.virtualLink || '',
         maxAttendees: eventData.maxAttendees || null,
+      });
+
+      // Actualizar locationData también
+      setLocationData({
+        location: eventData.location || '',
+        locationAddress: eventData.locationAddress || undefined,
+        locationMapsUrl: eventData.locationMapsUrl || undefined,
         isUnlimited: eventData.isUnlimited || false,
         status: eventData.status || 'DRAFT',
         coverImageUrl: eventData.coverImageUrl || '',
@@ -180,7 +201,7 @@ export default function EditEventPage() {
         return;
       }
 
-      if (!formData.isVirtual && !formData.location.trim()) {
+      if (!formData.isVirtual && !locationData.location.trim()) {
         setError('La ubicación es requerida para eventos presenciales');
         return;
       }
@@ -203,6 +224,7 @@ export default function EditEventPage() {
         timezone: formData.timezone,
         location: formData.location,
         locationAddress: formData.locationAddress,
+        locationMapsUrl: formData.locationMapsUrl || undefined,
         isVirtual: formData.isVirtual,
         virtualLink: formData.virtualLink || null,
         maxAttendees: formData.isUnlimited ? null : formData.maxAttendees,
@@ -487,32 +509,26 @@ export default function EditEventPage() {
                   />
                 </div>
               ) : (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
-                      Nombre del Lugar *
-                    </label>
-                    <Input
-                      type="text"
-                      value={formData.location}
-                      onChange={(e) => handleInputChange('location', e.target.value)}
-                      placeholder="Ej: Centro de Innovación BUAP"
-                      required={!formData.isVirtual}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
-                      Dirección Completa
-                    </label>
-                    <Input
-                      type="text"
-                      value={formData.locationAddress}
-                      onChange={(e) => handleInputChange('locationAddress', e.target.value)}
-                      placeholder="Calle, número, colonia, ciudad"
-                    />
-                  </div>
-                </>
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">
+                    Ubicación *
+                  </label>
+                  <LocationSelector
+                    value={locationData}
+                    onChange={(data) => {
+                      setLocationData(data);
+                      // Sincronizar con formData
+                      setFormData(prev => ({
+                        ...prev,
+                        location: data.location,
+                        locationAddress: data.locationAddress || '',
+                        locationMapsUrl: data.locationMapsUrl || '',
+                      }));
+                    }}
+                    required={!formData.isVirtual}
+                    disabled={isSaving}
+                  />
+                </div>
               )}
             </div>
           </div>

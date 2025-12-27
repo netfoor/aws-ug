@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import Link from 'next/link';
 import DateSelector from '@/components/common/DateSelector';
 import CoverImageUpload from '@/components/common/CoverImageUpload';
+import LocationSelector from '@/components/common/LocationSelector';
 
 type SpeakerApplication = Schema['SpeakerApplication']['type'];
 
@@ -46,7 +47,14 @@ export default function CreateEventPage() {
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('18:30');
   const [duration, setDuration] = useState(45);
-  const [location, setLocation] = useState('Oficinas de AWS User Group Puebla');
+  const [locationData, setLocationData] = useState<{
+    location: string;
+    locationAddress?: string;
+    locationMapsUrl?: string;
+  }>({
+    location: "Italiann's Puebla San Francisco",
+    locationMapsUrl: 'https://maps.app.goo.gl/d24bJGS9v8YQH5mD8',
+  });
   const [isVirtual, setIsVirtual] = useState(false);
   const [virtualLink, setVirtualLink] = useState('');
   
@@ -136,7 +144,7 @@ export default function CreateEventPage() {
       setError('La fecha es requerida');
       return;
     }
-    if (!location.trim() && !isVirtual) {
+    if (!locationData.location.trim() && !isVirtual) {
       setError('La ubicación es requerida (o marca como virtual)');
       return;
     }
@@ -165,7 +173,9 @@ export default function CreateEventPage() {
           eventDate: startDate,
           eventTime: startTime,
           duration,
-          location: location.trim(),
+          location: locationData.location.trim(),
+          locationMapsUrl: locationData.locationMapsUrl?.trim(),
+          locationAddress: locationData.locationAddress?.trim(),
           isVirtual,
           virtualLink: isVirtual ? virtualLink.trim() : undefined,
           maxAttendees,
@@ -471,19 +481,17 @@ export default function CreateEventPage() {
                 />
               </div>
             ) : (
-              <>
-                <div>
-                  <Label htmlFor="location">Lugar *</Label>
-                  <Input
-                    id="location"
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="ej: WeWork Angelópolis"
+              <div>
+                <Label>Ubicación *</Label>
+                <div className="mt-1">
+                  <LocationSelector
+                    value={locationData}
+                    onChange={setLocationData}
                     required={!isVirtual}
+                    disabled={isProcessing}
                   />
                 </div>
-              </>
+              </div>
             )}
           </div>
 

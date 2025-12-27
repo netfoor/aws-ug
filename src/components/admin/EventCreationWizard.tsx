@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import DateSelector from '@/components/common/DateSelector';
 import CoverImageUpload from '@/components/common/CoverImageUpload';
+import LocationSelector from '@/components/common/LocationSelector';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../amplify/data/resource';
 import { 
@@ -78,10 +79,20 @@ export function EventCreationWizard({
     eventDate: prefillDate,
     eventTime: prefillTime,
     eventEndTime: prefillEndTime,
-    location: 'Oficinas de AWS User Group Puebla',
+    location: "Italiann's Puebla San Francisco",
+    locationMapsUrl: 'https://maps.app.goo.gl/d24bJGS9v8YQH5mD8', // Pre-fill con el lugar por defecto
     capacity: 50,
     registrationDeadline: '',
     coverImageUrl: '', // Para almacenar el path de la imagen subida
+  });
+
+  const [locationData, setLocationData] = useState<{
+    location: string;
+    locationAddress?: string;
+    locationMapsUrl?: string;
+  }>({
+    location: "Italiann's Puebla San Francisco",
+    locationMapsUrl: 'https://maps.app.goo.gl/d24bJGS9v8YQH5mD8',
   });
 
   const handleCreateEvent = async (publish: boolean) => {
@@ -96,6 +107,9 @@ export function EventCreationWizard({
           talkProposalId,
           speakerApplicationId, // Para actualizar attachedProposal si la fecha cambió
           ...formData,
+          location: locationData.location,
+          locationMapsUrl: locationData.locationMapsUrl,
+          locationAddress: locationData.locationAddress,
           registrationDeadline: formData.registrationDeadline || `${formData.eventDate}T${formData.eventTime}:00.000Z`,
           publish,
         }),
@@ -242,18 +256,15 @@ export function EventCreationWizard({
 
           {/* Location */}
           <div>
-            <label htmlFor="location" className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-1.5 sm:mb-2">
+            <label className="text-xs font-medium text-text-primary flex items-center gap-1.5 mb-1.5 sm:mb-2">
               <MapPin className="w-3.5 h-3.5 text-accent" />
               Ubicación
             </label>
-            <input
-              id="location"
-              type="text"
-              value={formData.location}
-              onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-              placeholder="Ej: Auditorio Principal"
+            <LocationSelector
+              value={locationData}
+              onChange={setLocationData}
               required
-              className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
+              disabled={loading}
             />
           </div>
 
@@ -314,7 +325,7 @@ export function EventCreationWizard({
           <div className="flex flex-col gap-2 pt-2">
             <Button
               onClick={() => handleCreateEvent(true)}
-              disabled={loading || !formData.eventDate || !formData.eventTime || !formData.location}
+              disabled={loading || !formData.eventDate || !formData.eventTime || !locationData.location}
               className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold text-sm sm:text-base py-2.5 sm:py-3"
             >
               {loading ? (
@@ -332,7 +343,7 @@ export function EventCreationWizard({
             
             <Button
               onClick={() => handleCreateEvent(false)}
-              disabled={loading || !formData.eventDate || !formData.eventTime || !formData.location}
+              disabled={loading || !formData.eventDate || !formData.eventTime || !locationData.location}
               variant="outline"
               className="w-full text-sm sm:text-base py-2.5 sm:py-3"
             >

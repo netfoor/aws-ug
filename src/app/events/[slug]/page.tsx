@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/Button';
 import { QRTicketModal, TicketStatus } from '@/components/events';
 import { useQRTicket } from '@/hooks';
 import { getIconColors } from '@/lib/iconColorUtils';
+import LocationMapPreview from '@/components/common/LocationMapPreview';
 
 const client = generateClient<Schema>();
 
@@ -517,13 +518,12 @@ export default function EventDetailsPage() {
 
         {/* Location */}
         <div className="bg-transparent p-6 mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <MapPin className="w-5 h-5 text-accent" />
-            <h2 className="text-lg font-semibold text-text-primary">Ubicación</h2>
-          </div>
-          
           {event.isVirtual ? (
             <div>
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="w-5 h-5 text-accent" />
+                <h2 className="text-lg font-semibold text-text-primary">Ubicación</h2>
+              </div>
               <p className="text-text-secondary mb-2">Evento Virtual</p>
               {event.virtualLink && (
                 <a
@@ -537,22 +537,12 @@ export default function EventDetailsPage() {
               )}
             </div>
           ) : (
-            <div>
-              <p className="text-text-primary font-medium mb-2">{event.location}</p>
-              {event.locationAddress && (
-                <p className="text-text-secondary text-sm mb-3">{event.locationAddress}</p>
-              )}
-              {event.locationAddress && (
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.locationAddress)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block text-accent hover:underline text-sm"
-                >
-                  Ver en Google Maps →
-                </a>
-              )}
-            </div>
+            <LocationMapPreview
+              location={event.location}
+              locationMapsUrl={event.locationMapsUrl ?? undefined}
+              locationAddress={event.locationAddress ?? undefined}
+              showTitle={true}
+            />
           )}
         </div>
 

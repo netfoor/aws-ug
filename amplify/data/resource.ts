@@ -200,6 +200,7 @@ const schema = a.schema({
     timezone: a.string().default('America/Mexico_City'),
     location: a.string().required(), // Nombre del lugar
     locationAddress: a.string(), // Dirección completa
+    locationMapsUrl: a.string(), // URL de Google Maps (maps.app.goo.gl o maps.google.com)
     isVirtual: a.boolean().default(false),
     virtualLink: a.string(), // Zoom, Meet, etc.
     
