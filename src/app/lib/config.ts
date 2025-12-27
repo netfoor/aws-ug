@@ -39,7 +39,10 @@ export const initializeAmplify = () => {
     Amplify.configure(config, { ssr: true });
     
     isInitialized = true;
-    console.log('Amplify configured successfully with secure settings');
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Amplify configured successfully with secure settings');
+    }
   } catch (error) {
     console.error('Error configuring Amplify:', error);
   }

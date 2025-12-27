@@ -30,7 +30,7 @@ import {
 // ========================================
 const TABLE_PREFIX = process.env.SPEAKER_APPLICATION_TABLE_PREFIX || 'SpeakerApplication';
 const NOTIFICATION_TABLE_PREFIX = process.env.NOTIFICATION_TABLE_PREFIX || 'Notification';
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'no-reply@awspuebla.foor.dev';
 const REGION = process.env.AWS_REGION || 'us-east-1';
 
 // ========================================
@@ -257,11 +257,16 @@ export const handler: Handler<RejectionEvent> = async (event) => {
 
     console.log('✅ Status actualizado correctamente');
 
-    // 4️⃣ Enviar email de rechazo
+    // 4️⃣ Enviar email de rechazo (operación no crítica - no debe fallar el proceso)
     const userName = application.email.split('@')[0]; // Fallback
-    await sendRejectionEmail(application.email, userName, rejectionReason);
-
-    console.log('✅ Email de rechazo enviado');
+    try {
+      await sendRejectionEmail(application.email, userName, rejectionReason);
+      console.log('✅ Email de rechazo enviado');
+    } catch (emailError) {
+      console.error('⚠️ Error enviando email de rechazo (no crítico):', emailError);
+      // No lanzar error - el rechazo ya se completó exitosamente
+      // El usuario puede verificar su estado en el perfil o recibir notificación in-app
+    }
 
     // 5️⃣ Crear notificación in-app
     await createNotification(userId, rejectionReason, notificationTableName);

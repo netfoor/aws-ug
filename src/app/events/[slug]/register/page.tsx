@@ -246,8 +246,6 @@ export default function EventRegistrationPage() {
         return;
       }
 
-      console.log('✅ Registration created with ID:', registration.id);
-      console.log('ℹ️ QR token will be auto-generated when viewing event details');
 
       // Actualizar contador de registros en el evento
       const newGoingCount = (event.goingCount || 0) + 1;

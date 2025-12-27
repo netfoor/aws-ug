@@ -107,7 +107,6 @@ export function EventCreationWizard({
         throw new Error(result.error || 'Error al crear evento');
       }
 
-      console.log('✅ Evento creado:', result);
       
       // Guardar info del evento creado y pasar al paso de preguntas
       setCreatedEventId(result.event.id);
@@ -162,7 +161,6 @@ export function EventCreationWizard({
         registrationQuestions: JSON.stringify(defaultQuestions),
       });
 
-      console.log('✅ Preguntas por defecto agregadas');
       finishWizard();
     } catch (err) {
       console.error('❌ Error agregando preguntas:', err);
@@ -300,7 +298,6 @@ export function EventCreationWizard({
               eventId={createdEventId || talkProposalId} // Usar talkProposalId como fallback
               onImageUploaded={(imageUrl) => {
                 // Guardar el path de S3 en formData
-                console.log('✅ Imagen subida a S3:', imageUrl);
                 setFormData(prev => ({ ...prev, coverImageUrl: imageUrl }));
               }}
               onError={(error) => setError(error)}

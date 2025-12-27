@@ -40,10 +40,6 @@ export default function ProfilePage() {
       
       // Handle professional profile hash
       if (window.location.hash === '#professional-profile') {
-        console.log('🔍 Hash detected: #professional-profile');
-        console.log('📊 Profile data:', profile);
-        console.log('⏳ Profile loading:', profileLoading);
-        
         // Solo mostrar el formulario cuando el perfil ya se haya cargado
         if (!profileLoading && profile) {
           setShowProfessionalForm(true);
@@ -78,8 +74,6 @@ export default function ProfilePage() {
   }) {
     if (!user) return;
 
-    console.log('💾 Guardando perfil profesional:', data);
-
     try {
       const updateData = {
         id: user.userId,
@@ -92,14 +86,8 @@ export default function ProfilePage() {
         updatedAt: new Date().toISOString(),
       };
       
-      console.log('📤 Enviando a DynamoDB:', updateData);
-      
-      const result = await client.models.User.update(updateData);
-      
-      console.log('✅ Perfil actualizado en DynamoDB:', result);
-
+      await client.models.User.update(updateData);
       await refetch();
-      console.log('🔄 Perfil refetcheado');
       
       setShowProfessionalForm(false);
     } catch (error) {

@@ -102,11 +102,8 @@ export default function EventDetailsPage() {
           
           const actualCount = registrations?.filter(r => r.status === 'GOING').length || 0;
           
-          console.log(`📊 Event "${eventData.title}": DB goingCount=${eventData.goingCount}, Actual registrations=${actualCount}`);
-          
           // Si hay discrepancia, actualizar el display con el count real
           if (eventData.goingCount !== actualCount) {
-            console.warn(`⚠️ Count mismatch. Using actual count: ${actualCount}`);
             eventData.goingCount = actualCount;
           }
         } catch (err) {
@@ -214,8 +211,7 @@ export default function EventDetailsPage() {
           text: event?.description,
           url: url,
         });
-      } catch (err) {
-        console.log('Error sharing:', err);
+      } catch {
       }
     } else {
       // Copiar al clipboard

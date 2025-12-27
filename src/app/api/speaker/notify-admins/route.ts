@@ -60,9 +60,6 @@ export async function POST(request: NextRequest) {
       title,
     };
 
-    console.log(`🔔 Invocando Lambda ${lambdaFunctionName} para notificar admins...`);
-    console.log('Payload:', payload);
-
     // 5️⃣ Invocar Lambda
     const command = new InvokeCommand({
       FunctionName: lambdaFunctionName,
@@ -75,8 +72,6 @@ export async function POST(request: NextRequest) {
     const responsePayload = JSON.parse(
       new TextDecoder().decode(response.Payload)
     );
-
-    console.log('Lambda response:', responsePayload);
 
     // Verificar si la Lambda devolvió error
     if (response.FunctionError || responsePayload.statusCode !== 200) {

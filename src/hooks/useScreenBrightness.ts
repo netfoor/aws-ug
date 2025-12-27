@@ -56,9 +56,7 @@ export function useScreenBrightness({
           try {
             const navigatorWithWakeLock = navigator as unknown as NavigatorWithWakeLock;
             wakeLockRef.current = await navigatorWithWakeLock.wakeLock!.request('screen');
-            console.log('Wake lock activated');
-          } catch (wakeLockError) {
-            console.log('Wake lock not supported or denied:', wakeLockError);
+          } catch {
           }
         }
 
@@ -66,8 +64,7 @@ export function useScreenBrightness({
         document.documentElement.style.setProperty('--ticket-brightness', '1.5');
         document.documentElement.style.setProperty('--ticket-contrast', '1.2');
 
-      } catch (error) {
-        console.log('Brightness control setup failed:', error);
+      } catch {
       }
     };
 
@@ -84,8 +81,7 @@ export function useScreenBrightness({
               screen.brightness = originalBrightnessRef.current;
             }
           }
-        } catch (error) {
-          console.log('Could not restore brightness:', error);
+        } catch {
         }
       }
 
@@ -93,7 +89,6 @@ export function useScreenBrightness({
       if (wakeLockRef.current) {
         wakeLockRef.current.release();
         wakeLockRef.current = null;
-        console.log('Wake lock released');
       }
 
       // Remover CSS personalizado

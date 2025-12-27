@@ -110,7 +110,7 @@ backend.manualApproveSpeaker.addEnvironment(
 
 backend.manualApproveSpeaker.addEnvironment(
   'SENDER_EMAIL',
-  'fortino.romero.man@gmail.com'
+  'no-reply@awspuebla.foor.dev'
 );
 
 backend.manualApproveSpeaker.addEnvironment(
@@ -163,7 +163,7 @@ backend.rejectSpeakerApplication.resources.lambda.addToRolePolicy(
 
 backend.rejectSpeakerApplication.addEnvironment(
   'SENDER_EMAIL',
-  'fortino.romero.man@gmail.com'
+  'no-reply@awspuebla.foor.dev'
 );
 
 backend.rejectSpeakerApplication.addEnvironment(

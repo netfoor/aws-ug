@@ -73,11 +73,6 @@ export function AdminDateSelector({
         p.id !== currentProposalId
       ) || [];
 
-      console.log('📅 Admin Date Selector:', {
-        totalProposals: allProposals?.length,
-        proposalsWithDate: proposalsWithDate.length,
-        currentProposalId,
-      });
 
       // 4️⃣ Verificar disponibilidad de cada fecha
       const dateOptions: DateOption[] = upcomingThursdays.map((thursday) => {

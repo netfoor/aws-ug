@@ -91,7 +91,6 @@ export async function optimizeImage(
                 lastModified: Date.now(),
               });
 
-              console.log(`✅ Imagen optimizada: ${(file.size / 1024).toFixed(2)}KB → ${(optimizedFile.size / 1024).toFixed(2)}KB`);
               resolve(optimizedFile);
             },
             `image/${format}`,

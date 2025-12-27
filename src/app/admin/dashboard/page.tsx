@@ -121,7 +121,6 @@ export default function AdminDashboardPage() {
   // Handle approve all (speaker + proposal + event)
   const handleApproveAll = async (applicationId: string, userId: string) => {
     try {
-      console.log('🎯 Aprobando todo:', { applicationId, userId });
 
       const response = await fetch('/api/admin/approve-all', {
         method: 'POST',
@@ -141,7 +140,6 @@ export default function AdminDashboardPage() {
       }
 
       const result = await response.json();
-      console.log('✅ Resultado:', result);
 
       // Retornar el talkProposalId para que el wizard lo use
       return result;
@@ -155,7 +153,6 @@ export default function AdminDashboardPage() {
   // Handle approve speaker only
   const handleApproveSpeakerOnly = async (applicationId: string, userId: string) => {
     try {
-      console.log('🎯 Aprobando solo speaker:', { applicationId, userId });
 
       const response = await fetch('/api/admin/approve-speaker', {
         method: 'POST',
@@ -174,8 +171,7 @@ export default function AdminDashboardPage() {
         throw new Error(error.message || 'Error al aprobar el speaker');
       }
 
-      const result = await response.json();
-      console.log('✅ Resultado:', result);
+      await response.json();
 
       await showAlert('Speaker aprobado correctamente.\n\nSe ha enviado un email de notificación.', { variant: 'success' });
 
@@ -192,7 +188,6 @@ export default function AdminDashboardPage() {
   // Handle reject
   const handleReject = async (applicationId: string, userId: string, reason: string) => {
     try {
-      console.log('❌ Rechazando aplicación:', { applicationId, userId, reason });
 
       const response = await fetch('/api/admin/reject-speaker', {
         method: 'POST',
@@ -326,18 +321,15 @@ export default function AdminDashboardPage() {
             </div>
             <div className="space-y-3 sm:space-y-4">
               {proposalsWaitingForEvent.map((proposal) => {
-                // Buscar la aplicación del speaker correspondiente
+                // Buscar la aplicación del speaker correspondiente (opcional - puede no existir si la propuesta vino de /speaker/propose-talk)
                 const speakerApp = speakerApplications.find(app => app.userId === proposal.userId);
-                
-                if (!speakerApp) return null;
                 
                 return (
                   <ProposalWaitingCard
                     key={proposal.id}
                     proposal={proposal}
                     speakerApp={speakerApp}
-                    onEventCreated={(eventId, published) => {
-                      console.log(`✅ Evento ${published ? 'publicado' : 'creado'}: ${eventId}`);
+                    onEventCreated={() => {
                       loadDashboardData();
                     }}
                     onRefresh={loadDashboardData}

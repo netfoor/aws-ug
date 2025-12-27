@@ -66,8 +66,6 @@ export async function POST(request: NextRequest) {
       approvedBy: approvedBy || session.tokens.accessToken.payload.sub,
     };
 
-    console.log('🎯 Invocando Lambda:', lambdaFunctionName, payload);
-
     const command = new InvokeCommand({
       FunctionName: lambdaFunctionName,
       InvocationType: 'RequestResponse',
@@ -104,7 +102,6 @@ export async function POST(request: NextRequest) {
       result = { raw: response.Payload ? new TextDecoder().decode(response.Payload) : null };
     }
 
-    console.log('✅ Lambda response:', result);
 
     // 4️⃣ Verificar si hubo error en la Lambda (FunctionError indica excepción dentro de la Lambda)
     if (response.FunctionError) {

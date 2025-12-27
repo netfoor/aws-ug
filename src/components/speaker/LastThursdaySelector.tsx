@@ -63,10 +63,6 @@ export default function LastThursdaySelector({
         (p.status === 'PENDING' || p.status === 'APPROVED' || p.status === 'EVENT_CREATED')
       ) || [];
 
-      console.log('📅 LastThursdaySelector:', {
-        totalProposals: allProposals?.length,
-        proposalsWithDate: proposalsWithDate.length,
-      });
 
       // 4️⃣ Verificar disponibilidad de cada fecha
       const dateOptions: DateOption[] = upcomingThursdays.map((thursday) => {

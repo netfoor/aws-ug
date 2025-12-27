@@ -77,11 +77,9 @@ export function useQRScanner({
           const backCamera = cameras.find(camera => CameraUtils.isBackCamera(camera.label));
 
           if (backCamera) {
-            console.log('Found back camera:', backCamera.label);
             setCurrentCamera(backCamera.id);
           } else {
             // Si no encuentra cámara trasera por etiqueta, usar 'environment' como fallback
-            console.log('No back camera found by label, using environment constraint');
             setCurrentCamera('environment');
           }
         } catch (error) {

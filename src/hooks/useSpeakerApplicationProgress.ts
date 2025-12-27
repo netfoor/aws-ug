@@ -135,7 +135,6 @@ export function useSpeakerApplicationProgress(userId: string) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
       setHasProgress(true);
       
-      console.log('✅ Progress saved for section:', section);
     } catch (error) {
       console.error('Error saving progress:', error);
     }
@@ -166,19 +165,16 @@ export function useSpeakerApplicationProgress(userId: string) {
 
       // Check expiry
       if (isExpired(progress)) {
-        console.log('Progress expired, clearing');
         clearProgress();
         return null;
       }
 
       // Check version compatibility
       if (progress.version !== PROGRESS_VERSION) {
-        console.log('Progress version mismatch, clearing');
         clearProgress();
         return null;
       }
 
-      console.log('✅ Progress loaded for section:', progress.currentSection);
       return progress;
     } catch (error) {
       console.error('Error loading progress:', error);
@@ -199,7 +195,6 @@ export function useSpeakerApplicationProgress(userId: string) {
     try {
       localStorage.removeItem(STORAGE_KEY);
       setHasProgress(false);
-      console.log('✅ Progress cleared');
     } catch (error) {
       console.error('Error clearing progress:', error);
     }
@@ -266,8 +261,6 @@ export function useSpeakerApplicationProgress(userId: string) {
       const keys = Object.keys(localStorage);
       const progressKeys = keys.filter(key => key.startsWith('speaker-application-progress-'));
       
-      let cleanedCount = 0;
-      
       progressKeys.forEach(key => {
         try {
           const stored = localStorage.getItem(key);
@@ -275,19 +268,14 @@ export function useSpeakerApplicationProgress(userId: string) {
             const progress = JSON.parse(stored);
             if (progress.expiresAt && new Date(progress.expiresAt) < new Date()) {
               localStorage.removeItem(key);
-              cleanedCount++;
             }
           }
         } catch {
           // Remove corrupted entries
           localStorage.removeItem(key);
-          cleanedCount++;
         }
       });
 
-      if (cleanedCount > 0) {
-        console.log(`🧹 Cleaned up ${cleanedCount} expired progress entries`);
-      }
     } catch (error) {
       console.error('Error during cleanup:', error);
     }

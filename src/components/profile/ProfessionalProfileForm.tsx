@@ -78,7 +78,6 @@ export default function ProfessionalProfileForm({
 
     // Borrar foto vieja si existe (Sprint 2 - Tarea 3.2)
     if (photoKey) {
-      console.log('🗑️ Borrando foto vieja antes de subir nueva...');
       await deleteSpeakerFile(photoKey);
     }
 
@@ -111,7 +110,6 @@ export default function ProfessionalProfileForm({
 
     // Borrar CV viejo si existe (Sprint 2 - Tarea 3.2)
     if (cvKey) {
-      console.log('🗑️ Borrando CV viejo antes de subir nuevo...');
       await deleteSpeakerFile(cvKey);
     }
 

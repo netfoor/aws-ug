@@ -162,7 +162,6 @@ export default function TalkProposalsAdminPage() {
           createdAt: new Date().toISOString(),
           owner: selectedProposal.userId,
         });
-        console.log('✅ Notificación de rechazo enviada al speaker');
       } catch (notifyError) {
         console.warn('⚠️ Error al notificar speaker (no crítico):', notifyError);
       }

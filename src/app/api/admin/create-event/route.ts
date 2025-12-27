@@ -65,7 +65,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🎯 Creando evento desde cero:', { title, eventDate, eventTime, status });
 
     // Calcular fechas
     const startDateTime = new Date(`${eventDate}T${eventTime}:00.000Z`);
@@ -143,7 +142,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Evento creado:', createdEvent.id);
 
     // Si hay speaker, notificarlo
     if (selectedSpeakerId) {

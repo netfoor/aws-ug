@@ -33,8 +33,7 @@ export default function QRTicketModal({
         if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
           await document.documentElement.requestFullscreen();
         }
-      } catch (error) {
-        console.log('Fullscreen not supported:', error);
+      } catch {
       }
     };
 
@@ -43,7 +42,7 @@ export default function QRTicketModal({
     // Cleanup: salir de pantalla completa al cerrar
     return () => {
       if (document.fullscreenElement) {
-        document.exitFullscreen().catch(console.log);
+        document.exitFullscreen().catch(() => {});
       }
     };
   }, [isOpen]);

@@ -58,10 +58,6 @@ export function useQRTicket({ eventId, userId }: UseQRTicketOptions): UseQRTicke
                 const idMismatch = tokenData.registrationId !== userRegistration.id;
                 
                 if (isTemporaryId || idMismatch) {
-                  console.warn('⚠️ Detected invalid or temporary token, auto-regenerating...');
-                  console.log('Token registrationId:', tokenData.registrationId);
-                  console.log('Actual registration ID:', userRegistration.id);
-                  
                   // Regenerar el token automáticamente
                   const newToken = QRTokenUtils.generateToken({
                     eventId,
@@ -75,16 +71,12 @@ export function useQRTicket({ eventId, userId }: UseQRTicketOptions): UseQRTicke
                     qrCodeToken: newToken,
                   });
                   
-                  console.log('✅ Token auto-regenerated successfully');
-                  
                   // Actualizar el objeto local con el nuevo token
                   userRegistration.qrCodeToken = newToken;
                 }
               }
-            } catch (tokenError) {
+            } catch {
               // Si el token no es válido, regenerar automáticamente
-              console.warn('⚠️ Invalid token detected, auto-regenerating...', tokenError);
-              
               const newToken = QRTokenUtils.generateToken({
                 eventId,
                 userId,
@@ -96,13 +88,10 @@ export function useQRTicket({ eventId, userId }: UseQRTicketOptions): UseQRTicke
                 qrCodeToken: newToken,
               });
               
-              console.log('✅ Token auto-regenerated successfully');
               userRegistration.qrCodeToken = newToken;
             }
           } else if (userRegistration.id) {
             // Si no hay token, generar uno nuevo
-            console.log('📝 No token found, generating new one...');
-            
             const newToken = QRTokenUtils.generateToken({
               eventId,
               userId,
@@ -113,8 +102,6 @@ export function useQRTicket({ eventId, userId }: UseQRTicketOptions): UseQRTicke
               id: userRegistration.id,
               qrCodeToken: newToken,
             });
-            
-            console.log('✅ Token generated successfully');
             userRegistration.qrCodeToken = newToken;
           }
         }

@@ -133,13 +133,6 @@ export default function QRTicket({
           }
         }
 
-        console.log('QRious Library Margins:', {
-          top: topMargin,
-          bottom: bottomMargin,
-          left: leftMargin,
-          right: rightMargin,
-          canvasSize: { width: tempCanvas.width, height: tempCanvas.height }
-        });
       }
 
       // Setup main canvas with custom padding
@@ -163,7 +156,6 @@ export default function QRTicket({
       }
 
       // Draw QR code with precise cropping based on detected margins
-      console.log(`Mobile/Desktop QR: Size=${qrSize}, ActualWidth=${actualQRWidth}, ActualHeight=${actualQRHeight}`);
 
       ctx.drawImage(
         tempCanvas,

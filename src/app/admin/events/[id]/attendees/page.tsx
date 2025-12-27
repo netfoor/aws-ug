@@ -112,7 +112,6 @@ export default function AttendeesPage() {
 
   const handleAddAttendee = () => {
     // TODO: Implementar modal para agregar invitados
-    console.log('Agregar invitado');
   };
 
   const getStatusBadge = (status: string | null | undefined) => {

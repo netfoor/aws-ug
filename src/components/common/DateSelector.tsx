@@ -120,14 +120,6 @@ export default function DateSelector({
         }
       }) || [];
 
-      console.log('📅 DateSelector:', {
-        adminMode,
-        totalProposals: allProposals?.length,
-        proposalsWithDate: proposalsWithDate.length,
-        totalApplications: allApplications?.length,
-        applicationsWithDate: applicationsWithDate.length,
-        currentProposalId,
-      });
 
       // 4️⃣ Verificar disponibilidad de cada fecha
       const dateOptions: DateOption[] = upcomingThursdays.map((thursday) => {

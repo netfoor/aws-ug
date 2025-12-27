@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🚀 Iniciando aprobación completa:', { applicationId, userId, approvedBy });
 
     // STEP 1: Invocar Lambda manual-approve-speaker directamente
     const outputs = await import('../../../../../amplify_outputs.json') as { custom?: { manualApproveLambdaName?: string } };
@@ -74,7 +73,6 @@ export async function POST(request: NextRequest) {
       Payload: JSON.stringify(payload),
     });
 
-    console.log('📡 Invocando Lambda:', lambdaFunctionName, 'con payload:', payload);
 
     const response = await lambdaClient.send(command);
     
@@ -100,7 +98,6 @@ export async function POST(request: NextRequest) {
       const lambdaResponse = decoded ? JSON.parse(decoded) : {};
       // Lambda retorna { statusCode, body } donde body es un string JSON
       approveResult = lambdaResponse.body ? JSON.parse(lambdaResponse.body) : lambdaResponse;
-      console.log('📦 Respuesta de Lambda:', JSON.stringify(approveResult, null, 2));
     }
 
     // Verificar si la Lambda retornó un error en el body
@@ -116,17 +113,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Speaker aprobado exitosamente');
-
     // STEP 2: Si se creó una TalkProposal, crear el evento en borrador
     const eventId = null;
     if (approveResult.talkProposalCreated && approveResult.talkProposalId) {
-      console.log('🎯 Creando evento desde propuesta:', approveResult.talkProposalId);
-      
       // Obtener los datos de la propuesta para crear el evento
       // Por ahora retornamos indicando que se debe crear manualmente
       // TODO: Implementar creación automática de evento
-      console.log('ℹ️ Evento debe ser creado desde /admin/talk-proposals');
     }
 
     return NextResponse.json({

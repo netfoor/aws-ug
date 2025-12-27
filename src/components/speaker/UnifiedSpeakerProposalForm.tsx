@@ -277,7 +277,6 @@ export default function UnifiedSpeakerProposalForm({
       if (preparedPhoto) {
         // Sprint 2 - Tarea 3.2: Borrar foto vieja si existe
         if (formData.photoKey) {
-          console.log('🗑️ Borrando foto vieja antes de subir nueva...');
           await deleteSpeakerFile(formData.photoKey);
         }
 
@@ -298,7 +297,6 @@ export default function UnifiedSpeakerProposalForm({
       if (preparedCV) {
         // Sprint 2 - Tarea 3.2: Borrar CV viejo si existe
         if (formData.cvKey) {
-          console.log('🗑️ Borrando CV viejo antes de subir nuevo...');
           await deleteSpeakerFile(formData.cvKey);
         }
 

@@ -70,16 +70,7 @@ export default function ProposeTalkPage() {
   // Verificar completitud del perfil profesional
   useEffect(() => {
     if (profile && !profileLoading) {
-      console.log('🔍 Verificando perfil para propose-talk:', profile);
-      console.log('📋 Datos profesionales:', {
-        speakerPhotoKey: profile.speakerPhotoKey,
-        speakerCvKey: profile.speakerCvKey,
-        linkedInUrl: profile.linkedInUrl,
-        expertiseArea: profile.expertiseArea,
-      });
-      
       const check = canProposeTalk(profile);
-      console.log('✅ Resultado de canProposeTalk:', check);
       
       if (!check.allowed) {
         setShowProfileWarning(true);
@@ -204,7 +195,6 @@ export default function ProposeTalkPage() {
         });
 
         if (notifyResponse.ok) {
-          console.log('✅ Notificaciones enviadas a administradores');
         } else {
           console.warn('⚠️ Error al notificar admins:', await notifyResponse.text());
         }

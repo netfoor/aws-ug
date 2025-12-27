@@ -85,7 +85,6 @@ export default function UnifiedSpeakerApplicationPage() {
 
         if (userRole === 'ADMIN') {
           // Admin can access but we need to be careful not to trigger speaker notifications
-          console.log('🔐 Admin accessing speaker application - notifications will be suppressed');
           setHasAccess(true);
         } else if (userRole === 'SPEAKER') {
           // Already a speaker, redirect to propose-talk
@@ -174,7 +173,6 @@ export default function UnifiedSpeakerApplicationPage() {
         throw new Error('Error al crear la solicitud');
       }
 
-      console.log('✅ Application created with attached proposal:', application);
 
       // 🔔 Notify admins about new speaker application with proposal
       if (application?.id) {
@@ -194,7 +192,6 @@ export default function UnifiedSpeakerApplicationPage() {
           if (!notifyResponse.ok) {
             console.warn('⚠️ No se pudo notificar a los admins:', await notifyResponse.text());
           } else {
-            console.log('✅ Admins notificados sobre nueva aplicación');
           }
         } catch (notifyError) {
           console.warn('⚠️ Error al notificar admins (no crítico):', notifyError);
@@ -222,7 +219,6 @@ export default function UnifiedSpeakerApplicationPage() {
 
         // For admins, preserve their role and don't auto-promote to speaker
         if (isAdmin) {
-          console.log('🔐 Preserving admin role during speaker application');
           // Don't change role for admins
         }
 

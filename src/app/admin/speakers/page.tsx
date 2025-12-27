@@ -88,7 +88,6 @@ export default function AdminSpeakersPage() {
   // Aprobar postulación
   const handleApprove = async (applicationId: string, userId: string) => {
     try {
-      console.log('🎯 Aprobando aplicación:', { applicationId, userId });
 
       // Invocar Lambda via API route
       const response = await fetch('/api/admin/approve-speaker', {
@@ -109,7 +108,6 @@ export default function AdminSpeakersPage() {
       }
 
       const result = await response.json();
-      console.log('✅ Resultado:', result);
 
       // Recargar lista
       await loadApplications();
@@ -130,7 +128,6 @@ export default function AdminSpeakersPage() {
   // Rechazar postulación
   const handleReject = async (applicationId: string, userId: string, reason: string) => {
     try {
-      console.log('❌ Rechazando aplicación:', { applicationId, userId, reason });
 
       // Invocar Lambda via API route
       const response = await fetch('/api/admin/reject-speaker', {
@@ -151,8 +148,7 @@ export default function AdminSpeakersPage() {
         throw new Error(error.message || 'Error al rechazar la postulación');
       }
 
-      const result = await response.json();
-      console.log('✅ Resultado:', result);
+      await response.json();
 
       // Recargar lista
       await loadApplications();

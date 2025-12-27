@@ -132,7 +132,6 @@ export function UnifiedApplicationCard({
     
     setIsProcessing(true);
     try {
-      console.log('🎯 Aprobando speaker y creando propuesta...');
       const result = await onApproveAll(application.id as string, application.userId as string);
       
       // Obtener el talkProposalId real del response
@@ -140,11 +139,8 @@ export function UnifiedApplicationCard({
         setTalkProposalId(result.talkProposalId);
         setWizardStep('speaker-approved');
         setIsExpanded(true); // Auto-expandir para mostrar wizard
-        
-        console.log('✅ Speaker aprobado, mostrando wizard de evento');
       } else {
         // Si no se creó la propuesta, solo refrescar
-        console.warn('⚠️ No se creó TalkProposal automáticamente');
         if (onRefresh) {
           onRefresh();
         }
@@ -157,8 +153,8 @@ export function UnifiedApplicationCard({
     }
   };
 
-  const handleEventCreated = (createdEventId: string, published: boolean) => {
-    console.log(`✅ Evento ${published ? 'publicado' : 'creado'}:`, createdEventId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleEventCreated = (createdEventId: string, _published: boolean) => {
     setEventId(createdEventId);
     setWizardStep('event-created');
     

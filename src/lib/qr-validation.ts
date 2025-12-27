@@ -69,21 +69,9 @@ export class QRValidator {
             }
 
             // 3. Buscar el registro en la base de datos
-            console.log('🔍 Looking for registration with ID:', tokenData.registrationId);
             const { data: registration } = await client.models.EventRegistration.get({
                 id: tokenData.registrationId
             });
-
-            console.log('📋 Registration found:', registration ? 'Yes' : 'No');
-            if (registration) {
-                console.log('📋 Registration details:', {
-                    id: registration.id,
-                    eventId: registration.eventId,
-                    userId: registration.userId,
-                    status: registration.status,
-                    checkedIn: registration.checkedIn
-                });
-            }
 
             if (!registration) {
                 console.error('❌ Registration not found. Token data:', tokenData);
@@ -107,17 +95,10 @@ export class QRValidator {
                     const { data: allRegistrations } = await client.models.EventRegistration.registrationsByEvent({
                         eventId: expectedEventId,
                     });
-                    console.log('📊 Total registrations in event:', allRegistrations?.length || 0);
-                    
                     if (allRegistrations && allRegistrations.length > 0) {
-                        console.log('📊 Sample registration IDs:', allRegistrations.slice(0, 3).map(r => r.id));
-                        
                         // Check if there's a registration for the same user
                         const userReg = allRegistrations.find(r => r.userId === tokenData.userId);
                         if (userReg) {
-                            console.log('📊 Found registration for this user:', userReg.id);
-                            console.log('⚠️ User has a valid registration but QR token has wrong registration ID');
-                            console.log('⚠️ Expected:', userReg.id, 'Got:', tokenData.registrationId);
                             
                             return {
                                 isValid: false,

@@ -29,7 +29,6 @@ export function ProposalWaitingCard({
   const [eventCreated, setEventCreated] = useState(false);
 
   const handleEventCreated = (eventId: string, published: boolean) => {
-    console.log(`✅ Evento ${published ? 'publicado' : 'creado'}:`, eventId);
     setEventCreated(true);
     onEventCreated(eventId, published);
     
@@ -90,26 +89,35 @@ export function ProposalWaitingCard({
             
             {/* Info del speaker */}
             <div className="flex flex-col gap-1 text-xs sm:text-sm text-text-secondary mt-2">
-              {professionalProfile && (
-                <div className="flex items-center gap-2">
-                  <User className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>{professionalProfile.givenName} {professionalProfile.familyName}</span>
-                </div>
+              {professionalProfile ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <User className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>{professionalProfile.givenName} {professionalProfile.familyName}</span>
+                  </div>
+                  {professionalProfile.jobTitle && professionalProfile.company && (
+                    <div className="flex items-center gap-2">
+                      <Building className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="truncate">
+                        {professionalProfile.jobTitle} @ {professionalProfile.company}
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Fallback: mostrar info desde la propuesta si no hay professionalProfile
+                proposal.speakerName && (
+                  <div className="flex items-center gap-2">
+                    <User className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>{proposal.speakerName}</span>
+                  </div>
+                )
               )}
               
-              {professionalProfile?.jobTitle && professionalProfile?.company && (
-                <div className="flex items-center gap-2">
-                  <Building className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="truncate">
-                    {professionalProfile.jobTitle} @ {professionalProfile.company}
-                  </span>
-                </div>
-              )}
-              
-              {speakerApp?.email && (
+              {(speakerApp?.email || proposal.speakerEmail) && (
                 <div className="flex items-center gap-2">
                   <Mail className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="truncate">{speakerApp.email}</span>
+                  <span className="truncate">{speakerApp?.email || proposal.speakerEmail}</span>
                 </div>
               )}
             </div>

@@ -270,9 +270,7 @@ export async function deleteSpeakerFile(path: string): Promise<boolean> {
   }
 
   try {
-    console.log('🗑️ Borrando archivo viejo:', path);
     await remove({ path });
-    console.log('✅ Archivo borrado exitosamente');
     return true;
   } catch (error) {
     console.error('❌ Error borrando archivo:', error);

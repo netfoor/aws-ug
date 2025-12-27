@@ -48,13 +48,6 @@ export default function Home() {
 
       setEvents(sorted);
       
-      // DEBUG: Log goingCount values
-      console.log('📊 Events loaded with goingCount:', sorted.map(e => ({
-        title: e.title,
-        id: e.id,
-        goingCount: e.goingCount
-      })));
-      
       // Load actual registration counts
       await loadRegistrationCounts(sorted);
       
@@ -103,19 +96,14 @@ export default function Home() {
             // Contar solo los que tienen status GOING
             const actualCount = registrations?.filter(r => r.status === 'GOING').length || 0;
             
-            console.log(`📊 Event "${event.title}": DB goingCount=${event.goingCount}, Actual registrations=${actualCount}`);
-            
             // Si el count en DB no coincide con el real, usar el real
             if (event.goingCount !== actualCount) {
-              console.warn(`⚠️ Count mismatch for "${event.title}". Updating from ${event.goingCount} to ${actualCount}`);
-              
               // Actualizar también en la base de datos para sincronizar
               try {
                 await client.models.Event.update({
                   id: event.id,
                   goingCount: actualCount,
                 });
-                console.log(`✅ Updated DB goingCount for "${event.title}" to ${actualCount}`);
               } catch (updateErr) {
                 console.error(`Error updating goingCount in DB:`, updateErr);
               }

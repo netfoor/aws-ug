@@ -45,7 +45,6 @@ export function useUserProfile() {
     setLoading(true);
     setError(null);
     
-    console.log('🔄 useUserProfile: Fetching profile for userId:', user.userId);
     
     try {
       // IMPORTANTE: Obtener el role desde los grupos de Cognito (fuente de verdad)
@@ -247,13 +246,11 @@ export function useUserProfile() {
   useEffect(() => {
     // Fetch profile when user ID is available and we haven't fetched yet
     if (user?.userId && !hasFetched && !loading) {
-      console.log('🎯 useUserProfile: Initial fetch for userId:', user.userId);
       fetchProfile();
     }
     
     // Clear profile when user logs out
     if (!user?.userId && profile) {
-      console.log('🚪 useUserProfile: Clearing profile (user logged out)');
       setProfile(null);
       setHasFetched(false);
     }
@@ -265,7 +262,6 @@ export function useUserProfile() {
     error,
     updateProfile,
     refetch: () => {
-      console.log('🔄 useUserProfile: Manual refetch requested');
       setHasFetched(false); // Reset flag to allow re-fetch
       return fetchProfile();
     },

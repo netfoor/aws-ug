@@ -62,7 +62,6 @@ export function NotificationBell() {
       );
       
       if (hasRoleChangeNotification && refreshUser) {
-        console.log('🔄 Detectado cambio de rol, refrescando sesión...');
         await refreshUser();
       }
     } catch (error) {

@@ -37,7 +37,6 @@ export function useOnboardingRedirect() {
         const { data: userData } = await client.models.User.get({ id: user.userId });
         
         if (userData && !userData.profileCompleted) {
-          console.log('🔄 Usuario no ha completado onboarding, redirigiendo...');
           router.push('/onboarding');
         }
       } catch (err) {

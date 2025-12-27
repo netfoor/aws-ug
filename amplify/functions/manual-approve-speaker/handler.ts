@@ -132,7 +132,7 @@ const NOTIFICATION_TABLE_PREFIX = process.env.NOTIFICATION_TABLE_PREFIX || 'Noti
 const USER_TABLE_PREFIX = process.env.USER_TABLE_PREFIX || 'User';
 const TALK_PROPOSAL_TABLE_PREFIX = process.env.TALK_PROPOSAL_TABLE_PREFIX || 'TalkProposal';
 const USER_POOL_ID = process.env.USER_POOL_ID;
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'fortino.romero.man@gmail.com';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'no-reply@awspuebla.foor.dev';
 const REGION = process.env.AWS_REGION || 'us-east-1';
 
 // ========================================
@@ -419,11 +419,16 @@ export const handler: Handler<ManualApprovalEvent> = async (event) => {
 
     console.log('✅ Role y perfil profesional actualizados en User table');
 
-    // 6️⃣ Enviar email de aprobación
+    // 6️⃣ Enviar email de aprobación (operación no crítica - no debe fallar el proceso)
     const userName = application.email.split('@')[0]; // Fallback si no hay nombre
-    await sendApprovalEmail(application.email, userName);
-
-    console.log('✅ Email de aprobación enviado');
+    try {
+      await sendApprovalEmail(application.email, userName);
+      console.log('✅ Email de aprobación enviado');
+    } catch (emailError) {
+      console.error('⚠️ Error enviando email de aprobación (no crítico):', emailError);
+      // No lanzar error - la aprobación ya se completó exitosamente
+      // El usuario puede verificar su estado en el perfil o recibir notificación in-app
+    }
 
     // 7️⃣ 🆕 Crear TalkProposal automáticamente si tiene propuesta adjunta
     let talkProposalId: string | undefined;
