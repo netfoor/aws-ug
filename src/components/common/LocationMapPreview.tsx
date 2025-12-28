@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MapPin, ExternalLink } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 interface LocationMapPreviewProps {
   location: string;
@@ -26,24 +26,21 @@ export default function LocationMapPreview({
   // Google Maps bloquea el embedding de URLs normales (X-Frame-Options)
   // Debemos usar el formato ?q=...&output=embed que sí permite embedding
   const getEmbedUrl = (): string => {
+    // Si hay una URL de Maps guardada, intentar usarla directamente
+    // (aunque Google Maps generalmente bloquea el embedding de URLs compartidas)
+    if (locationMapsUrl) {
+      // Para URLs de maps.app.goo.gl o maps.google.com, usarlas directamente
+      // El iframe de Google Maps puede manejar estas URLs
+      return locationMapsUrl;
+    }
+    
+    // Si no hay URL guardada, generar una basada en la ubicación
     // Prioridad: usar dirección si existe, sino nombre del lugar
     const query = locationAddress || location;
     
     // Usar el formato de embed con parámetros adicionales para minimizar elementos
     // Nota: El texto "View larger map" no se puede quitar completamente sin API key
     return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed&iwloc=near`;
-  };
-
-  // URL para abrir en Google Maps - usar URL directa si existe, sino crear una simple
-  const getMapsLink = (): string => {
-    // Si hay URL de Maps guardada, usarla directamente
-    if (locationMapsUrl) {
-      return locationMapsUrl;
-    }
-    
-    // Si no, crear URL de búsqueda simple (sin api=1 que puede causar problemas)
-    const query = locationAddress || location;
-    return `https://www.google.com/maps/search/?query=${encodeURIComponent(query)}`;
   };
 
   return (

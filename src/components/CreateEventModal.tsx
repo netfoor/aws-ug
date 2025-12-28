@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
-import { Loader2, Calendar, MapPin, Users, X } from 'lucide-react';
+import { Loader2, Calendar, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';

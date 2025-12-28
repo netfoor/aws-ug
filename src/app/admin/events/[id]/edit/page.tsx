@@ -127,6 +127,11 @@ export default function EditEventPage() {
         isVirtual: eventData.isVirtual || false,
         virtualLink: eventData.virtualLink || '',
         maxAttendees: eventData.maxAttendees || null,
+        isUnlimited: eventData.isUnlimited || false,
+        status: eventData.status || 'DRAFT',
+        coverImageUrl: eventData.coverImageUrl || '',
+        speakerBio: eventData.speakerBio || '',
+        speakerAvatar: eventData.speakerAvatar || '',
       });
 
       // Actualizar locationData también
@@ -134,11 +139,6 @@ export default function EditEventPage() {
         location: eventData.location || '',
         locationAddress: eventData.locationAddress || undefined,
         locationMapsUrl: eventData.locationMapsUrl || undefined,
-        isUnlimited: eventData.isUnlimited || false,
-        status: eventData.status || 'DRAFT',
-        coverImageUrl: eventData.coverImageUrl || '',
-        speakerBio: eventData.speakerBio || '',
-        speakerAvatar: eventData.speakerAvatar || '',
       });
     } catch (err) {
       console.error('Error loading event:', err);

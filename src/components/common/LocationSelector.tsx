@@ -42,35 +42,6 @@ export default function LocationSelector({
   const [customMapsUrl, setCustomMapsUrl] = useState(value.locationMapsUrl || '');
   const [customLocation, setCustomLocation] = useState(value.location || '');
 
-  // Extraer coordenadas o place ID de la URL de Maps para el embed
-  const getEmbedUrl = (mapsUrl: string): string | null => {
-    if (!mapsUrl) return null;
-
-    // Formato: https://maps.app.goo.gl/xxxxx
-    // O: https://www.google.com/maps/place/...
-    // O: https://www.google.com/maps/@lat,lng,zoom
-    try {
-      // Si es un short URL de goo.gl, necesitamos expandirlo o usar el formato embed
-      // Para embed, podemos usar: https://www.google.com/maps/embed?pb=...
-      // Pero la forma más simple es usar el iframe de Google Maps con la URL completa
-      
-      // Convertir maps.app.goo.gl a formato embed
-      if (mapsUrl.includes('maps.app.goo.gl')) {
-        // Usar la URL directamente en un iframe (Google Maps lo maneja)
-        return mapsUrl;
-      }
-      
-      // Si ya es una URL de maps.google.com, usarla directamente
-      if (mapsUrl.includes('google.com/maps')) {
-        return mapsUrl;
-      }
-
-      return mapsUrl;
-    } catch {
-      return null;
-    }
-  };
-
   const handleSelectPredefined = (location: typeof PREDEFINED_LOCATIONS[0]) => {
     onChange({
       location: location.name,

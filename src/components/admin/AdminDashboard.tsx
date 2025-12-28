@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Users, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 interface DashboardStats {
   total: number;
@@ -39,41 +39,6 @@ export function AdminDashboard({ stats, isLoading = false }: AdminDashboardProps
       </div>
     );
   }
-
-  const statCards = [
-    {
-      title: 'Postulaciones',
-      value: stats.total,
-      icon: Users,
-      bgColor: 'bg-blue-100 dark:bg-blue-900',
-      iconColor: 'text-blue-600 dark:text-blue-300',
-      textColor: 'text-blue-700 dark:text-blue-100',
-    },
-    {
-      title: 'Pendientes',
-      value: stats.pending,
-      icon: Clock,
-      bgColor: 'bg-yellow-100 dark:bg-yellow-900',
-      iconColor: 'text-yellow-600 dark:text-yellow-300',
-      textColor: 'text-yellow-700 dark:text-yellow-100',
-    },
-    {
-      title: 'Aprobadas',
-      value: stats.approved,
-      icon: CheckCircle,
-      bgColor: 'bg-green-100 dark:bg-green-900',
-      iconColor: 'text-green-600 dark:text-green-300',
-      textColor: 'text-green-700 dark:text-green-100',
-    },
-    {
-      title: 'Rechazadas',
-      value: stats.rejected,
-      icon: XCircle,
-      bgColor: 'bg-red-100 dark:bg-red-900',
-      iconColor: 'text-red-600 dark:text-red-300',
-      textColor: 'text-red-700 dark:text-red-100',
-    },
-  ];
 
   // Dashboard simplificado - solo mostrar si no hay postulaciones
   if (stats.total === 0) {

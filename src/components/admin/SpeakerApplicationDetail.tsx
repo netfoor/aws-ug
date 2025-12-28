@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
-  Mail,
   Calendar,
-  User,
   MessageSquare,
   Tag,
   Award,
@@ -283,7 +281,7 @@ export function SpeakerApplicationDetail({
   };
 
   // Componente para texto copiable
-  const CopyableText = ({ text, fieldName, label }: { text: string; fieldName: string; label?: string }) => {
+  const CopyableText = ({ text, fieldName }: { text: string; fieldName: string }) => {
     const isCopied = copiedField === fieldName;
     return (
       <div className="flex items-center gap-2 group">
@@ -943,6 +941,7 @@ export function SpeakerApplicationDetail({
             
             {/* Imagen */}
             <div className="flex-1 overflow-auto bg-black flex items-center justify-center p-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photoPreviewUrl}
                 alt={`Foto de ${professionalProfile?.givenName} ${professionalProfile?.familyName}`}
