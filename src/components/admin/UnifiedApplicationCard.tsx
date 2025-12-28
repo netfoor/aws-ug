@@ -20,6 +20,7 @@ import {
   XCircle,
   Sparkles,
   Linkedin,
+  Copy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
@@ -211,6 +212,15 @@ export function UnifiedApplicationCard({
     INTERMEDIATE: 'Intermedio',
     ADVANCED: 'Avanzado',
     ALL: 'Todos los niveles',
+  };
+
+  // Function to copy text to clipboard
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      console.log(`Copied to clipboard: ${text}`);
+    }).catch((err) => {
+      console.error('Failed to copy text: ', err);
+    });
   };
 
   return (
@@ -508,35 +518,103 @@ export function UnifiedApplicationCard({
                 Perfil Profesional
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                {professionalProfile.givenName && professionalProfile.familyName && (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">Nombre Completo:</span>
+                      <p className="text-text-primary font-medium">
+                        {`${professionalProfile.givenName} ${professionalProfile.familyName}`}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(`${professionalProfile.givenName} ${professionalProfile.familyName}`)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar Nombre Completo"
+                    >
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
+                  </div>
+                )}
+                {professionalProfile.company && (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">Empresa:</span>
+                      <p className="text-text-primary font-medium">{professionalProfile.company}</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(professionalProfile.company)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar Empresa"
+                    >
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
+                  </div>
+                )}
                 {professionalProfile.jobTitle && (
-                  <div>
-                    <span className="text-text-secondary">Puesto:</span>
-                    <p className="text-text-primary font-medium">{professionalProfile.jobTitle}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">Puesto:</span>
+                      <p className="text-text-primary font-medium">{professionalProfile.jobTitle}</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(professionalProfile.jobTitle)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar Puesto"
+                    >
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
                   </div>
                 )}
                 {professionalProfile.expertiseArea && (
-                  <div>
-                    <span className="text-text-secondary">Área de Expertise:</span>
-                    <p className="text-text-primary font-medium">{professionalProfile.expertiseArea}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">Área de Expertise:</span>
+                      <p className="text-text-primary font-medium">{professionalProfile.expertiseArea}</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(professionalProfile.expertiseArea)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar Área de Expertise"
+                    >
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
                   </div>
                 )}
                 {professionalProfile.phoneNumber && (
-                  <div>
-                    <span className="text-text-secondary">Teléfono:</span>
-                    <p className="text-text-primary font-medium">{professionalProfile.phoneNumber}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">Teléfono:</span>
+                      <p className="text-text-primary font-medium">{professionalProfile.phoneNumber}</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(professionalProfile.phoneNumber)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar Teléfono"
+                    >
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
                   </div>
                 )}
                 {professionalProfile.linkedInUrl && (
-                  <div>
-                    <span className="text-text-secondary">LinkedIn:</span>
-                    <a
-                      href={professionalProfile.linkedInUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-accent hover:text-accent-dark flex items-center gap-1 font-medium"
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">LinkedIn:</span>
+                      <a
+                        href={professionalProfile.linkedInUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent hover:text-accent-dark flex items-center gap-1 font-medium"
+                      >
+                        Ver perfil <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(professionalProfile.linkedInUrl)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar LinkedIn"
                     >
-                      Ver perfil <ExternalLink className="w-3 h-3" />
-                    </a>
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
                   </div>
                 )}
               </div>
@@ -583,33 +661,77 @@ export function UnifiedApplicationCard({
             <div className="p-4 bg-accent/5 border border-accent/20 rounded-lg">
               <h4 className="font-semibold text-text-primary mb-3">Detalles Completos de la Propuesta</h4>
               <div className="space-y-3 text-sm">
-                <div>
-                  <span className="text-text-secondary">Título:</span>
-                  <p className="text-text-primary font-medium">{attachedProposal.talkTitle}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-text-secondary">Título:</span>
+                    <p className="text-text-primary font-medium">{attachedProposal.talkTitle}</p>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(attachedProposal.talkTitle)}
+                    className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                    title="Copiar Título"
+                  >
+                    <Copy className="w-4 h-4 text-accent" />
+                  </button>
                 </div>
-                <div>
-                  <span className="text-text-secondary">Descripción:</span>
-                  <p className="text-text-primary">{attachedProposal.talkDescription}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-text-secondary">Descripción:</span>
+                    <p className="text-text-primary">{attachedProposal.talkDescription}</p>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(attachedProposal.talkDescription)}
+                    className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                    title="Copiar Descripción"
+                  >
+                    <Copy className="w-4 h-4 text-accent" />
+                  </button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  <div>
-                    <span className="text-text-secondary">Duración:</span>
-                    <p className="text-text-primary font-medium">{attachedProposal.duration} minutos</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">Duración:</span>
+                      <p className="text-text-primary font-medium">{attachedProposal.duration} minutos</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(`${attachedProposal.duration} minutos`)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar Duración"
+                    >
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
                   </div>
-                  <div>
-                    <span className="text-text-secondary">Audiencia:</span>
-                    <p className="text-text-primary font-medium">
-                      {targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience}
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-text-secondary">Audiencia:</span>
+                      <p className="text-text-primary font-medium">
+                        {targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience)}
+                      className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                      title="Copiar Audiencia"
+                    >
+                      <Copy className="w-4 h-4 text-accent" />
+                    </button>
                   </div>
                   {attachedProposal.proposedDate && (() => {
                     const { day, month, year, weekday } = formatProposedDateUTC(attachedProposal.proposedDate);
+                    const formattedDate = `${weekday}, ${day} de ${month} de ${year}`;
                     return (
-                      <div>
-                        <span className="text-text-secondary">Fecha Propuesta:</span>
-                        <p className="text-text-primary font-medium">
-                          {weekday}, {day} de {month} de {year}
-                        </p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-text-secondary">Fecha Propuesta:</span>
+                          <p className="text-text-primary font-medium">{formattedDate}</p>
+                        </div>
+                        <button
+                          onClick={() => copyToClipboard(formattedDate)}
+                          className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
+                          title="Copiar Fecha Propuesta"
+                        >
+                          <Copy className="w-4 h-4 text-accent" />
+                        </button>
                       </div>
                     );
                   })()}
