@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
+import { SpeakerMediaPreview } from './SpeakerMediaPreview';
 import { EventCreationWizard } from './EventCreationWizard';
 import { useDialog } from '@/hooks/useDialog';
 import { DialogRenderer } from '@/components/ui/DialogRenderer';
@@ -314,6 +315,14 @@ export function UnifiedApplicationCard({
                         <span className="hidden sm:inline text-xs ml-1.5">LinkedIn</span>
                       </a>
                     )}
+
+                    {/* Media Preview Buttons */}
+                    <SpeakerMediaPreview
+                      photoKey={professionalProfile?.photoKey}
+                      cvKey={professionalProfile?.cvKey}
+                      speakerName={`${professionalProfile?.givenName || ''} ${professionalProfile?.familyName || ''}`.trim()}
+                      size="compact"
+                    />
                   </div>
                 </div>
               </div>

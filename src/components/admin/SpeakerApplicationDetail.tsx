@@ -22,6 +22,8 @@ import {
   Copy,
   Check,
   Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Textarea';
@@ -31,7 +33,15 @@ import { useDialog } from '@/hooks/useDialog';
 import { DialogRenderer } from '@/components/ui/DialogRenderer';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../../amplify/data/resource';
-import { getUrl } from 'aws-amplify/storage';
+import { getUrl, downloadData } from 'aws-amplify/storage';
+import dynamic from 'next/dynamic';
+
+// Dynamically import PDF viewer to avoid SSR issues
+const PDFViewer = dynamic<{
+  url: string;
+  pageNumber: number;
+  onLoadSuccess: (numPages: number) => void;
+}>(() => import('./PDFViewer'), { ssr: false });
 
 const client = generateClient<Schema>();
 
@@ -70,6 +80,11 @@ export function SpeakerApplicationDetail({
   const [downloadingCV, setDownloadingCV] = useState(false);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   // Helper para formatear fecha usando UTC (evita problemas de timezone)
   const formatProposedDateUTC = (dateString: string) => {
@@ -229,22 +244,23 @@ export function SpeakerApplicationDetail({
 
   // Función para descargar foto (desde el modal)
   const handleDownloadPhoto = async () => {
-    if (!photoPreviewUrl || !professionalProfile?.photoKey) return;
+    if (!professionalProfile?.photoKey) return;
     
     setDownloadingPhoto(true);
     try {
-      // Descargar como blob para forzar descarga
-      const response = await fetch(photoPreviewUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const { body } = await downloadData({
+        path: professionalProfile.photoKey,
+      }).result;
       
+      const blob = await body.blob();
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `speaker-photo-${professionalProfile.givenName || 'speaker'}-${professionalProfile.familyName || ''}-${Date.now()}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Error downloading photo:', err);
     } finally {
@@ -252,11 +268,11 @@ export function SpeakerApplicationDetail({
     }
   };
 
-  // Función para descargar CV
-  const handleDownloadCV = async () => {
+  // Función para ver PDF
+  const handleViewPdf = async () => {
     if (!professionalProfile?.cvKey) return;
     
-    setDownloadingCV(true);
+    setPdfLoading(true);
     try {
       const result = await getUrl({
         path: professionalProfile.cvKey,
@@ -264,21 +280,45 @@ export function SpeakerApplicationDetail({
           expiresIn: 3600,
         },
       });
+      setPdfPreviewUrl(result.url.toString());
+      setShowPdfModal(true);
+      setPageNumber(1);
+    } catch (err) {
+      console.error('Error loading PDF:', err);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
-      // Crear link temporal para descarga
+  // Función para descargar CV (desde el modal)
+  const handleDownloadCV = async () => {
+    if (!professionalProfile?.cvKey) return;
+    
+    setDownloadingCV(true);
+    try {
+      const { body } = await downloadData({
+        path: professionalProfile.cvKey,
+      }).result;
+      
+      const blob = await body.blob();
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = result.url.toString();
+      link.href = url;
       link.download = `CV-${professionalProfile.givenName || 'speaker'}-${professionalProfile.familyName || ''}-${Date.now()}.pdf`;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Error downloading CV:', err);
     } finally {
       setDownloadingCV(false);
     }
   };
+
+  // Navigate pages
+  const goToPrevPage = () => setPageNumber(prev => Math.max(prev - 1, 1));
+  const goToNextPage = () => setPageNumber(prev => Math.min(prev + 1, numPages || 1));
 
   // Componente para texto copiable
   const CopyableText = ({ text, fieldName }: { text: string; fieldName: string }) => {
@@ -384,17 +424,17 @@ export function SpeakerApplicationDetail({
                   )}
                   {professionalProfile.cvKey && (
                     <button
-                      onClick={handleDownloadCV}
-                      disabled={downloadingCV}
+                      onClick={handleViewPdf}
+                      disabled={pdfLoading}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-                      title="Descargar CV"
+                      title="Ver CV"
                     >
-                      {downloadingCV ? (
+                      {pdfLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <FileText className="w-4 h-4" />
                       )}
-                      <span className="hidden sm:inline">CV</span>
+                      <span className="hidden sm:inline">Ver CV</span>
                     </button>
                   )}
                 </div>
@@ -946,6 +986,82 @@ export function SpeakerApplicationDetail({
                 src={photoPreviewUrl}
                 alt={`Foto de ${professionalProfile?.givenName} ${professionalProfile?.familyName}`}
                 className="max-w-full max-h-[calc(90vh-80px)] object-contain rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de vista previa de PDF */}
+      {showPdfModal && pdfPreviewUrl && (
+        <div className="fixed inset-0 bg-black/90 z-[60] flex items-center justify-center p-4">
+          <div className="relative max-w-4xl w-full max-h-[90vh] flex flex-col">
+            {/* Header del modal */}
+            <div className="flex items-center justify-between p-4 bg-surface rounded-t-lg border-b border-border">
+              <h3 className="text-text-primary font-semibold">
+                CV de {professionalProfile?.givenName} {professionalProfile?.familyName}
+              </h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleDownloadCV}
+                  disabled={downloadingCV}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                >
+                  {downloadingCV ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Descargando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      <span>Descargar</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowPdfModal(false);
+                    setPdfPreviewUrl(null);
+                    setNumPages(null);
+                    setPageNumber(1);
+                  }}
+                  className="p-2 hover:bg-background rounded-full transition-all"
+                >
+                  <X className="w-5 h-5 text-text-primary" />
+                </button>
+              </div>
+            </div>
+            
+            {/* Controles de navegación */}
+            {numPages && numPages > 1 && (
+              <div className="flex items-center justify-center gap-4 p-3 bg-surface/95 border-b border-border">
+                <button
+                  onClick={goToPrevPage}
+                  disabled={pageNumber <= 1}
+                  className="p-2 hover:bg-background rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-5 h-5 text-text-primary" />
+                </button>
+                <span className="text-text-primary font-medium">
+                  Página {pageNumber} de {numPages}
+                </span>
+                <button
+                  onClick={goToNextPage}
+                  disabled={pageNumber >= numPages}
+                  className="p-2 hover:bg-background rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-5 h-5 text-text-primary" />
+                </button>
+              </div>
+            )}
+            
+            {/* PDF Viewer */}
+            <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-4">
+              <PDFViewer
+                url={pdfPreviewUrl}
+                pageNumber={pageNumber}
+                onLoadSuccess={(numPages: number) => setNumPages(numPages)}
               />
             </div>
           </div>

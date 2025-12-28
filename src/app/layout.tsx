@@ -10,6 +10,9 @@ import { OnboardingGuard } from "../components/OnboardingGuard";
 export const metadata: Metadata = {
   title: "AWS UG Puebla - User Group Oficial",
   description: "AWS User Group Puebla - Comunidad oficial para entusiastas de la nube, desarrolladores y profesionales DevOps.",
+  icons: {
+    icon: '/Logo.png',
+  },
 };
 
 export default async function RootLayout({

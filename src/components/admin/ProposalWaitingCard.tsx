@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { MessageSquare, User, Mail, Building, Lightbulb } from 'lucide-react';
 import { EventCreationWizard } from './EventCreationWizard';
+import { SpeakerMediaPreview } from './SpeakerMediaPreview';
 import type { Schema } from '../../../amplify/data/resource';
 
 type TalkProposal = Schema['TalkProposal']['type'];
@@ -121,6 +122,18 @@ export function ProposalWaitingCard({
                 </div>
               )}
             </div>
+
+            {/* Media Preview - Photo & CV */}
+            {professionalProfile && (professionalProfile.photoKey || professionalProfile.cvKey) && (
+              <div className="mt-2 pt-2 border-t border-border/50">
+                <SpeakerMediaPreview
+                  photoKey={professionalProfile.photoKey}
+                  cvKey={professionalProfile.cvKey}
+                  speakerName={`${professionalProfile.givenName || ''} ${professionalProfile.familyName || ''}`.trim()}
+                  size="normal"
+                />
+              </div>
+            )}
 
             {/* Descripción de la propuesta */}
             {!showWizard && proposal.description && (
