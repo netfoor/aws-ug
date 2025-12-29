@@ -11,7 +11,12 @@ export const metadata: Metadata = {
   title: "AWS UG Puebla - User Group Oficial",
   description: "AWS User Group Puebla - Comunidad oficial para entusiastas de la nube, desarrolladores y profesionales DevOps.",
   icons: {
-    icon: '/Logo.png',
+    icon: [
+      { url: '/Logo.png', sizes: 'any' },
+      { url: '/Logo.png', sizes: '16x16', type: 'image/png' },
+      { url: '/Logo.png', sizes: '32x32', type: 'image/png' },
+    ],
+    shortcut: '/Logo.png',
   },
 };
 
@@ -24,6 +29,10 @@ export default async function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#0a0b40" />
+        <link rel="icon" href="/Logo.png" sizes="any" />
+        <link rel="icon" href="/Logo.png" sizes="16x16" type="image/png" />
+        <link rel="icon" href="/Logo.png" sizes="32x32" type="image/png" />
+        <link rel="shortcut icon" href="/Logo.png" />
       </head>
       <body className="font-amazon min-h-screen bg-background text-text-primary theme-transition">
         <ThemeProvider>
