@@ -613,6 +613,8 @@ export default function Home() {
 
         {/* FAQ Section */}
         <section className="py-20 px-4 relative">
+          <TalaveraPattern variant="floating" className="top-10 right-10" animate />
+          <TalaveraPattern variant="floating" className="bottom-10 left-10" animate />
           <div className="container mx-auto relative z-10">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary scroll-reveal">
