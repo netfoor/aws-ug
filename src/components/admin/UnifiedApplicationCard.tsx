@@ -21,6 +21,7 @@ import {
   Sparkles,
   Linkedin,
   Copy,
+  Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
@@ -77,6 +78,7 @@ export function UnifiedApplicationCard({
   const [wizardStep, setWizardStep] = useState<WizardStep>('pending');
   const [talkProposalId, setTalkProposalId] = useState<string | null>(null);
   const [eventId, setEventId] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   // Parse JSON fields
   const professionalProfile = application.professionalProfile
@@ -215,13 +217,15 @@ export function UnifiedApplicationCard({
     ALL: 'Todos los niveles',
   };
 
-  // Function to copy text to clipboard
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log(`Copied to clipboard: ${text}`);
-    }).catch((err) => {
+  // Function to copy text to clipboard with visual feedback
+  const copyToClipboard = async (text: string, fieldName: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(fieldName);
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch (err) {
       console.error('Failed to copy text: ', err);
-    });
+    }
   };
 
   return (
@@ -536,11 +540,15 @@ export function UnifiedApplicationCard({
                       </p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(`${professionalProfile.givenName} ${professionalProfile.familyName}`)}
+                      onClick={() => copyToClipboard(`${professionalProfile.givenName} ${professionalProfile.familyName}`, 'fullName')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar Nombre Completo"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'fullName' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                 )}
@@ -551,11 +559,15 @@ export function UnifiedApplicationCard({
                       <p className="text-text-primary font-medium">{professionalProfile.company}</p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(professionalProfile.company)}
+                      onClick={() => copyToClipboard(professionalProfile.company, 'company')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar Empresa"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'company' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                 )}
@@ -566,11 +578,15 @@ export function UnifiedApplicationCard({
                       <p className="text-text-primary font-medium">{professionalProfile.jobTitle}</p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(professionalProfile.jobTitle)}
+                      onClick={() => copyToClipboard(professionalProfile.jobTitle, 'jobTitle')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar Puesto"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'jobTitle' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                 )}
@@ -581,11 +597,15 @@ export function UnifiedApplicationCard({
                       <p className="text-text-primary font-medium">{professionalProfile.expertiseArea}</p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(professionalProfile.expertiseArea)}
+                      onClick={() => copyToClipboard(professionalProfile.expertiseArea, 'expertiseArea')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar Área de Expertise"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'expertiseArea' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                 )}
@@ -596,11 +616,15 @@ export function UnifiedApplicationCard({
                       <p className="text-text-primary font-medium">{professionalProfile.phoneNumber}</p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(professionalProfile.phoneNumber)}
+                      onClick={() => copyToClipboard(professionalProfile.phoneNumber, 'phoneNumber')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar Teléfono"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'phoneNumber' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                 )}
@@ -618,11 +642,15 @@ export function UnifiedApplicationCard({
                       </a>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(professionalProfile.linkedInUrl)}
+                      onClick={() => copyToClipboard(professionalProfile.linkedInUrl, 'linkedInUrl')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar LinkedIn"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'linkedInUrl' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                 )}
@@ -676,11 +704,15 @@ export function UnifiedApplicationCard({
                     <p className="text-text-primary font-medium">{attachedProposal.talkTitle}</p>
                   </div>
                   <button
-                    onClick={() => copyToClipboard(attachedProposal.talkTitle)}
+                    onClick={() => copyToClipboard(attachedProposal.talkTitle, 'talkTitle')}
                     className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                     title="Copiar Título"
                   >
-                    <Copy className="w-4 h-4 text-accent" />
+                    {copiedField === 'talkTitle' ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-accent" />
+                    )}
                   </button>
                 </div>
                 <div className="flex items-center justify-between">
@@ -689,11 +721,15 @@ export function UnifiedApplicationCard({
                     <p className="text-text-primary">{attachedProposal.talkDescription}</p>
                   </div>
                   <button
-                    onClick={() => copyToClipboard(attachedProposal.talkDescription)}
+                    onClick={() => copyToClipboard(attachedProposal.talkDescription, 'talkDescription')}
                     className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                     title="Copiar Descripción"
                   >
-                    <Copy className="w-4 h-4 text-accent" />
+                    {copiedField === 'talkDescription' ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-accent" />
+                    )}
                   </button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -703,11 +739,15 @@ export function UnifiedApplicationCard({
                       <p className="text-text-primary font-medium">{attachedProposal.duration} minutos</p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(`${attachedProposal.duration} minutos`)}
+                      onClick={() => copyToClipboard(`${attachedProposal.duration} minutos`, 'duration')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar Duración"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'duration' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                   <div className="flex items-center justify-between">
@@ -718,11 +758,15 @@ export function UnifiedApplicationCard({
                       </p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience)}
+                      onClick={() => copyToClipboard(targetAudienceLabels[attachedProposal.targetAudience] || attachedProposal.targetAudience, 'targetAudience')}
                       className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                       title="Copiar Audiencia"
                     >
-                      <Copy className="w-4 h-4 text-accent" />
+                      {copiedField === 'targetAudience' ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-accent" />
+                      )}
                     </button>
                   </div>
                   {attachedProposal.proposedDate && (() => {
@@ -735,11 +779,15 @@ export function UnifiedApplicationCard({
                           <p className="text-text-primary font-medium">{formattedDate}</p>
                         </div>
                         <button
-                          onClick={() => copyToClipboard(formattedDate)}
+                          onClick={() => copyToClipboard(formattedDate, 'proposedDate')}
                           className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"
                           title="Copiar Fecha Propuesta"
                         >
-                          <Copy className="w-4 h-4 text-accent" />
+                          {copiedField === 'proposedDate' ? (
+                            <Check className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-accent" />
+                          )}
                         </button>
                       </div>
                     );

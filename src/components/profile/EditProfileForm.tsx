@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useUserProfile, type UserProfile } from '@/hooks/useUserProfile';
+import { validatePhoneNumber } from '@/lib/form-validation';
 
 interface EditProfileFormProps {
   onSuccess?: () => void;
@@ -55,6 +56,14 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
     
     if (!formData.familyName?.trim()) {
       errors.familyName = 'El apellido es requerido';
+    }
+    
+    // Validar teléfono si se proporciona
+    if (formData.phoneNumber?.trim()) {
+      const phoneValidation = validatePhoneNumber(formData.phoneNumber);
+      if (!phoneValidation.valid) {
+        errors.phoneNumber = phoneValidation.errors[0];
+      }
     }
     
     // Validar social links (URLs)
@@ -206,7 +215,11 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
               value={formData.phoneNumber || ''}
               onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
               placeholder="+52 222 123 4567"
+              className={validationErrors.phoneNumber ? 'border-red-500' : ''}
             />
+            {validationErrors.phoneNumber && (
+              <p className="text-red-500 text-xs mt-1">{validationErrors.phoneNumber}</p>
+            )}
           </div>
 
           <div>

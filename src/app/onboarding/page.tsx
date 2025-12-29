@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Loader2 } from 'lucide-react';
+import { validatePhoneNumber } from '@/lib/form-validation';
 
 const client = generateClient<Schema>();
 
@@ -134,8 +135,9 @@ export default function OnboardingPage() {
       return;
     }
 
-    if (!phoneNumber.trim()) {
-      setError('Teléfono es obligatorio');
+    const phoneValidation = validatePhoneNumber(phoneNumber);
+    if (!phoneValidation.valid) {
+      setError(phoneValidation.errors[0]);
       return;
     }
 
