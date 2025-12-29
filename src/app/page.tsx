@@ -317,9 +317,11 @@ export default function Home() {
 
 
             <div className="mt-8 scroll-reveal">
-              <img 
+              <Image 
                 src="/landing/amazon-arroy.svg" 
                 alt="Amazon Web Services" 
+                width={64}
+                height={64}
                 className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
               />
             </div>
@@ -355,9 +357,11 @@ export default function Home() {
               
 
 <div className="mt-8 scroll-reveal">
-              <img 
+              <Image 
                 src="/landing/amazon-arroy.svg" 
                 alt="Amazon Web Services" 
+                width={64}
+                height={64}
                 className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
               />
             </div>
@@ -459,9 +463,11 @@ export default function Home() {
               
 
               <div className="mt-8 scroll-reveal">
-              <img 
+              <Image 
                 src="/landing/amazon-arroy.svg" 
                 alt="Amazon Web Services" 
+                width={64}
+                height={64}
                 className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
               />
               </div>
@@ -516,9 +522,11 @@ export default function Home() {
                 ¿Por qué unirte?
               </h2>
               <div className="mt-8 scroll-reveal">
-              <img 
+              <Image 
                 src="/landing/amazon-arroy.svg" 
                 alt="Amazon Web Services" 
+                width={64}
+                height={64}
                 className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
               />
               </div>
@@ -621,9 +629,11 @@ export default function Home() {
                 Preguntas Frecuentes
               </h2>
               <div className="mt-8 scroll-reveal">
-              <img 
+              <Image 
                 src="/landing/amazon-arroy.svg" 
                 alt="Amazon Web Services" 
+                width={64}
+                height={64}
                 className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
               />
               </div>
