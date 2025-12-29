@@ -23,6 +23,25 @@ export default function Home() {
   const [filter, setFilter] = useState<'upcoming' | 'past'>('upcoming');
   const [speakers, setSpeakers] = useState<Record<string, Schema['User']['type']>>({});
 
+  // Scroll reveal animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const revealElements = document.querySelectorAll('.scroll-reveal');
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
   const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
@@ -286,6 +305,206 @@ export default function Home() {
           </div>
         </section>
 
+        {/* What is AWS User Group Section */}
+        <section className="py-20 px-4 relative bg-gradient-to-br from-surface to-background">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+          
+          <div className="container mx-auto text-center relative z-10">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary scroll-reveal">
+              ¿Qué es un AWS User Group?
+            </h2>
+
+
+            <div className="mt-8 scroll-reveal">
+              <img 
+                src="/landing/amazon-arroy.svg" 
+                alt="Amazon Web Services" 
+                className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
+              />
+            </div>
+            
+            <br />
+            <p className="text-lg md:text-xl text-text-secondary max-w-4xl mx-auto leading-relaxed scroll-reveal">
+              Los AWS User Groups son comunidades locales de desarrolladores, arquitectos y entusiastas de AWS que se reúnen para aprender, compartir conocimientos y hacer networking. Organizados por voluntarios, ofrecen eventos gratuitos como meetups, workshops y conferencias para promover el crecimiento profesional en la nube de AWS.
+            </p>
+            
+            <div className="mt-12 scroll-reveal">
+              <Image
+                src="/landing/ug-leaders.jpg"
+                alt="Líderes de las comunidades AWS User Groups en México"
+                width={800}
+                height={400}
+                className="w-full max-w-4xl mx-auto rounded-2xl shadow-talavera-lg"
+              />
+              <p className="text-center text-text-secondary mt-4 text-sm">
+                Líderes de las comunidades AWS User Groups en México
+              </p>
+            </div>
+            
+          </div>
+        </section>
+
+        {/* User Groups in Mexico Section */}
+        <section className="py-20 px-4 relative">
+          <div className="container mx-auto relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary scroll-reveal">
+                La Red de AWS User Groups en México
+              </h2>
+              
+
+<div className="mt-8 scroll-reveal">
+              <img 
+                src="/landing/amazon-arroy.svg" 
+                alt="Amazon Web Services" 
+                className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
+              />
+            </div>
+
+            <br />
+
+              <p className="text-lg md:text-xl text-text-secondary max-w-3xl mx-auto scroll-reveal">
+                México cuenta con una vibrante red de comunidades AWS que conectan a profesionales de la nube en todo el país.
+              </p>
+
+              
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+
+              {/* Other UGs */}
+              {[
+                { name: 'Ajolotes', image: 'ajolotes.png' },
+                { name: 'Embajadoras', image: 'embajadoras.png' },
+                { name: 'Ensenada', image: 'ensenada.png' },
+                { name: 'Hermosillo', image: 'hermosillo.png' },
+                { name: 'Jalisco', image: 'jalisco.png' },
+                { name: 'León', image: 'leon.png' },
+                { name: 'Mérida', image: 'merida.png' },
+                { name: 'Mexicali', image: 'mexicali.png' },
+                { name: 'Monterrey', image: 'monterrey.png' },
+                { name: 'Orizaba', image: 'orizaba.png' },
+                { name: 'Querétaro', image: 'queretaro.png' },
+                { name: 'Saltillo', image: 'saltillo.png' },
+                { name: 'Tijuana', image: 'tijuana.png' },
+                { name: 'Tlaxcala', image: 'tlaxcala.png' },
+                { name: 'Villahermosa', image: 'villahermosa.png' }
+              ].map((ug, index) => (
+                <div key={ug.name} className="group relative scroll-reveal" style={{ animationDelay: `${(index + 1) * 0.1}s` }}>
+                  <div className=" p-4 rounded-2xl shadow-lg hover:shadow-talavera-lg hover:scale-105 transition-all duration-300">
+                    <div className="text-center">
+                      <Image
+                        src={`/landing/ug-mex/${ug.image}`}
+                        alt={`AWS User Group ${ug.name}`}
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 mx-auto mb-3 rounded-lg object-contain"
+                      />
+                      <h3 className="font-bold text-text-primary text-sm">{ug.name}</h3>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+              <div className="mt-8 text-center scroll-reveal">
+                <br />
+                <br />
+                <p className="text-lg md:text-xl text-text-secondary max-w-3xl mx-auto scroll-reveal">
+                ¡Y Puebla es parte de esta gran familia!
+                <br />
+                <br />
+              </p>
+              </div>
+
+                            {/* Puebla - Highlighted */}
+              <div className="group relative scroll-reveal">
+                <div className=" from-accent to-primary rounded-2xl shadow-talavera-lg hover:scale-105 transition-all duration-300 p-4">
+                  <div className="text-center">
+                    
+                    <Image 
+                      src="/Logo.png" 
+                      alt="AWS User Group Puebla" 
+                      width={192}
+                      height={192}
+                      className="w-32 h-32 mx-auto mb-3 transition-all duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-4 group-hover:drop-shadow-2xl animate-bounce-slow"
+                      priority
+                    />
+                    <h3 className="font-bold text-text-primary text-sm">Puebla</h3>
+                    <p className="text-xs text-accent font-medium">¡Nuestra casa!</p>
+                  </div>
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center text-secondary text-xs font-bold">
+                  ★
+                </div>
+              </div>
+
+
+
+          </div>
+
+
+
+        </section>
+
+        {/* Past Events Section */}
+        <section className="py-20 px-4 relative bg-gradient-to-br from-background to-surface">
+          <div className="absolute inset-0 bg-[url('/landing/pueblabg.png')] bg-cover bg-center opacity-10"></div>
+          <div className="container mx-auto relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary scroll-reveal">
+                Revive Nuestros Eventos Pasados
+              </h2>
+              
+
+              <div className="mt-8 scroll-reveal">
+              <img 
+                src="/landing/amazon-arroy.svg" 
+                alt="Amazon Web Services" 
+                className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
+              />
+              </div>
+              <p className="text-lg md:text-xl text-text-secondary max-w-3xl mx-auto scroll-reveal">
+                Desde charlas técnicas hasta talleres prácticos, nuestros eventos han reunido a la comunidad AWS en Puebla con temas inspiradores y aprendizaje continuo.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                { image: 'anniversary.png', title: 'Aniversario AWS UG Puebla', description: 'Celebrando un año de comunidad y crecimiento' },
+                { image: 'meetup.png', title: 'Meetup Mensual', description: 'Networking y charlas técnicas en el corazón de Puebla' },
+                { image: 'summit-mexico.png', title: 'AWS Summit México', description: 'Participación en el evento nacional más importante' },
+                { image: 'talks.png', title: 'Charlas Especiales', description: 'Invitados expertos compartiendo conocimientos avanzados' }
+              ].map((event, index) => (
+                <div key={event.title} className="group relative scroll-reveal" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div className="relative overflow-hidden rounded-2xl shadow-talavera-lg hover:shadow-talavera-xl transition-all duration-300">
+                    <Image
+                      src={`/landing/events/${event.image}`}
+                      alt={event.title}
+                      width={400}
+                      height={300}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {/* Overlay solo en desktop */}
+                    <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute bottom-0 left-0 right-0 p-6 text-secondary">
+                        <h3 className="font-bold text-lg mb-2">{event.title}</h3>
+                        <p className="text-sm opacity-90">{event.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Descripción abajo solo en móvil */}
+                  <div className="md:hidden mt-4 text-center">
+                    <h3 className="font-bold text-lg mb-2 text-text-primary">{event.title}</h3>
+                    <p className="text-sm text-text-secondary">{event.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="py-20 px-4 relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl"></div>
@@ -296,13 +515,19 @@ export default function Home() {
               <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary">
                 ¿Por qué unirte?
               </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-accent to-primary mx-auto rounded-full"></div>
+              <div className="mt-8 scroll-reveal">
+              <img 
+                src="/landing/amazon-arroy.svg" 
+                alt="Amazon Web Services" 
+                className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
+              />
+              </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Card className="hover:shadow-talavera-lg transition-all duration-300 hover:-translate-y-2 group">
                 <CardHeader className="text-center">
-                  <div className="mx-auto h-16 w-16 bg-gradient-to-br from-accent to-accent/70 rounded-2xl flex items-center justify-center mb-4 shadow-talavera group-hover:scale-110 transition-transform">
+                  <div className="mx-auto h-16 w-16  rounded-2xl flex items-center justify-center mb-4 shadow-talavera group-hover:scale-110 transition-transform">
                     <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -334,7 +559,7 @@ export default function Home() {
 
               <Card className="hover:shadow-talavera-lg transition-all duration-300 hover:-translate-y-2 group">
                 <CardHeader className="text-center">
-                  <div className="mx-auto h-16 w-16 bg-gradient-to-br from-accent to-primary rounded-2xl flex items-center justify-center mb-4 shadow-talavera group-hover:scale-110 transition-transform">
+                  <div className="mx-auto h-16 w-16  rounded-2xl flex items-center justify-center mb-4 shadow-talavera group-hover:scale-110 transition-transform">
                     <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -343,7 +568,7 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-center text-base">
-                    Participa en meetups, hackathons y conferencias sobre tecnología AWS. Eventos mensuales presenciales.
+                    Participa en meetups, hackathons y conferencias sobre tecnología AWS. Charlas técnicas mensuales el último jueves de cada mes, presenciales en Puebla.
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -351,7 +576,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Stats Section 
         <section className="py-16 px-4 bg-gradient-to-r from-primary to-primary/90 text-secondary relative overflow-hidden">
           <TalaveraPattern variant="background" />
           <div className="container mx-auto relative z-10">
@@ -372,6 +597,71 @@ export default function Home() {
                 <div className="text-5xl font-bold text-accent mb-2">100%</div>
                 <div className="text-sm opacity-90">Gratis</div>
               </div>
+            </div>
+          </div>
+        </section>
+        */}
+
+        {/* Separator with Puebla Background */}
+        <section className="py-16 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/landing/pueblabg.png')] bg-cover bg-center opacity-20"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20"></div>
+          <div className="container mx-auto relative z-10 text-center">
+            
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-20 px-4 relative">
+          <div className="container mx-auto relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary scroll-reveal">
+                Preguntas Frecuentes
+              </h2>
+              <div className="mt-8 scroll-reveal">
+              <img 
+                src="/landing/amazon-arroy.svg" 
+                alt="Amazon Web Services" 
+                className="w-16 h-16 mx-auto opacity-80 hover:opacity-100 transition-opacity"
+              />
+              </div>
+              <p className="text-lg md:text-xl text-text-secondary max-w-3xl mx-auto scroll-reveal">
+                Resolvemos tus dudas sobre la comunidad AWS User Group Puebla
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto space-y-6">
+              {[
+                {
+                  question: '¿Los eventos son gratuitos?',
+                  answer: 'Sí, todos nuestros eventos son completamente gratuitos. Creemos que el conocimiento debe ser accesible para todos.'
+                },
+                {
+                  question: '¿Necesito experiencia previa en AWS?',
+                  answer: 'No es necesario. Nuestros eventos van desde introducción a temas avanzados, así que hay algo para todos los niveles.'
+                },
+                {
+                  question: '¿Cómo me uno a la comunidad?',
+                  answer: 'Solo regístrate en nuestra plataforma y únete a nuestros eventos. También puedes seguirnos en redes sociales para estar al día.'
+                },
+                {
+                  question: '¿Dónde se realizan los eventos?',
+                  answer: 'Principalmente en Puebla, en espacios como universidades, coworkings y empresas locales. Nuestras charlas técnicas regulares son el último jueves de cada mes. Algunos eventos son híbridos o virtuales.'
+                },
+                {
+                  question: '¿Qué temas se cubren en los eventos?',
+                  answer: 'Desde fundamentos de AWS hasta temas avanzados como serverless, machine learning, DevOps, y mejores prácticas en la nube.'
+                },
+                {
+                  question: '¿Puedo proponer un tema o ser speaker?',
+                  answer: '¡Absolutamente! Si tienes experiencia en AWS y quieres compartir conocimientos, contáctanos. Valoramos las contribuciones de la comunidad.'
+                }
+              ].map((faq, index) => (
+                <div key={index} className="bg-surface border border-border-light rounded-2xl p-6 shadow-lg hover:shadow-talavera-lg transition-all duration-300 scroll-reveal" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <h3 className="text-xl font-bold text-text-primary mb-3">{faq.question}</h3>
+                  <p className="text-text-secondary leading-relaxed">{faq.answer}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
