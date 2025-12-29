@@ -79,3 +79,5 @@ docs/
 jest.config.js
 jest.setup.js
 jest-setup.ts
+
+data-testing/
