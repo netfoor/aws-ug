@@ -50,7 +50,7 @@ export function validatePhoneNumber(phone: string): ValidationResult {
         }
       }
     }
-  } catch (_) {
+  } catch {
     errors.push('El número de teléfono tiene un formato inválido');
   }
 
@@ -88,7 +88,7 @@ export function normalizePhoneNumber(phone: string): string {
       normalized = '+' + normalized;
     }
     return normalized;
-  } catch (_) {
+  } catch {
     // Return cleaned version if parsing fails
     let normalized = cleanPhone.replace(/[\s\-\(\)]/g, '');
     if (!normalized.startsWith('+')) {
