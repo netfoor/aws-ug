@@ -5,6 +5,8 @@
  * Includes validation for personal data, professional profile, and talk proposals
  */
 
+import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
@@ -20,7 +22,7 @@ export interface ValidationRule<T> {
   custom?: (value: unknown) => string | null;
 }
 
-// Phone number validation
+// Phone number validation - supports international numbers using libphonenumber
 export function validatePhoneNumber(phone: string): ValidationResult {
   const errors: string[] = [];
 
@@ -29,15 +31,71 @@ export function validatePhoneNumber(phone: string): ValidationResult {
     return { valid: false, errors };
   }
 
-  // Remove spaces, dashes, parentheses, and +52 prefix
-  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '').replace(/^\+52/, '');
+  const cleanPhone = phone.trim();
 
-  // Must be 10 digits (Mexican format without +52)
-  if (!/^\d{10}$/.test(cleanPhone)) {
-    errors.push('El teléfono debe tener 10 dígitos (formato mexicano: +52 222 123 4567)');
+  // Try to parse as international format first
+  try {
+    // Try with international format (if user provided +52, +51, etc.)
+    if (cleanPhone.startsWith('+')) {
+      if (!isValidPhoneNumber(cleanPhone)) {
+        errors.push('El número telefónico internacional no es válido. Ej: +52 222 123 4567 o +51 999 888 777');
+      }
+    } else {
+      // Try as Mexican number (default country)
+      if (!isValidPhoneNumber(cleanPhone, 'MX')) {
+        // If not valid as Mexican, try detecting country from the number itself
+        // This handles cases like user entering a valid number without country code
+        if (!isValidPhoneNumber('+52' + cleanPhone, 'MX')) {
+          errors.push('El número de teléfono no es válido. Puedes usar: 55 1234 5678 (México) o +52 (México), +51 (Perú), +50 (Costa Rica), etc.');
+        }
+      }
+    }
+  } catch (_) {
+    errors.push('El número de teléfono tiene un formato inválido');
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+// Phone number normalization - converts to standard international format
+export function normalizePhoneNumber(phone: string): string {
+  if (!phone || !phone.trim()) return '';
+
+  const cleanPhone = phone.trim();
+
+  try {
+    // Try to parse as international (with +)
+    if (cleanPhone.startsWith('+')) {
+      const parsed = parsePhoneNumber(cleanPhone);
+      return parsed?.number || cleanPhone;
+    }
+
+    // Try as Mexican number
+    const parsed = parsePhoneNumber(cleanPhone, 'MX');
+    if (parsed) {
+      return parsed.number; // Returns in E.164 format: +52...
+    }
+
+    // If parsing fails, try adding +52 (Mexican default)
+    const mxParsed = parsePhoneNumber('+52' + cleanPhone, 'MX');
+    if (mxParsed) {
+      return mxParsed.number;
+    }
+
+    // Last resort: just clean up and add + if missing
+    let normalized = cleanPhone.replace(/[\s\-\(\)]/g, '');
+    if (!normalized.startsWith('+')) {
+      normalized = '+' + normalized;
+    }
+    return normalized;
+  } catch (_) {
+    // Return cleaned version if parsing fails
+    let normalized = cleanPhone.replace(/[\s\-\(\)]/g, '');
+    if (!normalized.startsWith('+')) {
+      normalized = '+52' + normalized;
+    }
+    return normalized;
+  }
 }
 
 // Email validation (enhanced)

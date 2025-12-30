@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Loader2 } from 'lucide-react';
-import { validatePhoneNumber } from '@/lib/form-validation';
+import { validatePhoneNumber, normalizePhoneNumber } from '@/lib/form-validation';
 
 const client = generateClient<Schema>();
 
@@ -29,7 +29,7 @@ export default function OnboardingPage() {
   // Form state
   const [givenName, setGivenName] = useState('');
   const [familyName, setFamilyName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('+52 ');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [company, setCompany] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [awsExperienceLevel, setAwsExperienceLevel] = useState<'PROFESSIONAL' | 'PERSONAL' | 'NONE' | 'LEARNING'>('NONE');
@@ -59,11 +59,11 @@ export default function OnboardingPage() {
       if (userAttributes.family_name && familyName === '') {
         setFamilyName(userAttributes.family_name as string);
       }
-      // Pre-llenar teléfono si viene de Cognito (solo si está en el valor inicial)
-      if (userAttributes.phone_number && phoneNumber === '+52 ') {
+      // Pre-llenar teléfono si viene de Cognito (solo si está vacío)
+      if (userAttributes.phone_number && phoneNumber === '') {
         const phone = userAttributes.phone_number as string;
-        // Si ya tiene el +52, úsalo; si no, agrégalo
-        setPhoneNumber(phone.startsWith('+52') ? phone : `+52 ${phone}`);
+        // Si ya tiene el +, úsalo; si no, agrégalo
+        setPhoneNumber(phone.startsWith('+') ? phone : `+${phone}`);
       }
     }
   }, [userAttributes]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -100,24 +100,9 @@ export default function OnboardingPage() {
 
   // Handler para teléfono con auto-formato +52
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-    
-    // Si el usuario borra todo, mantener el +52
-    if (value === '' || value === '+') {
-      setPhoneNumber('+52 ');
-      return;
-    }
-    
-    // Si no empieza con +52, agregarlo
-    if (!value.startsWith('+52')) {
-      value = '+52 ' + value.replace(/^\+?52?\s?/, '');
-    }
-    
-    // Asegurar que haya un espacio después del +52
-    if (value.startsWith('+52') && value[3] !== ' ') {
-      value = '+52 ' + value.substring(3);
-    }
-    
+    const value = e.target.value;
+    // Simplemente permitir que el usuario escriba lo que quiera
+    // La normalización ocurre al guardar, no mientras escribe
     setPhoneNumber(value);
   };
 
@@ -167,7 +152,7 @@ export default function OnboardingPage() {
         id: user.userId,
         givenName: givenName.trim(),
         familyName: familyName.trim(),
-        phoneNumber: phoneNumber.trim(),
+        phoneNumber: normalizePhoneNumber(phoneNumber),
         company: company.trim(),
         jobTitle: jobTitle.trim(),
         awsExperienceLevel,

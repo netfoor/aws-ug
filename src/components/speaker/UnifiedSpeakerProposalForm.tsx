@@ -14,6 +14,7 @@ import {
   validateProfessionalProfileCompletion,
   validateMandatoryTalkProposal,
   validateSpecializationArea,
+  normalizePhoneNumber,
   type UnifiedFormData as ValidationFormData
 } from '@/lib/form-validation';
 
@@ -79,7 +80,7 @@ export default function UnifiedSpeakerProposalForm({
     givenName: userName.split(' ')[0] || '',
     familyName: userName.split(' ').slice(1).join(' ') || '',
     email: userEmail,
-    phoneNumber: userPhone || '+52 ',
+    phoneNumber: userPhone || '',
     company: userCompany || '',
     jobTitle: userJobTitle || '',
     expertiseArea: '',
@@ -158,24 +159,9 @@ export default function UnifiedSpeakerProposalForm({
 
   // Handle phone change with +52 auto-format
   const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    // Si está vacío o solo tiene +, resetear a +52
-    if (value === '' || value === '+') {
-      setFormData(prev => ({ ...prev, phoneNumber: '+52 ' }));
-      return;
-    }
-
-    // Asegurar que siempre empiece con +52
-    if (!value.startsWith('+52')) {
-      value = '+52 ' + value.replace(/^\+?52?\s?/, '');
-    }
-
-    // Asegurar espacio después de +52
-    if (value.startsWith('+52') && value[3] !== ' ') {
-      value = '+52 ' + value.substring(3);
-    }
-
+    const value = e.target.value;
+    // Simplemente permitir que el usuario escriba lo que quiera
+    // La normalización ocurre al guardar, no mientras escribe
     setFormData(prev => ({ ...prev, phoneNumber: value }));
   }, []);
 
@@ -313,9 +299,10 @@ export default function UnifiedSpeakerProposalForm({
         uploadedCVKey = cvResult.key || null;
       }
 
-      // Actualizar formData con las keys de S3
+      // Actualizar formData con las keys de S3 y normalizar teléfono
       const submissionData = {
         ...formData,
+        phoneNumber: normalizePhoneNumber(formData.phoneNumber),
         photoKey: uploadedPhotoKey || formData.photoKey,
         cvKey: uploadedCVKey || formData.cvKey,
       };
@@ -485,6 +472,9 @@ export default function UnifiedSpeakerProposalForm({
               onChange={handlePhoneChange}
               placeholder="+52 222 123 4567"
             />
+            <p className="text-xs text-text-secondary mt-1">
+              Formato: +52 (México), +51 (Perú), +50 (Costa Rica), etc.
+            </p>
           </div>
 
           <div>

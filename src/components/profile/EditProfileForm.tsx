@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useUserProfile, type UserProfile } from '@/hooks/useUserProfile';
-import { validatePhoneNumber } from '@/lib/form-validation';
+import { validatePhoneNumber, normalizePhoneNumber } from '@/lib/form-validation';
 
 interface EditProfileFormProps {
   onSuccess?: () => void;
@@ -107,6 +107,7 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
     
     const updatedProfile = {
       ...formData,
+      phoneNumber: formData.phoneNumber ? normalizePhoneNumber(formData.phoneNumber) : undefined,
       interests: interests.split(',').map(i => i.trim()).filter(Boolean),
     };
 
@@ -220,6 +221,9 @@ export function EditProfileForm({ onSuccess, onCancel }: EditProfileFormProps) {
             {validationErrors.phoneNumber && (
               <p className="text-red-500 text-xs mt-1">{validationErrors.phoneNumber}</p>
             )}
+            <p className="text-xs text-text-secondary mt-1">
+              Formato: +52 (México), +51 (Perú), +50 (Costa Rica), etc.
+            </p>
           </div>
 
           <div>
