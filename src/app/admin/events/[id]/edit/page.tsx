@@ -31,7 +31,7 @@ interface EventFormData {
   locationMapsUrl: string;
   isVirtual: boolean;
   virtualLink: string;
-  maxAttendees: number | null;
+  maxAttendees: string;
   isUnlimited: boolean;
   status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED' | 'COMPLETED';
   coverImageUrl: string;
@@ -76,7 +76,7 @@ export default function EditEventPage() {
     locationMapsUrl: '',
     isVirtual: false,
     virtualLink: '',
-    maxAttendees: null,
+    maxAttendees: '',
     isUnlimited: false,
     status: 'DRAFT',
     coverImageUrl: '',
@@ -126,7 +126,7 @@ export default function EditEventPage() {
         locationMapsUrl: eventData.locationMapsUrl || '',
         isVirtual: eventData.isVirtual || false,
         virtualLink: eventData.virtualLink || '',
-        maxAttendees: eventData.maxAttendees || null,
+        maxAttendees: eventData.maxAttendees ? String(eventData.maxAttendees) : '',
         isUnlimited: eventData.isUnlimited || false,
         status: eventData.status || 'DRAFT',
         coverImageUrl: eventData.coverImageUrl || '',
@@ -212,6 +212,10 @@ export default function EditEventPage() {
       }
 
       // Actualizar evento
+      const capacity = !formData.isUnlimited && formData.maxAttendees?.trim() 
+        ? parseInt(formData.maxAttendees, 10) 
+        : null;
+
       const { errors: updateErrors } = await client.models.Event.update({
         id: eventId,
         title: formData.title,
@@ -227,7 +231,7 @@ export default function EditEventPage() {
         locationMapsUrl: formData.locationMapsUrl || undefined,
         isVirtual: formData.isVirtual,
         virtualLink: formData.virtualLink || null,
-        maxAttendees: formData.isUnlimited ? null : formData.maxAttendees,
+        maxAttendees: capacity,
         isUnlimited: formData.isUnlimited,
         status: formData.status,
         coverImageUrl: formData.coverImageUrl || null,
@@ -561,8 +565,8 @@ export default function EditEventPage() {
                   </label>
                   <Input
                     type="number"
-                    value={formData.maxAttendees || ''}
-                    onChange={(e) => handleInputChange('maxAttendees', e.target.value ? parseInt(e.target.value) : '')}
+                    value={formData.maxAttendees}
+                    onChange={(e) => handleInputChange('maxAttendees', e.target.value)}
                     placeholder="50"
                     min="1"
                   />
