@@ -8,7 +8,7 @@ const PREDEFINED_LOCATIONS = [
   {
     id: 'default',
     name: "Italiann's Puebla San Francisco",
-    mapsUrl: 'https://maps.app.goo.gl/HzQmzCJQmiMSM23o6',
+    mapsUrl: 'https://maps.app.goo.gl/d24bJGS9v8YQH5mD8',
   },
   // Puedes agregar más lugares aquí cuando los tengas
 ];

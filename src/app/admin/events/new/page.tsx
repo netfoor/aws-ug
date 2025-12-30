@@ -59,7 +59,7 @@ export default function CreateEventPage() {
   const [virtualLink, setVirtualLink] = useState('');
   
   // Capacidad
-  const [maxAttendees, setMaxAttendees] = useState<number>(50);
+  const [maxAttendees, setMaxAttendees] = useState<string>('50');
   
   // Speaker
   const [speakers, setSpeakers] = useState<SpeakerApplication[]>([]);
@@ -161,6 +161,9 @@ export default function CreateEventPage() {
     setError(null);
 
     try {
+      // Convertir maxAttendees a número, usar 50 si está vacío
+      const capacity = maxAttendees?.trim() ? parseInt(maxAttendees, 10) : 50;
+
       // PASO 1: Crear evento usando el endpoint
       const response = await fetch('/api/admin/create-event', {
         method: 'POST',
@@ -178,7 +181,7 @@ export default function CreateEventPage() {
           locationAddress: locationData.locationAddress?.trim(),
           isVirtual,
           virtualLink: isVirtual ? virtualLink.trim() : undefined,
-          maxAttendees,
+          maxAttendees: capacity,
           selectedSpeakerId,
           status,
         }),
@@ -505,7 +508,7 @@ export default function CreateEventPage() {
                 id="maxAttendees"
                 type="number"
                 value={maxAttendees}
-                onChange={(e) => setMaxAttendees(Number(e.target.value))}
+                onChange={(e) => setMaxAttendees(e.target.value)}
                 min={1}
                 required
               />

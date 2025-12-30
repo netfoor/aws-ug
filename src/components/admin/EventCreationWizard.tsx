@@ -81,7 +81,7 @@ export function EventCreationWizard({
     eventEndTime: prefillEndTime,
     location: "Italiann's Puebla San Francisco",
     locationMapsUrl: 'https://maps.app.goo.gl/d24bJGS9v8YQH5mD8', // Pre-fill con el lugar por defecto
-    capacity: 50,
+    capacity: '50', // String para permitir edición sin restricciones
     registrationDeadline: '',
     coverImageUrl: '', // Para almacenar el path de la imagen subida
   });
@@ -100,6 +100,9 @@ export function EventCreationWizard({
     setError('');
 
     try {
+      // Convertir capacity a número, usar 50 si está vacío
+      const capacity = formData.capacity?.trim() ? parseInt(formData.capacity, 10) : 50;
+
       const response = await fetch('/api/admin/create-and-publish-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -107,6 +110,7 @@ export function EventCreationWizard({
           talkProposalId,
           speakerApplicationId, // Para actualizar attachedProposal si la fecha cambió
           ...formData,
+          capacity, // Usar el valor convertido
           location: locationData.location,
           locationMapsUrl: locationData.locationMapsUrl,
           locationAddress: locationData.locationAddress,
@@ -280,7 +284,7 @@ export function EventCreationWizard({
                 type="number"
                 min="1"
                 value={formData.capacity}
-                onChange={(e) => setFormData(prev => ({ ...prev, capacity: parseInt(e.target.value) || 50 }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, capacity: e.target.value }))}
                 className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors theme-transition"
               />
             </div>
