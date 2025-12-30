@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -123,7 +124,7 @@ function AuthCallbackContent() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <LoadingSpinner size="md" variant="blue" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Procesando Autenticación
@@ -152,7 +153,7 @@ export default function AuthCallbackPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <LoadingSpinner size="lg" variant="blue" className="mx-auto" />
           <p className="mt-4 text-gray-600">Cargando...</p>
         </div>
       </div>

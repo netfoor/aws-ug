@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { TalaveraPattern } from '@/components/ui/TalaveraPattern';
 
 function LoginPageContent() {
@@ -37,7 +38,7 @@ function LoginPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/30 to-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-accent border-t-transparent mx-auto mb-4"></div>
+          <LoadingSpinner size="xl" variant="accent" className="mx-auto mb-4" />
           <p className="text-text-secondary">Verificando autenticación...</p>
         </div>
       </div>
