@@ -5,12 +5,12 @@
  * Verifica que la configuración esté correcta antes de compilar
  */
 
-// Cargar el validador usando require para Node.js
-const path = require('path');
+// Cargar el validador usando ES modules
+import path from 'path';
+import fs from 'fs';
 
 // Función para validar amplify_outputs.json
 function validateAmplifyConfig() {
-  const fs = require('fs');
   const errors = [];
   const warnings = [];
 

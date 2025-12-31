@@ -1,5 +1,10 @@
 
 /*
+This script generates an example ticket image with a QR code and event details.
+
+To run this script, ensure you have the 'canvas' package installed:
+  npm install canvas
+  
 import { createCanvas, loadImage } from 'canvas';
 import * as fs from 'fs';
 import * as path from 'path';

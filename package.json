@@ -2,6 +2,7 @@
   "name": "aws-ug",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:mobile": "next dev --turbopack --hostname 0.0.0.0",
@@ -42,7 +43,7 @@
     "@types/node-fetch": "^2.6.13",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/react-pdf": "^6.2.0",
+    "@types/react-pdf": "^5.0.7",
     "aws-cdk-lib": "^2.204.0",
     "constructs": "^10.4.2",
     "cross-env": "^10.1.0",

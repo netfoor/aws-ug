@@ -2,6 +2,14 @@
 
 A production-ready authentication platform built with Next.js 15, AWS Amplify Gen 2, and Amazon Cognito. Features Google OAuth integration, advanced security measures, and performance optimizations.
 
+## 📖 Setup Guide
+
+**For detailed step-by-step onboarding, including complete configuration, troubleshooting, and system exploration, see:**
+
+👉 **[GUIA_CONFIGURACION.md](./GUIA_CONFIGURACION.md)** - Complete setup and system tour guide
+
+---
+
 ## 🚀 Features
 
 ### Authentication & Security
@@ -100,11 +108,46 @@ aws-ug/
 
 3. **Configure environment variables**:
    
-   Create `.env.local`:
+   Copy `.env.local.example` to `.env.local` and fill in your actual values:
    ```bash
-   GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   cp .env.local.example .env.local
    ```
+   
+   Required environment variables:
+   ```bash
+   # Development settings
+   NODE_ENV=development
+   ENABLE_NGROK_MODE=false
+   NEXTAUTH_URL=http://localhost:3000
+   
+   # Google OAuth (get from Google Cloud Console)
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   
+   # Google Maps API Key (get from Google Cloud Console)
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   
+   # AWS Region (optional)
+   AWS_REGION=us-east-1
+   
+   # Email configuration
+   SENDER_EMAIL=no-reply@awspuebla.foor.dev
+   ```
+   
+   **Important**: Never commit `.env.local` to version control. It's already in `.gitignore`.
+
+   ### Environment Variables Reference
+
+   | Variable | Required | Description |
+   |----------|----------|-------------|
+   | `NODE_ENV` | Yes | Environment mode (development/production) |
+   | `ENABLE_NGROK_MODE` | No | Enable ngrok tunneling for external access |
+   | `NEXTAUTH_URL` | Yes | Base URL for NextAuth.js |
+   | `GOOGLE_CLIENT_ID` | Yes | Google OAuth client ID |
+   | `GOOGLE_CLIENT_SECRET` | Yes | Google OAuth client secret |
+   | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | No | Google Maps API key for location features |
+   | `AWS_REGION` | No | AWS region (defaults to us-east-1) |
+   | `SENDER_EMAIL` | No | Email address for SES notifications |
 
 4. **Configure Google OAuth**:
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -117,17 +160,79 @@ aws-ug/
      https://your-cognito-domain.auth.us-east-1.amazoncognito.com/oauth2/idpresponse
      ```
 
-5. **Deploy Amplify backend**:
+5. **Set up Amplify secrets** (for Google OAuth):
    ```bash
-   npm run amplify:deploy
+   npx ampx sandbox secret set GOOGLE_CLIENT_ID your_actual_google_client_id
+   npx ampx sandbox secret set GOOGLE_CLIENT_SECRET your_actual_google_client_secret
    ```
 
-6. **Run development server**:
+6. **Start Amplify sandbox**:
+   ```bash
+   npx ampx sandbox
+   ```
+   This will deploy the backend locally. Keep this running in a separate terminal.
+
+7. **Run development server**:
    ```bash
    npm run dev
    ```
 
    Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+### Additional Setup Steps
+
+8. **Seed historical data** (optional, for development):
+   ```bash
+   # Make sure Amplify sandbox is running
+   npx tsx scripts/seed-historical-events.ts
+   ```
+
+9. **Validate configuration**:
+   ```bash
+   npm run validate
+   ```
+
+### Available Scripts
+
+- `npm run dev` - Start development server with Turbopack
+- `npm run dev:mobile` - Start dev server accessible from mobile devices
+- `npm run dev:ngrok` - Start dev server with ngrok mode enabled
+- `npm run build` - Build for production (validates config first)
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run validate` - Validate configuration files
+
+## 🔧 Troubleshooting
+
+### Build Issues
+
+If `npm run build` fails:
+
+1. **Validate configuration**:
+   ```bash
+   npm run validate
+   ```
+
+2. **Check environment variables**:
+   - Ensure `.env.local` exists and has all required variables
+   - Copy from `.env.local.example` if needed
+
+3. **Clear Next.js cache**:
+   ```bash
+   rm -rf .next
+   npm run build
+   ```
+
+### Amplify Issues
+
+- **Sandbox not starting**: Ensure AWS CLI is configured with valid credentials
+- **Secrets not set**: Use `npx ampx sandbox secret set KEY value`
+- **Backend changes**: Run `npx ampx sandbox` after modifying `amplify/` files
+
+### Authentication Issues
+
+- **Google OAuth not working**: Check callback URLs in Google Cloud Console
+- **Cognito domain**: Ensure domain is configured in Amplify auth settings
 
 ### Running Tests
 
@@ -299,5 +404,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 **Version**: 2.0 (Phase 4 completed)  
-**Last Updated**: 2024  
+**Last Updated**: December 2025  
 **Maintained by**: AWS UG Team

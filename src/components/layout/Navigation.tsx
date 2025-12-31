@@ -37,9 +37,9 @@ export function Navigation({ className }: NavigationProps) {
 
   const navItems = [
     { href: '/', label: 'Inicio' },
-    { href: '/comunidad', label: 'Comunidad' },
-    { href: '/speakers', label: 'Speakers' },
-    { href: '/blog', label: 'Blog' },
+    //{ href: '/comunidad', label: 'Comunidad' },
+    //{ href: '/speakers', label: 'Speakers' },
+    //{ href: '/blog', label: 'Blog' },
   ];
 
   return (
