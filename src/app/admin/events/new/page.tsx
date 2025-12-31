@@ -12,7 +12,7 @@ import {
   Save
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Label } from '@/components/ui';
+import Label from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import Link from 'next/link';

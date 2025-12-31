@@ -8,7 +8,7 @@ import type { Schema } from '../../../amplify/data/resource';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui';
+import Label from '@/components/ui/Label';
 import { Loader2 } from 'lucide-react';
 import { validatePhoneNumber, normalizePhoneNumber } from '@/lib/form-validation';
 

@@ -10,7 +10,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { canProposeTalk } from '@/lib/profile-utils';
 import { Loader2, Lightbulb, Users, Clock, Wrench, FileText, Calendar, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Label } from '@/components/ui';
+import Label from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import LastThursdaySelector from '@/components/speaker/LastThursdaySelector';
 import { dateToISO } from '@/lib/date-utils';

@@ -5,7 +5,7 @@ import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { uploadData, getUrl } from 'aws-amplify/storage';
 import { optimizeImage, validateImageFile, createImagePreview, revokeImagePreview } from '@/lib/image-optimizer';
 import { Button } from '@/components/ui/Button';
-import { Label } from '@/components/ui';
+import Label from '@/components/ui/Label';
 
 /**
  * 📸 CoverImageUpload - Componente reutilizable para subir imágenes de portada

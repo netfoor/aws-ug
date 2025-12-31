@@ -6,7 +6,7 @@ import type { Schema } from '../../amplify/data/resource';
 import { useAuth } from '@/context/auth-context';
 import { Loader2, Calendar, Users, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Label } from '@/components/ui';
+import Label from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import DateSelector from '@/components/common/DateSelector';
 import CoverImageUpload from '@/components/common/CoverImageUpload';

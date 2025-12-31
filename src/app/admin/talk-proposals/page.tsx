@@ -7,7 +7,7 @@ import { useAuth } from '@/context/auth-context';
 import { Loader2, ShieldAlert, Lightbulb, Clock, Users, CheckCircle, XCircle, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
-import { Label } from '@/components/ui';
+import Label from '@/components/ui/Label';
 import CreateEventModal from '@/components/CreateEventModal';
 
 const client = generateClient<Schema>();
