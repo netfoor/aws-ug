@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Textarea';
-import { Label } from '../ui/Label';
+import { Label } from '../ui';
 import { SpeakerPhotoPreview } from './SpeakerPhotoPreview';
 import { useDialog } from '@/hooks/useDialog';
 import { DialogRenderer } from '@/components/ui/DialogRenderer';

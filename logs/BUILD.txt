@@ -1,0 +1,705 @@
+2025-12-31T08:05:23.067Z [INFO]: # Build environment configured with Standard build compute type: 8GiB Memory, 4vCPUs, 128GB Disk Space
+2025-12-31T08:05:23.859Z [INFO]: # Cloning repository: git@github.com:netfoor/aws-ug.git
+2025-12-31T08:05:24.736Z [INFO]: 
+2025-12-31T08:05:24.736Z [INFO]: Cloning into 'aws-ug'...
+2025-12-31T08:05:24.737Z [INFO]: # Switching to commit: 651ab99ffa6fedd4c20f8c93fed7f0e4db95ebf7
+2025-12-31T08:05:24.813Z [INFO]: Note: switching to '651ab99ffa6fedd4c20f8c93fed7f0e4db95ebf7'.
+                                 You are in 'detached HEAD' state. You can look around, make experimental
+                                 changes and commit them, and you can discard any commits you make in this
+                                 state without impacting any branches by switching back to a branch.
+                                 If you want to create a new branch to retain commits you create, you may
+                                 do so (now or later) by using -c with the switch command. Example:
+                                 git switch -c <new-branch-name>
+                                 Or undo this operation with:
+                                 git switch -
+                                 Turn off this advice by setting config variable advice.detachedHead to false
+                                 HEAD is now at 651ab99 Add Label export to ui/index.ts to fix Turbopack build errors
+2025-12-31T08:05:24.861Z [INFO]: Successfully cleaned up Git credentials
+2025-12-31T08:05:24.861Z [INFO]: # Checking for Git submodules at: /codebuild/output/src2209125443/src/aws-ug/.gitmodules
+2025-12-31T08:05:24.871Z [INFO]: # Retrieving environment cache...
+2025-12-31T08:05:24.925Z [WARNING]: ! Unable to write cache: {"code":"ERR_BAD_REQUEST","message":"Request failed with status code 404"})}
+2025-12-31T08:05:24.925Z [INFO]: ---- Setting Up SSM Secrets ----
+2025-12-31T08:05:24.925Z [INFO]: SSM params {"Path":"/amplify/dxyg3izchp54i/dev/","WithDecryption":true}
+2025-12-31T08:05:25.720Z [INFO]: # No package override configuration found.
+2025-12-31T08:05:25.724Z [INFO]: # Retrieving cache...
+2025-12-31T08:05:25.777Z [INFO]: # Retrieved cache
+2025-12-31T08:05:30.139Z [INFO]: ## Starting Backend Build
+                                 # Starting phase: build
+                                 # Executing command: npm ci --cache .npm --prefer-offline
+2025-12-31T08:05:49.005Z [WARNING]: npm warn ERESOLVE overriding peer dependency
+2025-12-31T08:05:49.013Z [WARNING]: npm warn While resolving: @aws-amplify/plugin-types@1.10.1
+                                    npm warn Found: @aws-sdk/types@3.821.0
+                                    npm warn node_modules/@aws-amplify/data-construct/node_modules/@aws-amplify/ai-constructs/node_modules/@aws-amplify/plugin-types/node_modules/@aws-sdk/types
+                                    npm warn
+                                    npm warn Could not resolve dependency:
+                                    npm warn peer @aws-sdk/types@"^3.734.0" from @aws-amplify/plugin-types@1.10.1
+                                    npm warn node_modules/@aws-amplify/data-construct/node_modules/@aws-amplify/ai-constructs/node_modules/@aws-amplify/plugin-types
+                                    npm warn   @aws-amplify/plugin-types@"^1.10.1" from @aws-amplify/ai-constructs@1.5.3
+                                    npm warn   node_modules/@aws-amplify/data-construct/node_modules/@aws-amplify/ai-constructs
+2025-12-31T08:05:49.158Z [WARNING]: npm warn ERESOLVE overriding peer dependency
+2025-12-31T08:05:49.158Z [WARNING]: npm warn While resolving: @aws-amplify/plugin-types@1.10.1
+                                    npm warn Found: @aws-sdk/types@3.821.0
+                                    npm warn node_modules/@aws-amplify/graphql-api-construct/node_modules/@aws-amplify/ai-constructs/node_modules/@aws-amplify/plugin-types/node_modules/@aws-sdk/types
+                                    npm warn
+                                    npm warn Could not resolve dependency:
+                                    npm warn peer @aws-sdk/types@"^3.734.0" from @aws-amplify/plugin-types@1.10.1
+                                    npm warn node_modules/@aws-amplify/graphql-api-construct/node_modules/@aws-amplify/ai-constructs/node_modules/@aws-amplify/plugin-types
+                                    npm warn   @aws-amplify/plugin-types@"^1.10.1" from @aws-amplify/ai-constructs@1.5.3
+                                    npm warn   node_modules/@aws-amplify/graphql-api-construct/node_modules/@aws-amplify/ai-constructs
+2025-12-31T08:07:04.515Z [WARNING]: npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2025-12-31T08:07:05.488Z [WARNING]: npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2025-12-31T08:07:05.842Z [WARNING]: npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+2025-12-31T08:07:08.084Z [WARNING]: npm warn deprecated @babel/plugin-proposal-object-rest-spread@7.20.7: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-object-rest-spread instead.
+2025-12-31T08:07:08.157Z [WARNING]: npm warn deprecated @babel/plugin-proposal-class-properties@7.18.6: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-class-properties instead.
+2025-12-31T08:07:09.556Z [WARNING]: npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2025-12-31T08:07:16.082Z [WARNING]: npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2025-12-31T08:07:25.071Z [WARNING]: npm warn deprecated core-js@2.6.12: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
+2025-12-31T08:07:53.102Z [INFO]: added 1944 packages, and audited 2800 packages in 2m
+2025-12-31T08:07:53.106Z [INFO]: 255 packages are looking for funding
+                                 run `npm fund` for details
+                                 found 0 vulnerabilities
+2025-12-31T08:07:53.139Z [INFO]: # Executing command: npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+2025-12-31T08:07:57.792Z [INFO]: 8:07:57 AM Synthesizing backend...
+2025-12-31T08:07:57.797Z [INFO]: 
+2025-12-31T08:07:59.227Z [WARNING]: Bundling asset amplify-dxyg3izchp54i-dev-branch-9e62ee885f/AmplifyBranchLinker/CustomResourceLambda/Code/Stage...
+2025-12-31T08:07:59.577Z [WARNING]: ...8a832ed0f6c8e63ba696e709181f0dff85f3bd2fce65a6-building/index.js  968.9kb
+                                    ⚡ Done in 73ms
+2025-12-31T08:07:59.696Z [WARNING]: Bundling asset amplify-dxyg3izchp54i-dev-branch-9e62ee885f/auth/AmplifySecretFetcherResourceProviderLambda/Code/Stage...
+2025-12-31T08:08:00.032Z [WARNING]: ...0277bca3576be52ac667ffdd1183f403e88d672239d021-building/index.js  714.7kb
+                                    ⚡ Done in 57ms
+2025-12-31T08:08:00.091Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:00.092Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:00.095Z [WARNING]: Bundling asset amplify-dxyg3izchp54i-dev-branch-9e62ee885f/auth/post-authentication-lambda/Code/Stage...
+2025-12-31T08:08:01.296Z [WARNING]: WARNING: owners may reassign ownership for the following model(s) and role(s): User: [owner], TalkProposal: [owner], Notification: [owner], EventRegistration: [owner]. If this is not intentional, you may want to apply field-level authorization rules to these fields. To read more: https://docs.amplify.aws/cli/graphql/authorization-rules/#per-user--owner-based-data-access.
+2025-12-31T08:08:01.377Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:01.377Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:01.379Z [WARNING]: Bundling asset amplify-dxyg3izchp54i-dev-branch-9e62ee885f/auth/manual-approve-speaker-lambda/Code/Stage...
+2025-12-31T08:08:01.933Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:01.933Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:01.934Z [WARNING]: Bundling asset amplify-dxyg3izchp54i-dev-branch-9e62ee885f/auth/reject-speaker-application-lambda/Code/Stage...
+2025-12-31T08:08:02.411Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:02.412Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:02.413Z [WARNING]: Bundling asset amplify-dxyg3izchp54i-dev-branch-9e62ee885f/function/create-event-from-proposal-lambda/Code/Stage...
+2025-12-31T08:08:02.709Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:02.710Z [WARNING]: [WARNING] aws-cdk-lib.aws_lambda.FunctionOptions#logRetention is deprecated.
+                                    use `logGroup` instead
+                                    This API will be removed in the next major release.
+2025-12-31T08:08:02.711Z [WARNING]: Bundling asset amplify-dxyg3izchp54i-dev-branch-9e62ee885f/auth/notify-admins-new-proposal-lambda/Code/Stage...
+2025-12-31T08:08:03.200Z [INFO]: ✅ Permisos de invocación Lambda agregados para API routes
+2025-12-31T08:08:03.200Z [INFO]: ✅ Speaker Application Workflow configurado (Flujo simplificado)
+2025-12-31T08:08:03.221Z [INFO]: ✅ CloudWatch Log Retention configurado (7 días) para todas las Lambdas
+2025-12-31T08:08:04.521Z [INFO]: 8:08:04 AM ✔ Backend synthesized in 7.29 seconds
+2025-12-31T08:08:04.526Z [INFO]: 8:08:04 AM Running type checks...
+2025-12-31T08:08:12.018Z [INFO]: 8:08:12 AM ✔ Type checks completed in 7.49 seconds
+2025-12-31T08:08:12.039Z [INFO]: 8:08:12 AM Building and publishing assets...
+2025-12-31T08:08:13.842Z [INFO]: 8:08:13 AM ✔ Built and published assets
+2025-12-31T08:08:16.728Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   0 | 8:08:14 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f User Initiated
+2025-12-31T08:08:18.852Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   0 | 8:08:18 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | auth.NestedStack/auth.NestedStackResource (auth179371D7)
+2025-12-31T08:08:20.996Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   0 | 8:08:18 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | function.NestedStack/function.NestedStackResource (function1351588B)
+2025-12-31T08:08:21.002Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV |   0 | 8:08:19 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV User Initiated
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   1 | 8:08:19 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | function.NestedStack/function.NestedStackResource (function1351588B)
+2025-12-31T08:08:25.279Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV |   1 | 8:08:24 AM | UPDATE_IN_PROGRESS | Custom::AmplifySecretFetcherResource | auth/AmplifySecretFetcherResource/Default (AmplifySecretFetcherResource)
+2025-12-31T08:08:29.551Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV |   2 | 8:08:29 AM | UPDATE_COMPLETE | Custom::AmplifySecretFetcherResource | auth/AmplifySecretFetcherResource/Default (AmplifySecretFetcherResource)
+2025-12-31T08:08:33.879Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV |   3 | 8:08:31 AM | UPDATE_COMPLETE_CLEANUP_IN_PROGRESS | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV
+2025-12-31T08:08:42.631Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   4 | 8:08:40 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | auth.NestedStack/auth.NestedStackResource (auth179371D7)
+2025-12-31T08:08:42.636Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   4 | 8:08:41 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | storage.NestedStack/storage.NestedStackResource (storage0EC3F24A)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   4 | 8:08:41 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data.NestedStack/data.NestedStackResource (data7552DF31)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   4 | 8:08:42 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB User Initiated
+2025-12-31T08:08:44.871Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   5 | 8:08:42 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | storage.NestedStack/storage.NestedStackResource (storage0EC3F24A)
+2025-12-31T08:08:49.372Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   5 | 8:08:47 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data/amplifyData/AmplifyTableManager.NestedStack/AmplifyTableManager.NestedStackResource (amplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource86290833)
+2025-12-31T08:08:49.376Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:48 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/AmplifyTableManager.NestedStack/AmplifyTableManager.NestedStackResource (amplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource86290833)
+2025-12-31T08:08:52.054Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:49 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data/amplifyData/Event.NestedStack/Event.NestedStackResource (amplifyDataEventNestedStackEventNestedStackResourceE9D0FB99)
+2025-12-31T08:08:52.054Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:49 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data/amplifyData/User.NestedStack/User.NestedStackResource (amplifyDataUserNestedStackUserNestedStackResource9488907F)
+2025-12-31T08:08:52.055Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:49 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data/amplifyData/TalkProposal.NestedStack/TalkProposal.NestedStackResource (amplifyDataTalkProposalNestedStackTalkProposalNestedStackResourceD2FCA78F)
+2025-12-31T08:08:52.055Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:49 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data/amplifyData/SpeakerApplication.NestedStack/SpeakerApplication.NestedStackResource (amplifyDataSpeakerApplicationNestedStackSpeakerApplicationNestedStackResourceF25409F1)
+2025-12-31T08:08:52.055Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:49 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data/amplifyData/EventRegistration.NestedStack/EventRegistration.NestedStackResource (amplifyDataEventRegistrationNestedStackEventRegistrationNestedStackResourceF68E76BF)
+2025-12-31T08:08:52.056Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:49 AM | UPDATE_IN_PROGRESS | AWS::CloudFormation::Stack | data/amplifyData/Notification.NestedStack/Notification.NestedStackResource (amplifyDataNotificationNestedStackNotificationNestedStackResource648CCF39)
+2025-12-31T08:08:52.056Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   7 | 8:08:50 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/Event.NestedStack/Event.NestedStackResource (amplifyDataEventNestedStackEventNestedStackResourceE9D0FB99)
+2025-12-31T08:08:52.056Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   8 | 8:08:50 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/TalkProposal.NestedStack/TalkProposal.NestedStackResource (amplifyDataTalkProposalNestedStackTalkProposalNestedStackResourceD2FCA78F)
+2025-12-31T08:08:52.057Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   9 | 8:08:50 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/SpeakerApplication.NestedStack/SpeakerApplication.NestedStackResource (amplifyDataSpeakerApplicationNestedStackSpeakerApplicationNestedStackResourceF25409F1)
+2025-12-31T08:08:52.057Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |  10 | 8:08:50 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/Notification.NestedStack/Notification.NestedStackResource (amplifyDataNotificationNestedStackNotificationNestedStackResource648CCF39)
+2025-12-31T08:08:52.057Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |  11 | 8:08:50 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/User.NestedStack/User.NestedStackResource (amplifyDataUserNestedStackUserNestedStackResource9488907F)
+2025-12-31T08:08:52.058Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |  12 | 8:08:50 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/EventRegistration.NestedStack/EventRegistration.NestedStackResource (amplifyDataEventRegistrationNestedStackEventRegistrationNestedStackResourceF68E76BF)
+2025-12-31T08:08:54.657Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |  13 | 8:08:52 AM | UPDATE_COMPLETE_CLEANUP_IN_PROGRESS | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB
+2025-12-31T08:08:54.662Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |  14 | 8:08:52 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data.NestedStack/data.NestedStackResource (data7552DF31)
+2025-12-31T08:08:57.275Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |  15 | 8:08:54 AM | UPDATE_COMPLETE_CLEANUP_IN_PROGRESS | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f
+2025-12-31T08:08:57.275Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |  14 | 8:08:55 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | function.NestedStack/function.NestedStackResource (function1351588B)
+2025-12-31T08:08:57.276Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |  13 | 8:08:55 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | storage.NestedStack/storage.NestedStackResource (storage0EC3F24A)
+2025-12-31T08:09:00.038Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |  12 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/SpeakerApplication.NestedStack/SpeakerApplication.NestedStackResource (amplifyDataSpeakerApplicationNestedStackSpeakerApplicationNestedStackResourceF25409F1)
+2025-12-31T08:09:00.043Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |  11 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/EventRegistration.NestedStack/EventRegistration.NestedStackResource (amplifyDataEventRegistrationNestedStackEventRegistrationNestedStackResourceF68E76BF)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |  10 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/TalkProposal.NestedStack/TalkProposal.NestedStackResource (amplifyDataTalkProposalNestedStackTalkProposalNestedStackResourceD2FCA78F)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   9 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/User.NestedStack/User.NestedStackResource (amplifyDataUserNestedStackUserNestedStackResource9488907F)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   8 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/Notification.NestedStack/Notification.NestedStackResource (amplifyDataNotificationNestedStackNotificationNestedStackResource648CCF39)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   7 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/Event.NestedStack/Event.NestedStackResource (amplifyDataEventNestedStackEventNestedStackResourceE9D0FB99)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   6 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data/amplifyData/AmplifyTableManager.NestedStack/AmplifyTableManager.NestedStackResource (amplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource86290833)
+                                 amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB |   7 | 8:08:57 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f-data7552DF31-1ARJGPSMELMJB
+2025-12-31T08:09:06.625Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   6 | 8:09:06 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | data.NestedStack/data.NestedStackResource (data7552DF31)
+2025-12-31T08:09:08.788Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV |   7 | 8:09:07 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f-auth179371D7-1O4MPX56UJ6QV
+2025-12-31T08:09:17.251Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   6 | 8:09:16 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | auth.NestedStack/auth.NestedStackResource (auth179371D7)
+2025-12-31T08:09:17.256Z [INFO]: amplify-dxyg3izchp54i-dev-branch-9e62ee885f |   7 | 8:09:16 AM | UPDATE_COMPLETE | AWS::CloudFormation::Stack | amplify-dxyg3izchp54i-dev-branch-9e62ee885f
+2025-12-31T08:09:20.309Z [INFO]: 8:09:20 AM ✔ Deployment completed in 66.467 seconds
+2025-12-31T08:09:20.310Z [INFO]: 8:09:20 AM AppSync API endpoint = https://ebzyaipfxbctlevr35aoxeaune.appsync-api.us-east-1.amazonaws.com/graphql
+2025-12-31T08:09:20.669Z [INFO]: 8:09:20 AM File written: amplify_outputs.json
+2025-12-31T08:09:20.906Z [INFO]: # Completed phase: build
+                                 ## Completed Backend Build
+2025-12-31T08:09:20.910Z [INFO]: ## Starting Frontend Build
+2025-12-31T08:09:20.911Z [INFO]: # Starting phase: build
+                                 # Executing command: npm run build
+2025-12-31T08:09:21.015Z [INFO]: > aws-ug@0.1.0 build
+                                 > node scripts/validate-config.js && next build --turbopack
+2025-12-31T08:09:21.049Z [INFO]: 🔍 1. Validating configuration before build...
+2025-12-31T08:09:21.049Z [INFO]: ✅ Configuration validation passed!
+2025-12-31T08:09:21.854Z [INFO]: ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+2025-12-31T08:09:21.859Z [INFO]: Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2025-12-31T08:09:21.859Z [INFO]: This information is used to shape Next.js' roadmap and prioritize features.
+                                 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+                                 https://nextjs.org/telemetry
+2025-12-31T08:09:21.949Z [INFO]: ▲ Next.js 15.5.9 (Turbopack)
+2025-12-31T08:09:21.949Z [INFO]: - Experiments (use with caution):
+                                 · optimizePackageImports
+2025-12-31T08:09:22.045Z [INFO]: Creating an optimized production build ...
+2025-12-31T08:09:40.485Z [INFO]: ✓ Finished writing to disk in 34ms
+2025-12-31T08:09:40.621Z [WARNING]: 
+2025-12-31T08:09:40.621Z [WARNING]: > Build error occurred
+2025-12-31T08:09:40.635Z [WARNING]: Error: Turbopack build failed with 40 errors:
+                                    ./src/components/admin/SpeakerApplicationDetail.tsx:30:1
+                                    Module not found: Can't resolve '../ui/Label'
+                                    [0m [90m 28 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'../ui/Button'[39m[33m;[39m
+                                    [90m 29 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'../ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 30 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'../ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 31 |[39m [36mimport[39m { [33mSpeakerPhotoPreview[39m } [36mfrom[39m [32m'./SpeakerPhotoPreview'[39m[33m;[39m
+                                    [90m 32 |[39m [36mimport[39m { useDialog } [36mfrom[39m [32m'@/hooks/useDialog'[39m[33m;[39m
+                                    [90m 33 |[39m [36mimport[39m { [33mDialogRenderer[39m } [36mfrom[39m [32m'@/components/ui/DialogRenderer'[39m[33m;[39m[0m
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/admin/SpeakerApplicationDetail.tsx:30:1
+                                    Module not found: Can't resolve '../ui/Label'
+                                    [0m [90m 28 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'../ui/Button'[39m[33m;[39m
+                                    [90m 29 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'../ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 30 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'../ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 31 |[39m [36mimport[39m { [33mSpeakerPhotoPreview[39m } [36mfrom[39m [32m'./SpeakerPhotoPreview'[39m[33m;[39m
+                                    [90m 32 |[39m [36mimport[39m { useDialog } [36mfrom[39m [32m'@/hooks/useDialog'[39m[33m;[39m
+                                    [90m 33 |[39m [36mimport[39m { [33mDialogRenderer[39m } [36mfrom[39m [32m'@/components/ui/DialogRenderer'[39m[33m;[39m[0m
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/admin/SpeakerApplicationDetail.tsx:30:1
+                                    Module not found: Can't resolve '../ui/Label'
+                                    [0m [90m 28 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'../ui/Button'[39m[33m;[39m
+                                    [90m 29 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'../ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 30 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'../ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 31 |[39m [36mimport[39m { [33mSpeakerPhotoPreview[39m } [36mfrom[39m [32m'./SpeakerPhotoPreview'[39m[33m;[39m
+                                    [90m 32 |[39m [36mimport[39m { useDialog } [36mfrom[39m [32m'@/hooks/useDialog'[39m[33m;[39m
+                                    [90m 33 |[39m [36mimport[39m { [33mDialogRenderer[39m } [36mfrom[39m [32m'@/components/ui/DialogRenderer'[39m[33m;[39m[0m
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/admin/SpeakerApplicationDetail.tsx:30:1
+                                    Module not found: Can't resolve '../ui/Label'
+                                    [0m [90m 28 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'../ui/Button'[39m[33m;[39m
+                                    [90m 29 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'../ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 30 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'../ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 31 |[39m [36mimport[39m { [33mSpeakerPhotoPreview[39m } [36mfrom[39m [32m'./SpeakerPhotoPreview'[39m[33m;[39m
+                                    [90m 32 |[39m [36mimport[39m { useDialog } [36mfrom[39m [32m'@/hooks/useDialog'[39m[33m;[39m
+                                    [90m 33 |[39m [36mimport[39m { [33mDialogRenderer[39m } [36mfrom[39m [32m'@/components/ui/DialogRenderer'[39m[33m;[39m[0m
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/events/new/page.tsx:15:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 13 |[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 15 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 16 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m 17 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 18 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'next/link'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/events/new/page.tsx:15:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 13 |[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 15 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 16 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m 17 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 18 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'next/link'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/events/new/page.tsx:15:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 13 |[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 15 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 16 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m 17 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 18 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'next/link'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/events/new/page.tsx:15:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 13 |[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 15 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 16 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m 17 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 18 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'next/link'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/talk-proposals/page.tsx:10:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 11 |[39m [36mimport[39m [33mCreateEventModal[39m [36mfrom[39m [32m'@/components/CreateEventModal'[39m[33m;[39m
+                                    [90m 12 |[39m
+                                    [90m 13 |[39m [36mconst[39m client [33m=[39m generateClient[33m<[39m[33mSchema[39m[33m>[39m()[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/talk-proposals/page.tsx:10:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 11 |[39m [36mimport[39m [33mCreateEventModal[39m [36mfrom[39m [32m'@/components/CreateEventModal'[39m[33m;[39m
+                                    [90m 12 |[39m
+                                    [90m 13 |[39m [36mconst[39m client [33m=[39m generateClient[33m<[39m[33mSchema[39m[33m>[39m()[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/talk-proposals/page.tsx:10:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 11 |[39m [36mimport[39m [33mCreateEventModal[39m [36mfrom[39m [32m'@/components/CreateEventModal'[39m[33m;[39m
+                                    [90m 12 |[39m
+                                    [90m 13 |[39m [36mconst[39m client [33m=[39m generateClient[33m<[39m[33mSchema[39m[33m>[39m()[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/admin/talk-proposals/page.tsx:10:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 11 |[39m [36mimport[39m [33mCreateEventModal[39m [36mfrom[39m [32m'@/components/CreateEventModal'[39m[33m;[39m
+                                    [90m 12 |[39m
+                                    [90m 13 |[39m [36mconst[39m client [33m=[39m generateClient[33m<[39m[33mSchema[39m[33m>[39m()[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/onboarding/page.tsx:11:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  9 |[39m [36mimport[39m { [33mCard[39m[33m,[39m [33mCardContent[39m[33m,[39m [33mCardHeader[39m[33m,[39m [33mCardTitle[39m } [36mfrom[39m [32m'@/components/ui/Card'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mLoader2[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 13 |[39m [36mimport[39m { validatePhoneNumber[33m,[39m normalizePhoneNumber } [36mfrom[39m [32m'@/lib/form-validation'[39m[33m;[39m
+                                    [90m 14 |[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/onboarding/page.tsx:11:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  9 |[39m [36mimport[39m { [33mCard[39m[33m,[39m [33mCardContent[39m[33m,[39m [33mCardHeader[39m[33m,[39m [33mCardTitle[39m } [36mfrom[39m [32m'@/components/ui/Card'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mLoader2[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 13 |[39m [36mimport[39m { validatePhoneNumber[33m,[39m normalizePhoneNumber } [36mfrom[39m [32m'@/lib/form-validation'[39m[33m;[39m
+                                    [90m 14 |[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/onboarding/page.tsx:11:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  9 |[39m [36mimport[39m { [33mCard[39m[33m,[39m [33mCardContent[39m[33m,[39m [33mCardHeader[39m[33m,[39m [33mCardTitle[39m } [36mfrom[39m [32m'@/components/ui/Card'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mLoader2[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 13 |[39m [36mimport[39m { validatePhoneNumber[33m,[39m normalizePhoneNumber } [36mfrom[39m [32m'@/lib/form-validation'[39m[33m;[39m
+                                    [90m 14 |[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/onboarding/page.tsx:11:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  9 |[39m [36mimport[39m { [33mCard[39m[33m,[39m [33mCardContent[39m[33m,[39m [33mCardHeader[39m[33m,[39m [33mCardTitle[39m } [36mfrom[39m [32m'@/components/ui/Card'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mLoader2[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 13 |[39m [36mimport[39m { validatePhoneNumber[33m,[39m normalizePhoneNumber } [36mfrom[39m [32m'@/lib/form-validation'[39m[33m;[39m
+                                    [90m 14 |[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/speaker/propose-talk/page.tsx:13:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 11 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mLightbulb[39m[33m,[39m [33mUsers[39m[33m,[39m [33mClock[39m[33m,[39m [33mWrench[39m[33m,[39m [33mFileText[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mAlertCircle[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 13 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 15 |[39m [36mimport[39m [33mLastThursdaySelector[39m [36mfrom[39m [32m'@/components/speaker/LastThursdaySelector'[39m[33m;[39m
+                                    [90m 16 |[39m [36mimport[39m { dateToISO } [36mfrom[39m [32m'@/lib/date-utils'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/speaker/propose-talk/page.tsx:13:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 11 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mLightbulb[39m[33m,[39m [33mUsers[39m[33m,[39m [33mClock[39m[33m,[39m [33mWrench[39m[33m,[39m [33mFileText[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mAlertCircle[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 13 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 15 |[39m [36mimport[39m [33mLastThursdaySelector[39m [36mfrom[39m [32m'@/components/speaker/LastThursdaySelector'[39m[33m;[39m
+                                    [90m 16 |[39m [36mimport[39m { dateToISO } [36mfrom[39m [32m'@/lib/date-utils'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/speaker/propose-talk/page.tsx:13:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 11 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mLightbulb[39m[33m,[39m [33mUsers[39m[33m,[39m [33mClock[39m[33m,[39m [33mWrench[39m[33m,[39m [33mFileText[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mAlertCircle[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 13 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 15 |[39m [36mimport[39m [33mLastThursdaySelector[39m [36mfrom[39m [32m'@/components/speaker/LastThursdaySelector'[39m[33m;[39m
+                                    [90m 16 |[39m [36mimport[39m { dateToISO } [36mfrom[39m [32m'@/lib/date-utils'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/app/speaker/propose-talk/page.tsx:13:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m 11 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mLightbulb[39m[33m,[39m [33mUsers[39m[33m,[39m [33mClock[39m[33m,[39m [33mWrench[39m[33m,[39m [33mFileText[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mAlertCircle[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m 13 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 14 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 15 |[39m [36mimport[39m [33mLastThursdaySelector[39m [36mfrom[39m [32m'@/components/speaker/LastThursdaySelector'[39m[33m;[39m
+                                    [90m 16 |[39m [36mimport[39m { dateToISO } [36mfrom[39m [32m'@/lib/date-utils'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/CreateEventModal.tsx:9:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  7 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mUsers[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  9 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 11 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m [33mCoverImageUpload[39m [36mfrom[39m [32m'@/components/common/CoverImageUpload'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/CreateEventModal.tsx:9:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  7 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mUsers[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  9 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 11 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m [33mCoverImageUpload[39m [36mfrom[39m [32m'@/components/common/CoverImageUpload'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/CreateEventModal.tsx:9:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  7 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mUsers[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  9 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 11 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m [33mCoverImageUpload[39m [36mfrom[39m [32m'@/components/common/CoverImageUpload'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/CreateEventModal.tsx:9:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  7 |[39m [36mimport[39m { [33mLoader2[39m[33m,[39m [33mCalendar[39m[33m,[39m [33mUsers[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  9 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m 11 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 12 |[39m [36mimport[39m [33mCoverImageUpload[39m [36mfrom[39m [32m'@/components/common/CoverImageUpload'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/common/CoverImageUpload.tsx:8:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  6 |[39m [36mimport[39m { optimizeImage[33m,[39m validateImageFile[33m,[39m createImagePreview[33m,[39m revokeImagePreview } [36mfrom[39m [32m'@/lib/image-optimizer'[39m[33m;[39m
+                                    [90m  7 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  9 |[39m
+                                    [90m 10 |[39m [90m/**[39m
+                                    [90m 11 |[39m [90m * 📸 CoverImageUpload - Componente reutilizable para subir imágenes de portada[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/common/CoverImageUpload.tsx:8:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  6 |[39m [36mimport[39m { optimizeImage[33m,[39m validateImageFile[33m,[39m createImagePreview[33m,[39m revokeImagePreview } [36mfrom[39m [32m'@/lib/image-optimizer'[39m[33m;[39m
+                                    [90m  7 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  9 |[39m
+                                    [90m 10 |[39m [90m/**[39m
+                                    [90m 11 |[39m [90m * 📸 CoverImageUpload - Componente reutilizable para subir imágenes de portada[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/common/CoverImageUpload.tsx:8:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  6 |[39m [36mimport[39m { optimizeImage[33m,[39m validateImageFile[33m,[39m createImagePreview[33m,[39m revokeImagePreview } [36mfrom[39m [32m'@/lib/image-optimizer'[39m[33m;[39m
+                                    [90m  7 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  9 |[39m
+                                    [90m 10 |[39m [90m/**[39m
+                                    [90m 11 |[39m [90m * 📸 CoverImageUpload - Componente reutilizable para subir imágenes de portada[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/common/CoverImageUpload.tsx:8:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  6 |[39m [36mimport[39m { optimizeImage[33m,[39m validateImageFile[33m,[39m createImagePreview[33m,[39m revokeImagePreview } [36mfrom[39m [32m'@/lib/image-optimizer'[39m[33m;[39m
+                                    [90m  7 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  9 |[39m
+                                    [90m 10 |[39m [90m/**[39m
+                                    [90m 11 |[39m [90m * 📸 CoverImageUpload - Componente reutilizable para subir imágenes de portada[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/profile/ProfessionalProfileForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/profile/ProfessionalProfileForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/profile/ProfessionalProfileForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/profile/ProfessionalProfileForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/SpeakerProfileEditor.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/SpeakerProfileEditor.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/SpeakerProfileEditor.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/SpeakerProfileEditor.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { getUrl } [36mfrom[39m [32m'aws-amplify/storage'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+2025-12-31T08:09:40.636Z [WARNING]: [1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m {
+                                    [90m 10 |[39m   uploadSpeakerPhoto[33m,[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mEXPERTISE_AREAS[39m[33m,[39m formatFileSize[33m,[39m prepareSpeakerPhoto[33m,[39m prepareSpeakerCV[33m,[39m commitSpeakerPhoto[33m,[39m commitSpeakerCV[33m,[39m deleteSpeakerFile[33m,[39m type [33mPreparedFile[39m } [36mfrom[39m [32m'@/lib/speaker-uploads'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mEXPERTISE_AREAS[39m[33m,[39m formatFileSize[33m,[39m prepareSpeakerPhoto[33m,[39m prepareSpeakerCV[33m,[39m commitSpeakerPhoto[33m,[39m commitSpeakerCV[33m,[39m deleteSpeakerFile[33m,[39m type [33mPreparedFile[39m } [36mfrom[39m [32m'@/lib/speaker-uploads'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mEXPERTISE_AREAS[39m[33m,[39m formatFileSize[33m,[39m prepareSpeakerPhoto[33m,[39m prepareSpeakerCV[33m,[39m commitSpeakerPhoto[33m,[39m commitSpeakerCV[33m,[39m deleteSpeakerFile[33m,[39m type [33mPreparedFile[39m } [36mfrom[39m [32m'@/lib/speaker-uploads'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    ./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1
+                                    Module not found: Can't resolve '@/components/ui/Label'
+                                    [0m [90m  5 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/Button'[39m[33m;[39m
+                                    [90m  6 |[39m [36mimport[39m { [33mInput[39m } [36mfrom[39m [32m'@/components/ui/Input'[39m[33m;[39m
+                                    [31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { [33mLabel[39m } [36mfrom[39m [32m'@/components/ui/Label'[39m[33m;[39m
+                                    [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+                                    [90m  8 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/Textarea'[39m[33m;[39m
+                                    [90m  9 |[39m [36mimport[39m [33mDateSelector[39m [36mfrom[39m [32m'@/components/common/DateSelector'[39m[33m;[39m
+                                    [90m 10 |[39m [36mimport[39m { [33mEXPERTISE_AREAS[39m[33m,[39m formatFileSize[33m,[39m prepareSpeakerPhoto[33m,[39m prepareSpeakerCV[33m,[39m commitSpeakerPhoto[33m,[39m commitSpeakerCV[33m,[39m deleteSpeakerFile[33m,[39m type [33mPreparedFile[39m } [36mfrom[39m [32m'@/lib/speaker-uploads'[39m[33m;[39m[0m
+                                    Import map: aliased to relative './src/components/ui/Label' inside of [project]/
+                                    https://nextjs.org/docs/messages/module-not-found
+                                    at <unknown> (./src/components/admin/SpeakerApplicationDetail.tsx:30:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/admin/SpeakerApplicationDetail.tsx:30:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/admin/SpeakerApplicationDetail.tsx:30:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/admin/SpeakerApplicationDetail.tsx:30:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/events/new/page.tsx:15:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/events/new/page.tsx:15:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/events/new/page.tsx:15:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/events/new/page.tsx:15:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/talk-proposals/page.tsx:10:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/talk-proposals/page.tsx:10:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/talk-proposals/page.tsx:10:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/admin/talk-proposals/page.tsx:10:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/onboarding/page.tsx:11:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/onboarding/page.tsx:11:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/onboarding/page.tsx:11:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/onboarding/page.tsx:11:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/speaker/propose-talk/page.tsx:13:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/speaker/propose-talk/page.tsx:13:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/speaker/propose-talk/page.tsx:13:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/app/speaker/propose-talk/page.tsx:13:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/CreateEventModal.tsx:9:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/CreateEventModal.tsx:9:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/CreateEventModal.tsx:9:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/CreateEventModal.tsx:9:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/common/CoverImageUpload.tsx:8:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/common/CoverImageUpload.tsx:8:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/common/CoverImageUpload.tsx:8:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/common/CoverImageUpload.tsx:8:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/profile/ProfessionalProfileForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/profile/ProfessionalProfileForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/profile/ProfessionalProfileForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/profile/ProfessionalProfileForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/SpeakerProfileEditor.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/SpeakerProfileEditor.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/SpeakerProfileEditor.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/SpeakerProfileEditor.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+                                    at <unknown> (./src/components/speaker/UnifiedSpeakerProposalForm.tsx:7:1)
+                                    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2025-12-31T08:09:40.654Z [ERROR]: !!! Build failed
+2025-12-31T08:09:40.654Z [INFO]: Please read more about Amplify Hosting's support for SSR frameworks to find if your build failure is related to an unsupported feature: https://docs.aws.amazon.com/amplify/latest/userguide/amplify-ssr-framework-support.html. You may also find this troubleshooting guide useful: https://docs.aws.amazon.com/amplify/latest/userguide/troubleshooting-ssr-deployment.html
+2025-12-31T08:09:40.654Z [ERROR]: !!! Error: Command failed with exit code 1
+2025-12-31T08:09:40.654Z [INFO]: # Starting environment caching...
+2025-12-31T08:09:40.655Z [INFO]: # Environment caching completed
+

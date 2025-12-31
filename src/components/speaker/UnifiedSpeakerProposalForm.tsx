@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { User, Briefcase, Lightbulb, Calendar, FileText, Upload, LinkIcon, Check, Loader2, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
+import { Label } from '@/components/ui';
 import { Textarea } from '@/components/ui/Textarea';
 import DateSelector from '@/components/common/DateSelector';
 import { EXPERTISE_AREAS, formatFileSize, prepareSpeakerPhoto, prepareSpeakerCV, commitSpeakerPhoto, commitSpeakerCV, deleteSpeakerFile, type PreparedFile } from '@/lib/speaker-uploads';
