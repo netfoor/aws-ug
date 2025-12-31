@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Briefcase, Upload, FileText, Link as LinkIcon, Loader2, Check, AlertCircle } from 'lucide-react';
 import { getUrl } from 'aws-amplify/storage';
 import { Button } from '@/components/ui/Button';
-import Label from '@/components/ui/Label';
+import Label from '@/components/ui/label';
 import { Input } from '@/components/ui/Input';
 import {
   uploadSpeakerPhoto,
