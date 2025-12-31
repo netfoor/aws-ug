@@ -464,23 +464,21 @@ async function sendApprovalEmail(email: string, userName: string): Promise<void>
                         </tr>
                       </tbody>
                     </table>
-                    <table
-                      align="center"
-                      width="100%"
-                      border="0"
-                      cellpadding="0"
-                      cellspacing="0"
-                      role="presentation"
-                      style="padding:64px 0;position:relative;overflow:hidden">
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div
-                              style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url(https://images.foor.dev/pueblabg.png);background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0.2;z-index:1"></div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                            <tr>
+                              <td align="center">
+                                <img
+                                  src="https://images.foor.dev/pueblabg.png"
+                                  alt="Puebla"
+                                  width="600"
+                                  style="display:block;
+                                        width:100%;
+                                        max-width:600px;
+                                        opacity:0.2;"
+                                />
+                              </td>
+                            </tr>
+                          </table>
                     <div class="text-center">
                       <p
                         style="font-size:12px;line-height:24px;color:#000000;font-family:-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, &#x27;Roboto&#x27;, &#x27;Oxygen&#x27;, &#x27;Ubuntu&#x27;, &#x27;Cantarell&#x27;, &#x27;Fira Sans&#x27;, &#x27;Droid Sans&#x27;, &#x27;Helvetica Neue&#x27;, sans-serif;text-align:center;margin-top:48px;position:relative;z-index:10;margin-bottom:16px">

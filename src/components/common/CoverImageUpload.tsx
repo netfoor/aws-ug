@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useCallback, useImperativeHandle, forwardRef, useEffect } from 'react';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
-import { uploadData } from 'aws-amplify/storage';
+import { uploadData, getUrl } from 'aws-amplify/storage';
 import { optimizeImage, validateImageFile, createImagePreview, revokeImagePreview } from '@/lib/image-optimizer';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
@@ -87,7 +87,8 @@ const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(
   quality = 0.85,
 }, ref) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [signedUrl, setSignedUrl] = useState<string | undefined>(undefined);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -117,6 +118,30 @@ const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(
       }
     };
   }, [previewUrl, currentImageUrl]);
+
+  // Cargar URL firmada cuando currentImageUrl cambie
+  useEffect(() => {
+    const loadSignedUrl = async () => {
+      if (currentImageUrl && !currentImageUrl.startsWith('blob:') && !currentImageUrl.startsWith('http')) {
+        try {
+          const urlResult = await getUrl({
+            path: currentImageUrl,
+            options: {
+              expiresIn: 3600, // 1 hour
+            },
+          });
+          setSignedUrl(urlResult.url.toString());
+        } catch (err) {
+          console.warn('Error loading signed URL for current image:', err);
+          setSignedUrl(undefined);
+        }
+      } else {
+        setSignedUrl(currentImageUrl || undefined);
+      }
+    };
+
+    loadSignedUrl();
+  }, [currentImageUrl]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -225,18 +250,19 @@ const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(
   };
 
   const handleRemove = useCallback(() => {
-    if (previewUrl && previewUrl !== currentImageUrl) {
+    if (previewUrl && previewUrl !== signedUrl) {
       revokeImagePreview(previewUrl);
     }
-    setPreviewUrl(currentImageUrl || null);
+    setPreviewUrl(null);
+    setSignedUrl(currentImageUrl || undefined);
     setSelectedFile(null);
     setError(null);
     setUploadProgress(0);
     onImageRemoved?.();
-  }, [previewUrl, currentImageUrl, onImageRemoved]);
+  }, [previewUrl, signedUrl, currentImageUrl, onImageRemoved]);
 
   const isProcessing = isOptimizing || isUploading;
-  const hasPreview = !!previewUrl;
+  const hasPreview = !!previewUrl || !!signedUrl;
   const showUploadButton = !autoUpload && selectedFile && !isUploading;
 
   // ========================================
@@ -249,7 +275,7 @@ const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(
           <div className="relative group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={previewUrl}
+              src={previewUrl || signedUrl || ''}
               alt="Preview"
               className="w-full h-32 object-cover rounded-lg border border-border"
             />
@@ -383,7 +409,7 @@ const CoverImageUpload = forwardRef<CoverImageUploadRef, CoverImageUploadProps>(
         <div className="relative group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={previewUrl}
+            src={previewUrl || signedUrl || ''}
             alt="Cover preview"
             className="w-full h-64 object-cover rounded-lg border border-border"
           />

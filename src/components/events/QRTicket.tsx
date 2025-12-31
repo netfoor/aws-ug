@@ -198,61 +198,92 @@ export default function QRTicket({
     if (!canvasRef.current || !qrGenerated) return;
 
     try {
-      // Crear un canvas más grande para la descarga con información adicional
+      // Crear un canvas más grande para la descarga
       const downloadCanvas = document.createElement('canvas');
       const ctx = downloadCanvas.getContext('2d');
       if (!ctx) return;
 
-      // Configurar el canvas de descarga (más grande para incluir texto)
-      const padding = 40;
-      const qrSize = 300;
-      const textHeight = 200;
-      downloadCanvas.width = qrSize + (padding * 2);
-      downloadCanvas.height = qrSize + textHeight + (padding * 2);
+      // Configurar el canvas de descarga
+      downloadCanvas.width = 800;
+      downloadCanvas.height = 1200;
 
-      // Fondo blanco
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, downloadCanvas.width, downloadCanvas.height);
+      // Función para dividir texto en líneas si es largo
+      const wrapText = (text: string, maxWidth: number, font: string) => {
+        ctx.font = font;
+        const words = text.split(' ');
+        const lines: string[] = [];
+        let currentLine = '';
 
-      // Dibujar el QR code
-      ctx.drawImage(canvasRef.current, padding, padding, qrSize, qrSize);
-
-      // Configurar texto
-      ctx.fillStyle = '#000000';
-      ctx.textAlign = 'center';
-
-      // Título del evento
-      ctx.font = 'bold 18px Arial';
-      ctx.fillText(eventTitle, downloadCanvas.width / 2, qrSize + padding + 30);
-
-      // Información del evento
-      ctx.font = '14px Arial';
-      const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-MX', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        });
+        for (const word of words) {
+          const testLine = currentLine + (currentLine ? ' ' : '') + word;
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        lines.push(currentLine);
+        return lines;
       };
 
-      ctx.fillText(`📅 ${formatDate(eventDate)}`, downloadCanvas.width / 2, qrSize + padding + 55);
-      ctx.fillText(`📍 ${eventLocation}`, downloadCanvas.width / 2, qrSize + padding + 75);
-      ctx.fillText(`👤 ${userName}`, downloadCanvas.width / 2, qrSize + padding + 95);
+      // Cargar la plantilla de Canva
+      const templateImage = new Image();
+      templateImage.src = '/qr/ticket-template.png';
+      templateImage.onload = () => {
+        // Dibujar la plantilla como fondo
+        ctx.drawImage(templateImage, 0, 0, downloadCanvas.width, downloadCanvas.height);
 
-      // Instrucciones
-      ctx.font = '12px Arial';
-      ctx.fillStyle = '#666666';
-      ctx.fillText('Presenta este código en el evento para hacer check-in', downloadCanvas.width / 2, qrSize + padding + 120);
+        // Dibujar el QR code
+        if (!canvasRef.current) return;
+        ctx.drawImage(canvasRef.current, 150, 225, 500, 500);
 
-      // Descargar la imagen
-      const link = document.createElement('a');
-      link.download = `ticket-${eventTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`;
-      link.href = downloadCanvas.toDataURL('image/png');
-      link.click();
+        // Configurar texto
+        ctx.fillStyle = '#071637';
+        ctx.textAlign = 'center';
+
+        // Título del evento (con wrapping)
+        const titleLines = wrapText(eventTitle, 600, 'bold 24px Arial');
+        let yPos = 775;
+        titleLines.forEach(line => {
+          ctx.font = 'bold 24px Arial';
+          ctx.fillText(line, downloadCanvas.width / 2, yPos);
+          yPos += 30; // Espacio entre líneas
+        });
+
+        // Información del evento
+        ctx.font = '16px Arial';
+        const formatDate = (dateString: string) => {
+          const date = new Date(dateString);
+          return date.toLocaleDateString('es-MX', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+        };
+
+        ctx.fillText(formatDate(eventDate), downloadCanvas.width / 2, yPos + 30);
+        ctx.fillText(eventLocation, downloadCanvas.width / 2, yPos + 60);
+        ctx.fillText(userName, downloadCanvas.width / 2, yPos + 90);
+
+        // Instrucciones
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#666666';
+        ctx.fillText('Presenta este código en el evento para hacer check-in', downloadCanvas.width / 2, yPos + 140);
+
+        // Descargar la imagen
+        const link = document.createElement('a');
+        link.download = `ticket-${eventTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`;
+        link.href = downloadCanvas.toDataURL('image/png');
+        link.click();
+      };
+      templateImage.onerror = () => {
+        console.error('Error loading template image');
+      };
     } catch (err) {
       console.error('Error downloading QR code:', err);
     }

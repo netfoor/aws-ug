@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Briefcase, Upload, FileText, Link as LinkIcon, Loader2, Check } from 'lucide-react';
+import { getUrl } from 'aws-amplify/storage';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
@@ -44,6 +45,7 @@ export default function ProfessionalProfileForm({
   // Estado de archivos
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoSignedUrl, setPhotoSignedUrl] = useState<string | undefined>(undefined);
   const [photoKey, setPhotoKey] = useState<string | undefined>(initialData?.speakerPhotoKey);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoProgress, setPhotoProgress] = useState(0);
@@ -60,6 +62,30 @@ export default function ProfessionalProfileForm({
   // Estado general
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Cargar URL firmada cuando photoKey cambie
+  useEffect(() => {
+    const loadPhotoSignedUrl = async () => {
+      if (photoKey) {
+        try {
+          const urlResult = await getUrl({
+            path: photoKey,
+            options: {
+              expiresIn: 3600, // 1 hour
+            },
+          });
+          setPhotoSignedUrl(urlResult.url.toString());
+        } catch (err) {
+          console.warn('Error loading signed URL for photo:', err);
+          setPhotoSignedUrl(undefined);
+        }
+      } else {
+        setPhotoSignedUrl(undefined);
+      }
+    };
+
+    loadPhotoSignedUrl();
+  }, [photoKey]);
 
   // Handler para foto
   async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -206,11 +232,11 @@ export default function ProfessionalProfileForm({
         <div className="flex flex-col sm:flex-row sm:items-start gap-4">
           {/* Preview */}
           <div className="flex-shrink-0 mx-auto sm:mx-0">
-            {photoPreview ? (
+            {photoPreview || photoSignedUrl ? (
               <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-accent">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={photoPreview}
+                  src={photoPreview || photoSignedUrl}
                   alt="Preview"
                   className="w-full h-full object-cover"
                 />
