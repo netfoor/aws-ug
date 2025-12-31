@@ -20,11 +20,13 @@ export const auth = defineAuth({
         'https://sandbox.foor.dev/auth/callback',
         'https://awspuebla.com/auth/callback',
         'http://localhost:3000/auth/callback',
+        'https://awspuebla.foor.dev/auth/callback',
       ],
       logoutUrls: [
         'https://sandbox.foor.dev/',
         'https://awspuebla.com/',
         'http://localhost:3000/',
+        'https://awspuebla.foor.dev/',
       ],
     }
   },
