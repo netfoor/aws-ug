@@ -2,38 +2,38 @@
 
 A production-ready authentication platform built with Next.js 15, AWS Amplify Gen 2, and Amazon Cognito. Features Google OAuth integration, advanced security measures, and performance optimizations.
 
-## 📖 Setup Guide
+## Setup Guide
 
 **For detailed step-by-step onboarding, including complete configuration, troubleshooting, and system exploration, see:**
 
-👉 **[GUIA_CONFIGURACION.md](./GUIA_CONFIGURACION.md)** - Complete setup and system tour guide
+**[GUIA_CONFIGURACION.md](./GUIA_CONFIGURACION.md)** - Complete setup and system tour guide
 
 ---
 
-## 🚀 Features
+## Features
 
 ### Authentication & Security
-- ✅ **Google OAuth 2.0** integration via Amazon Cognito
-- ✅ **Multi-Factor Authentication (MFA)** support (TOTP & SMS)
-- ✅ **CSRF Protection** for all state-changing operations
-- ✅ **Rate Limiting** (100 req/min general, 10 req/15min login)
-- ✅ **Secure Headers** (X-Frame-Options, CSP, etc.)
-- ✅ **Token Management** with automatic rotation
+- **Google OAuth 2.0** integration via Amazon Cognito
+- **Multi-Factor Authentication (MFA)** support (TOTP & SMS)
+- **CSRF Protection** for all state-changing operations
+- **Rate Limiting** (100 req/min general, 10 req/15min login)
+- **Secure Headers** (X-Frame-Options, CSP, etc.)
+- **Token Management** with automatic rotation
 
-### Performance Optimizations ⚡
-- ✅ **Debouncing** (300ms) for window focus events
-- ✅ **In-Memory Caching** (5s TTL) to reduce API calls by 80%
-- ✅ **Request Deduplication** to prevent concurrent API calls
-- ✅ **Function Memoization** with React.useCallback
-- ✅ **useRef-based caching** to avoid unnecessary re-renders
+### Performance Optimizations
+- **Debouncing** (300ms) for window focus events
+- **In-Memory Caching** (5s TTL) to reduce API calls by 80%
+- **Request Deduplication** to prevent concurrent API calls
+- **Function Memoization** with React.useCallback
+- **useRef-based caching** to avoid unnecessary re-renders
 
 ### Testing & Quality
-- ✅ **95/95 tests passing** (100% success rate)
-- ✅ **~85% code coverage**
-- ✅ **Unit tests** for all core modules (Jest + React Testing Library)
-- ✅ **E2E tests** with Playwright (coming soon)
+- **95/95 tests passing** (100% success rate)
+- **~85% code coverage**
+- **Unit tests** for all core modules (Jest + React Testing Library)
+- **E2E tests** with Playwright (coming soon)
 
-## 📊 Performance Metrics
+## Performance Metrics
 
 | Metric | Before Optimization | After Optimization | Improvement |
 |--------|-------------------|-------------------|-------------|
@@ -41,7 +41,7 @@ A production-ready authentication platform built with Next.js 15, AWS Amplify Ge
 | Cache hit rate | 0% | 75% | **+75%** |
 | Unnecessary re-renders | ~15/min | ~3/min | **80% ↓** |
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js 15.1.7 (App Router)
 - **Authentication**: AWS Amplify Gen 2
@@ -51,7 +51,7 @@ A production-ready authentication platform built with Next.js 15, AWS Amplify Ge
 - **Testing**: Jest, React Testing Library, Playwright
 - **Language**: TypeScript 5.x
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 aws-ug/
@@ -84,7 +84,7 @@ aws-ug/
     └── testing/                # Testing guides
 ```
 
-## 🚦 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -202,7 +202,7 @@ aws-ug/
 - `npm run lint` - Run ESLint
 - `npm run validate` - Validate configuration files
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Build Issues
 
@@ -250,7 +250,7 @@ npm run test:coverage
 npm run test:e2e
 ```
 
-## 🔐 Authentication Flow
+## Authentication Flow
 
 ```mermaid
 sequenceDiagram
@@ -271,7 +271,7 @@ sequenceDiagram
     App->>User: Redirect to /dashboard
 ```
 
-## 📚 Documentation
+## Documentation
 
 - **[AUTHENTICATION.md](./docs/AUTHENTICATION.md)** - Complete authentication architecture guide
   - Authentication flow diagrams
@@ -284,7 +284,7 @@ sequenceDiagram
 - **[Security Documentation](./docs/security/)** - Security best practices and implementation
 - **[Testing Guide](./docs/testing/)** - Testing strategy and patterns
 
-## 🧪 Testing
+## Testing
 
 ### Unit Tests (95 tests)
 
@@ -311,7 +311,7 @@ New E2E tests will replace the legacy tests in `__tests__/paused-e2e/` and will 
 - CSRF validation
 - Error handling and edge cases
 
-## 🏗️ Architecture
+## Architecture
 
 ### Authentication Context (Optimized)
 
@@ -342,7 +342,7 @@ The `AuthContext` provides global authentication state with advanced optimizatio
 - `GET /api/auth/csrf` - Generate CSRF token
 - `POST /api/auth/logout` - Logout user (with CSRF validation)
 
-## 🔧 Configuration
+## Configuration
 
 ### Amplify Backend
 
@@ -367,7 +367,7 @@ export const auth = defineAuth({
 });
 ```
 
-## 📈 Roadmap
+## Roadmap
 
 ### Phase 5: E2E Testing (Next)
 - [ ] Remove legacy E2E tests
@@ -382,7 +382,7 @@ export const auth = defineAuth({
 - [ ] Remember me functionality
 - [ ] Multi-device session management
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -390,11 +390,11 @@ export const auth = defineAuth({
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [AWS Amplify Gen 2](https://docs.amplify.aws/)
